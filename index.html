@@ -399,7 +399,64 @@
 
             /* =====================================================
                2. 배경지도
+               - VWorld 일반지도
+               - VWorld 영상지도
+               - VWorld 영상 + 지명
+               - OpenStreetMap
             ===================================================== */
+
+            const VWORLD_API_KEY =
+                "6476C315-830A-3C00-9E28-033BD2561DAF";
+
+            /*
+             * VWorld WMTS 공식 요청 형식
+             * /{key}/{layer}/{z}/{y}/{x}.확장자
+             */
+            const vworldBaseLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Base/{z}/{y}/{x}.png`,
+                {
+                    minZoom: 6,
+                    maxZoom: 19,
+                    tileSize: 256,
+                    attribution: "&copy; VWorld"
+                }
+            );
+
+            const vworldSatelliteLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
+                {
+                    minZoom: 6,
+                    maxZoom: 19,
+                    tileSize: 256,
+                    attribution: "&copy; VWorld"
+                }
+            );
+
+            const vworldSatelliteForHybrid = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
+                {
+                    minZoom: 6,
+                    maxZoom: 19,
+                    tileSize: 256,
+                    attribution: "&copy; VWorld"
+                }
+            );
+
+            const vworldHybridLabelLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Hybrid/{z}/{y}/{x}.png`,
+                {
+                    minZoom: 6,
+                    maxZoom: 19,
+                    tileSize: 256,
+                    attribution: "&copy; VWorld"
+                }
+            );
+
+            const vworldSatelliteHybridLayer = L.layerGroup([
+                vworldSatelliteForHybrid,
+                vworldHybridLabelLayer
+            ]);
+
             const osmLayer = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
@@ -408,22 +465,17 @@
                 }
             );
 
-            const cartoLightLayer = L.tileLayer(
-                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-                {
-                    maxZoom: 20,
-                    subdomains: "abcd",
-                    attribution:
-                        "&copy; OpenStreetMap contributors &copy; CARTO"
-                }
-            );
-
-            osmLayer.addTo(map);
+            /*
+             * 기본 배경지도는 VWorld 일반지도입니다.
+             */
+            vworldBaseLayer.addTo(map);
 
             L.control.layers(
                 {
-                    "OpenStreetMap": osmLayer,
-                    "밝은 배경지도": cartoLightLayer
+                    "VWorld 일반지도": vworldBaseLayer,
+                    "VWorld 영상지도": vworldSatelliteLayer,
+                    "VWorld 영상 + 지명": vworldSatelliteHybridLayer,
+                    "OpenStreetMap": osmLayer
                 },
                 {},
                 {
@@ -431,6 +483,7 @@
                     collapsed: true
                 }
             ).addTo(map);
+
 
             /* =====================================================
                3. 스케일바
@@ -571,7 +624,7 @@
                     );
 
                     scenarioInfo.innerHTML =
-                        "Leaflet 기본지도와 스케일바가 실행되었습니다.<br>" +
+                        "VWorld 배경지도와 스케일바가 실행되었습니다.<br>" +
                         "다음 단계는 경상북도 경계 GeoJSON을 추가하는 것입니다.";
                 });
 
