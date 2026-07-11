@@ -3,55 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>경상북도 TRIGRS WebGIS - 배포 테스트</title>
+    <title>경상북도 TRIGRS WebGIS</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+
     <style>
+        * { box-sizing: border-box; }
         html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: "Malgun Gothic", sans-serif;
-            background: #eef3f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%; height: 100%; margin: 0;
+            font-family: "Malgun Gothic", "Noto Sans KR", sans-serif;
+            overflow: hidden;
         }
-        .container {
-            padding: 40px;
-            text-align: center;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            max-width: 500px;
+        #header {
+            height: 76px; padding: 10px 18px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 20px; color: #fff; background: #17324d;
+            position: relative; z-index: 1000;
         }
-        h1 {
-            margin-top: 0;
-            color: #17324d;
-            font-size: 28px;
+        #header h1 { margin: 0 0 4px; font-size: 22px; }
+        #header p { margin: 0; font-size: 13px; opacity: 0.85; }
+        .controls { display: flex; align-items: center; gap: 8px; }
+        .controls label { font-size: 14px; font-weight: 700; white-space: nowrap; }
+        #scenario-select {
+            min-width: 205px; padding: 9px 10px;
+            border: 1px solid #d0d7de; border-radius: 6px;
+            background: #fff; font-size: 14px;
         }
-        p {
-            color: #444;
-            font-size: 16px;
-            line-height: 1.6;
+        #map { width: 100%; height: calc(100% - 76px); background: #e8eef3; }
+        #info-panel, #legend {
+            position: absolute; right: 16px; z-index: 900;
+            width: 245px; padding: 13px; border-radius: 8px;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 2px 9px rgba(0,0,0,0.24);
+            font-size: 13px; line-height: 1.6;
         }
-        .status-badge {
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
+        #info-panel { top: 92px; }
+        #info-panel strong, .legend-title { font-size: 14px; }
+        #scenario-info { margin: 7px 0 0; }
+        #legend { bottom: 24px; }
+        .legend-title { margin-bottom: 6px; font-weight: 700; }
+        .legend-row { display: flex; align-items: center; gap: 7px; }
+        .legend-color {
+            width: 19px; height: 12px;
+            border: 1px solid rgba(0,0,0,0.3);
+            flex: 0 0 auto;
+        }
+        .fs1 { background: #d7191c; }
+        .fs2 { background: #fdae61; }
+        .fs3 { background: #ffff66; }
+        .fs4 { background: #a6d96a; }
+        .fs5 { background: #1a9641; }
+        @media (max-width: 720px) {
+            #header { height: 118px; display: block; padding: 9px 12px; }
+            #header h1 { font-size: 18px; }
+            .controls { margin-top: 10px; }
+            #scenario-select { width: 100%; min-width: 0; }
+            #map { height: calc(100% - 118px); }
+            #info-panel { top: 130px; right: 10px; width: 215px; }
+            #legend { right: 10px; bottom: 20px; width: 175px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>경상북도 TRIGRS WebGIS</h1>
-        <p><b>🎉 GitHub Pages 신규 배포 성공!</b></p>
-        <p>저장소와 웹서버가 충돌 없이 완전히 새롭게 연결되었습니다. 이제 본 작업(Leaflet 지도 구현 및 타일 업로드)을 시작하실 수 있습니다.</p>
-        <div class="status-badge">System Active</div>
-    </div>
+    <header id="header">
+        <div>
+            <h1>경상북도 TRIGRS 산사태 위험 WebGIS</h1>
+            <p>누적강우 시나리오별 사면안전율(FS) 분석</p>
+        </div>
+        <div class="controls">
+            <label for="scenario-select">강우 시나리오</label>
+            <select id="scenario-select">
+                <option value="">선택</option>
+                <option value="12">12시간 / 50 mm</option>
+                <option value="24">24시간 / 100 mm</option>
+                <option value="36">36시간 / 150 mm</option>
+                <option value="48">48시간 / 200 mm</option>
+                <option value="60">60시간 / 250 mm</option>
+                <option value="72">72시간 / 300 mm</option>
+            </select>
+        </div>
+    </header>
+
+    <div id="map"></div>
+
+    <section id="info-panel">
+        <strong>분석정보</strong>
+        <p id="scenario-info">
+            Leaflet 기본지도가 실행되었습니다.<br>
+            다음 단계는 경상북도 경계 GeoJSON을 추가하는 것입니다.
+        </p>
+    </section>
+
+    <section id="legend">
+        <div class="legend-title">안전율 FS</div>
+        <div class="legend-row"><span class="legend-color fs1"></span>FS &lt; 1.0</div>
+        <div class="legend-row"><span class="legend-color fs2"></span>1.0 ≤ FS &lt; 1.2</div>
+        <div class="legend-row"><span class="legend-color fs3"></span>1.2 ≤ FS &lt; 1.3</div>
+        <div class="legend-row"><span class="legend-color fs4"></span>1.3 ≤ FS &lt; 1.5</div>
+        <div class="legend-row"><span class="legend-color fs5"></span>FS ≥ 1.5</div>
+    </section>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9coqIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+
+    <script>
+        "use strict";
+
+        const map = L.map("map", {
+            center: [36.35, 128.75],
+            zoom: 8,
+            minZoom: 6,
+            maxZoom: 18
+        });
+
+        const osm = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        );
+
+        const positron = L.tileLayer(
+            "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            {
+                maxZoom: 20,
+                attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+            }
+        );
+
+        osm.addTo(map);
+
+        L.control.layers(
+            { "OpenStreetMap": osm, "밝은 배경지도": positron },
+            {},
+            { position: "topleft" }
+        ).addTo(map);
+
+        L.control.scale({
+            position: "bottomleft",
+            metric: true,
+            imperial: false,
+            maxWidth: 180
+        }).addTo(map);
+
+        const scenarios = {
+            "12": { duration: 12, rainfall: 50 },
+            "24": { duration: 24, rainfall: 100 },
+            "36": { duration: 36, rainfall: 150 },
+            "48": { duration: 48, rainfall: 200 },
+            "60": { duration: 60, rainfall: 250 },
+            "72": { duration: 72, rainfall: 300 }
+        };
+
+        const scenarioSelect = document.getElementById("scenario-select");
+        const scenarioInfo = document.getElementById("scenario-info");
+
+        scenarioSelect.addEventListener("change", function () {
+            const scenario = scenarios[this.value];
+            if (!scenario) {
+                scenarioInfo.innerHTML = "강우 시나리오를 선택해 주세요.";
+                return;
+            }
+            scenarioInfo.innerHTML = `
+                <strong>${scenario.duration}시간 시나리오</strong><br>
+                누적강우량: ${scenario.rainfall} mm<br>
+                TRIGRS 결과 레이어는 다음 단계에서 연결합니다.
+            `;
+        });
+
+        /*
+         * 다음 파일을 업로드하면 경북 경계가 자동으로 표시됩니다.
+         * data/boundary/gyeongbuk.geojson
+         * GeoJSON 좌표계는 EPSG:4326이어야 합니다.
+         */
+        fetch("./data/boundary/gyeongbuk.geojson")
+            .then((response) => {
+                if (!response.ok) throw new Error(`GeoJSON HTTP ${response.status}`);
+                return response.json();
+            })
+            .then((data) => {
+                const boundaryLayer = L.geoJSON(data, {
+                    style: {
+                        color: "#222222",
+                        weight: 2,
+                        fillColor: "#ffffff",
+                        fillOpacity: 0.04
+                    },
+                    onEachFeature: (feature, layer) => {
+                        const p = feature.properties || {};
+                        const name = p.CTP_KOR_NM || p.name || p.NAME || "경상북도";
+                        layer.bindPopup(`<strong>${name}</strong>`);
+                    }
+                }).addTo(map);
+
+                if (boundaryLayer.getBounds().isValid()) {
+                    map.fitBounds(boundaryLayer.getBounds(), { padding: [15, 15] });
+                }
+
+                scenarioInfo.innerHTML = "경상북도 경계 GeoJSON을 정상적으로 불러왔습니다.";
+            })
+            .catch((error) => {
+                console.info("경계 파일은 아직 없습니다. 기본지도는 정상 작동합니다.", error);
+            });
+
+        L.popup()
+            .setLatLng([36.35, 128.75])
+            .setContent(
+                "<strong>Leaflet 기본지도 배포 성공</strong><br>" +
+                "다음 단계: 경북 경계 GeoJSON 추가"
+            )
+            .openOn(map);
+
+        window.addEventListener("load", () => {
+            setTimeout(() => map.invalidateSize(), 150);
+        });
+    </script>
 </body>
 </html>
