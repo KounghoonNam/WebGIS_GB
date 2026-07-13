@@ -315,6 +315,40 @@
             cursor: pointer;
         }
 
+
+        /* 시군구 + 읍면동 통합 툴팁 */
+        .admin-area-tooltip {
+            min-width: 125px;
+            padding: 7px 9px;
+
+            color: #1f2937;
+            background: rgba(255, 255, 255, 0.97);
+
+            border: 1px solid #4b5563;
+            border-radius: 5px;
+
+            font-size: 12px;
+            line-height: 1.45;
+            text-align: center;
+
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
+        }
+
+        .admin-area-tooltip::before {
+            border-top-color: #4b5563 !important;
+        }
+
+        .admin-tooltip-sigungu {
+            color: #174a7e;
+            font-weight: 700;
+        }
+
+        .admin-tooltip-emd {
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
         /* =========================================================
            6. 스케일바 강조
         ========================================================= */
@@ -1294,6 +1328,38 @@
                         "다음 단계는 경상북도 경계 GeoJSON을 추가하는 것입니다.";
                 });
 
+            /*
+             * 읍면동 GeoJSON의 COL_ADM_SE 코드에 대응하는
+             * 경상북도 22개 시군구명입니다.
+             *
+             * 포항시 남구·북구의 읍면동도 COL_ADM_SE는 47110으로
+             * 통합되어 있으므로 화면에는 "포항시"로 표시합니다.
+             */
+            const gyeongbukSigunguNameByCode = {
+                "47110": "포항시",
+                "47130": "경주시",
+                "47150": "김천시",
+                "47170": "안동시",
+                "47190": "구미시",
+                "47210": "영주시",
+                "47230": "영천시",
+                "47250": "상주시",
+                "47280": "문경시",
+                "47290": "경산시",
+                "47730": "의성군",
+                "47750": "청송군",
+                "47760": "영양군",
+                "47770": "영덕군",
+                "47820": "청도군",
+                "47830": "고령군",
+                "47840": "성주군",
+                "47850": "칠곡군",
+                "47900": "예천군",
+                "47920": "봉화군",
+                "47930": "울진군",
+                "47940": "울릉군"
+            };
+
             /* =====================================================
                6. 경상북도 시군구 경계 GeoJSON
 
@@ -1374,11 +1440,16 @@
                             `);
 
                             layer.bindTooltip(
-                                escapeHtml(sigunguName),
+                                `
+                                    <span class="admin-tooltip-sigungu">
+                                        ${escapeHtml(sigunguName)}
+                                    </span>
+                                `,
                                 {
                                     sticky: true,
                                     direction: "top",
-                                    opacity: 0.95
+                                    opacity: 0.97,
+                                    className: "admin-area-tooltip"
                                 }
                             );
 
@@ -1509,18 +1580,41 @@
                                 properties.COL_ADM_SE ||
                                 "-";
 
+                            const sigunguName =
+                                gyeongbukSigunguNameByCode[
+                                    String(sigunguCode)
+                                ] ||
+                                `시군구 ${sigunguCode}`;
+
                             layer.bindPopup(`
-                                <strong>${escapeHtml(emdName)}</strong><br>
+                                <strong>
+                                    ${escapeHtml(sigunguName)}
+                                    ${escapeHtml(emdName)}
+                                </strong><br>
+                                시군구: ${escapeHtml(sigunguName)}<br>
+                                읍면동: ${escapeHtml(emdName)}<br>
                                 읍면동 코드: ${escapeHtml(emdCode)}<br>
                                 시군구 코드: ${escapeHtml(sigunguCode)}
                             `);
 
+                            /*
+                             * 읍면동 레이어에서 시군구명과 읍면동명을
+                             * 하나의 툴팁으로 동시에 표시합니다.
+                             */
                             layer.bindTooltip(
-                                escapeHtml(emdName),
+                                `
+                                    <span class="admin-tooltip-sigungu">
+                                        ${escapeHtml(sigunguName)}
+                                    </span><br>
+                                    <span class="admin-tooltip-emd">
+                                        ${escapeHtml(emdName)}
+                                    </span>
+                                `,
                                 {
                                     sticky: true,
                                     direction: "top",
-                                    opacity: 0.9
+                                    opacity: 0.97,
+                                    className: "admin-area-tooltip"
                                 }
                             );
 
@@ -1563,6 +1657,56 @@
                         emdLayer,
                         "경상북도 읍면동 경계"
                     );
+
+                    /*
+                     * 핵심 수정:
+                     *
+                     * 시군구 폴리곤은 읍면동보다 위에 있으므로,
+                     * 내부가 투명해도 마우스 이벤트를 먼저 가져갑니다.
+                     *
+                     * 읍면동 레이어가 켜질 때는 시군구 pane의
+                     * pointer-events를 none으로 바꾸어 마우스가
+                     * 읍면동 레이어까지 전달되도록 합니다.
+                     *
+                     * 읍면동 레이어를 끄면 다시 시군구 툴팁과
+                     * 클릭 기능이 작동하도록 auto로 되돌립니다.
+                     */
+                    function updateAdministrativePointerEvents() {
+                        const sigunguPane =
+                            map.getPane("sigunguPane");
+
+                        if (!sigunguPane) {
+                            return;
+                        }
+
+                        sigunguPane.style.pointerEvents =
+                            map.hasLayer(emdLayer)
+                                ? "none"
+                                : "auto";
+                    }
+
+                    map.on(
+                        "overlayadd",
+                        (event) => {
+                            if (event.layer === emdLayer) {
+                                updateAdministrativePointerEvents();
+                            }
+                        }
+                    );
+
+                    map.on(
+                        "overlayremove",
+                        (event) => {
+                            if (event.layer === emdLayer) {
+                                updateAdministrativePointerEvents();
+                            }
+                        }
+                    );
+
+                    /*
+                     * 초기 상태에도 적용합니다.
+                     */
+                    updateAdministrativePointerEvents();
 
                     /*
                      * 확대·축소할 때 선 굵기를 갱신합니다.

@@ -1,0 +1,125 @@
+{
+  "source_crs_if_missing": "EPSG:32652",
+  "tile_crs": "EPSG:3857 / WebMercatorQuad",
+  "tile_convention": "XYZ",
+  "zoom": {
+    "min": 7,
+    "max": 12
+  },
+  "classes": [
+    {
+      "label": "FS < 1.0",
+      "color": "#d7191c"
+    },
+    {
+      "label": "1.0 <= FS < 1.3",
+      "color": "#fdae61"
+    },
+    {
+      "label": "1.3 <= FS < 1.5",
+      "color": "#a6d96a"
+    },
+    {
+      "label": "FS >= 1.5",
+      "color": "#1a9641"
+    }
+  ],
+  "scenarios": {
+    "12": {
+      "duration_h": 12,
+      "rainfall_mm": 50,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_1.asc",
+      "tile_folder": "data/trigrs/12",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 8456,
+        "1.0 <= FS < 1.3": 581068,
+        "1.3 <= FS < 1.5": 1351887,
+        "FS >= 1.5": 12485507
+      }
+    },
+    "24": {
+      "duration_h": 24,
+      "rainfall_mm": 100,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_2.asc",
+      "tile_folder": "data/trigrs/24",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 47179,
+        "1.0 <= FS < 1.3": 1139323,
+        "1.3 <= FS < 1.5": 1573727,
+        "FS >= 1.5": 11666689
+      }
+    },
+    "36": {
+      "duration_h": 36,
+      "rainfall_mm": 150,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_3.asc",
+      "tile_folder": "data/trigrs/36",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 63730,
+        "1.0 <= FS < 1.3": 1704088,
+        "1.3 <= FS < 1.5": 1769244,
+        "FS >= 1.5": 10889856
+      }
+    },
+    "48": {
+      "duration_h": 48,
+      "rainfall_mm": 200,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_4.asc",
+      "tile_folder": "data/trigrs/48",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 64184,
+        "1.0 <= FS < 1.3": 2055189,
+        "1.3 <= FS < 1.5": 2028403,
+        "FS >= 1.5": 10279142
+      }
+    },
+    "60": {
+      "duration_h": 60,
+      "rainfall_mm": 250,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_5.asc",
+      "tile_folder": "data/trigrs/60",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 64184,
+        "1.0 <= FS < 1.3": 2137611,
+        "1.3 <= FS < 1.5": 2274463,
+        "FS >= 1.5": 9950660
+      }
+    },
+    "72": {
+      "duration_h": 72,
+      "rainfall_mm": 300,
+      "source": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\OUTPUT_GB_50_300mm\\TRfs_min_gb50300_6.asc",
+      "tile_folder": "data/trigrs/72",
+      "tile_count": 708,
+      "valid_cells": 14426918,
+      "fs_min": 0.8310999870300293,
+      "fs_max": 10.0,
+      "classes": {
+        "FS < 1.0": 64184,
+        "1.0 <= FS < 1.3": 2137941,
+        "1.3 <= FS < 1.5": 2324329,
+        "FS >= 1.5": 9900464
+      }
+    }
+  }
+}
