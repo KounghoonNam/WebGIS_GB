@@ -117,8 +117,111 @@
             line-height: 1.6;
         }
 
+
         /* =========================================================
-           4. 정보 패널 및 범례
+           4. 주소 및 좌표 검색 패널
+        ========================================================= */
+        #search-panel {
+            position: absolute;
+            top: 92px;
+            left: 70px;
+            z-index: 1500;
+
+            width: 390px;
+            padding: 13px;
+
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 2px 9px rgba(0, 0, 0, 0.24);
+
+            font-size: 13px;
+        }
+
+        .search-title {
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .search-row,
+        .coordinate-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        #address-input,
+        #latitude-input,
+        #longitude-input {
+            min-width: 0;
+            padding: 8px 9px;
+
+            border: 1px solid #b8c2cc;
+            border-radius: 5px;
+            background: #ffffff;
+            font-size: 13px;
+        }
+
+        #address-input {
+            flex: 1 1 auto;
+        }
+
+        #latitude-input,
+        #longitude-input {
+            width: 110px;
+            flex: 1 1 0;
+        }
+
+        #address-search-button,
+        #coordinate-search-button {
+            flex: 0 0 auto;
+            padding: 8px 11px;
+
+            color: #ffffff;
+            background: #1f5f8b;
+            border: 0;
+            border-radius: 5px;
+
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        #address-search-button:hover,
+        #coordinate-search-button:hover {
+            background: #174968;
+        }
+
+        #address-search-button:disabled,
+        #coordinate-search-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #search-message {
+            min-height: 20px;
+            margin-top: 8px;
+            color: #3d4a57;
+            line-height: 1.45;
+        }
+
+        #search-message.error {
+            color: #b42318;
+        }
+
+        #search-message.success {
+            color: #176b3a;
+        }
+
+        .search-help {
+            margin-top: 6px;
+            color: #66727e;
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        /* =========================================================
+           5. 정보 패널 및 범례
         ========================================================= */
         #info-panel,
         #legend {
@@ -193,7 +296,7 @@
         }
 
         /* =========================================================
-           5. 스케일바 강조
+           6. 스케일바 강조
         ========================================================= */
         .leaflet-control-scale {
             margin-left: 15px !important;
@@ -225,7 +328,7 @@
         }
 
         /* =========================================================
-           6. 모바일 화면
+           7. 모바일 화면
         ========================================================= */
         @media screen and (max-width: 720px) {
             #header {
@@ -251,8 +354,15 @@
                 height: calc(100% - 118px);
             }
 
-            #info-panel {
+            #search-panel {
                 top: 130px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+            }
+
+            #info-panel {
+                top: 342px;
                 right: 10px;
                 width: 215px;
             }
@@ -299,6 +409,52 @@
             인터넷 연결 또는 CDN 접근 상태를 확인한 후 새로고침해 주세요.
         </div>
     </main>
+
+
+    <section id="search-panel">
+        <div class="search-title">주소 및 좌표 검색</div>
+
+        <div class="search-row">
+            <input
+                id="address-input"
+                type="search"
+                placeholder="예: 경상북도 예천군 감천면 포리 688"
+                autocomplete="off"
+                aria-label="검색할 주소"
+            >
+            <button id="address-search-button" type="button">
+                주소검색
+            </button>
+        </div>
+
+        <div class="coordinate-row">
+            <input
+                id="latitude-input"
+                type="number"
+                step="any"
+                placeholder="위도 36.35"
+                aria-label="위도"
+            >
+            <input
+                id="longitude-input"
+                type="number"
+                step="any"
+                placeholder="경도 128.75"
+                aria-label="경도"
+            >
+            <button id="coordinate-search-button" type="button">
+                좌표이동
+            </button>
+        </div>
+
+        <div id="search-message">
+            주소를 입력하거나 지도에서 원하는 지점을 클릭해 주세요.
+        </div>
+
+        <div class="search-help">
+            좌표계: WGS84(EPSG:4326) · 위도(Y), 경도(X) 순서
+        </div>
+    </section>
 
     <section id="info-panel">
         <strong>분석정보</strong>
@@ -383,7 +539,26 @@
         }
 
         function initializeWebGIS() {
-            const scenarioInfo = document.getElementById("scenario-info");
+            const scenarioInfo =
+                document.getElementById("scenario-info");
+
+            const searchMessage =
+                document.getElementById("search-message");
+
+            const addressInput =
+                document.getElementById("address-input");
+
+            const latitudeInput =
+                document.getElementById("latitude-input");
+
+            const longitudeInput =
+                document.getElementById("longitude-input");
+
+            const addressSearchButton =
+                document.getElementById("address-search-button");
+
+            const coordinateSearchButton =
+                document.getElementById("coordinate-search-button");
 
             /* =====================================================
                1. 지도 생성
@@ -407,6 +582,326 @@
 
             const VWORLD_API_KEY =
                 "6476C315-830A-3C00-9E28-033BD2561DAF";
+
+            /*
+             * VWorld Geocoder는 브라우저에서 JSONP 방식으로 호출합니다.
+             * 주소검색: ROAD 검색 후 실패하면 PARCEL을 자동 재검색합니다.
+             * 좌표검색: 입력 좌표로 이동한 뒤 역지오코딩으로 주소를 표시합니다.
+             */
+            let searchMarker = null;
+
+            function setSearchMessage(message, type = "") {
+                searchMessage.textContent = message;
+                searchMessage.className = type;
+            }
+
+            function escapeHtml(value) {
+                return String(value)
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function requestVWorldJsonp(parameters) {
+                return new Promise((resolve, reject) => {
+                    const callbackName =
+                        `vworldCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+
+                    const script =
+                        document.createElement("script");
+
+                    const timeoutId = window.setTimeout(() => {
+                        cleanup();
+                        reject(
+                            new Error(
+                                "VWorld 검색 응답 시간이 초과되었습니다."
+                            )
+                        );
+                    }, 12000);
+
+                    function cleanup() {
+                        window.clearTimeout(timeoutId);
+                        script.remove();
+
+                        try {
+                            delete window[callbackName];
+                        } catch (error) {
+                            window[callbackName] = undefined;
+                        }
+                    }
+
+                    window[callbackName] = (result) => {
+                        cleanup();
+                        resolve(result);
+                    };
+
+                    script.onerror = () => {
+                        cleanup();
+                        reject(
+                            new Error(
+                                "VWorld 검색 API를 불러오지 못했습니다."
+                            )
+                        );
+                    };
+
+                    const query = new URLSearchParams({
+                        service: "address",
+                        version: "2.0",
+                        format: "json",
+                        errorformat: "json",
+                        key: VWORLD_API_KEY,
+                        callback: callbackName,
+                        ...parameters
+                    });
+
+                    script.src =
+                        `https://api.vworld.kr/req/address?${query.toString()}`;
+
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function geocodeAddress(address, addressType) {
+                return requestVWorldJsonp({
+                    request: "getCoord",
+                    crs: "EPSG:4326",
+                    type: addressType,
+                    address: address,
+                    refine: "true",
+                    simple: "false"
+                });
+            }
+
+            async function reverseGeocode(latitude, longitude) {
+                const result = await requestVWorldJsonp({
+                    request: "getAddress",
+                    crs: "EPSG:4326",
+                    type: "BOTH",
+                    point: `${longitude},${latitude}`,
+                    zipcode: "true",
+                    simple: "false"
+                });
+
+                const response = result?.response;
+
+                if (response?.status !== "OK") {
+                    return "";
+                }
+
+                const items = Array.isArray(response.result)
+                    ? response.result
+                    : [];
+
+                const roadAddress =
+                    items.find((item) => item.type === "ROAD")?.text;
+
+                const parcelAddress =
+                    items.find((item) => item.type === "PARCEL")?.text;
+
+                return roadAddress || parcelAddress || items[0]?.text || "";
+            }
+
+            function showSearchLocation(
+                latitude,
+                longitude,
+                title,
+                description = ""
+            ) {
+                if (searchMarker) {
+                    map.removeLayer(searchMarker);
+                }
+
+                searchMarker = L.marker(
+                    [latitude, longitude],
+                    {
+                        title: title
+                    }
+                ).addTo(map);
+
+                const popupHtml = `
+                    <strong>${escapeHtml(title)}</strong><br>
+                    ${description
+                        ? `${escapeHtml(description)}<br>`
+                        : ""}
+                    위도: ${latitude.toFixed(7)}<br>
+                    경도: ${longitude.toFixed(7)}
+                `;
+
+                searchMarker
+                    .bindPopup(popupHtml)
+                    .openPopup();
+
+                map.setView(
+                    [latitude, longitude],
+                    Math.max(map.getZoom(), 16)
+                );
+
+                latitudeInput.value =
+                    latitude.toFixed(7);
+
+                longitudeInput.value =
+                    longitude.toFixed(7);
+            }
+
+            async function runAddressSearch() {
+                const address = addressInput.value.trim();
+
+                if (!address) {
+                    setSearchMessage(
+                        "검색할 주소를 입력해 주세요.",
+                        "error"
+                    );
+                    addressInput.focus();
+                    return;
+                }
+
+                addressSearchButton.disabled = true;
+                setSearchMessage(
+                    "주소를 검색하는 중입니다."
+                );
+
+                try {
+                    let result =
+                        await geocodeAddress(address, "ROAD");
+
+                    if (result?.response?.status !== "OK") {
+                        result =
+                            await geocodeAddress(address, "PARCEL");
+                    }
+
+                    const response = result?.response;
+
+                    if (response?.status !== "OK") {
+                        const errorText =
+                            response?.error?.text ||
+                            "검색 결과가 없습니다.";
+
+                        throw new Error(errorText);
+                    }
+
+                    const point =
+                        response.result?.point;
+
+                    const longitude =
+                        Number(point?.x);
+
+                    const latitude =
+                        Number(point?.y);
+
+                    if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude)
+                    ) {
+                        throw new Error(
+                            "검색 결과의 좌표가 올바르지 않습니다."
+                        );
+                    }
+
+                    const refinedAddress =
+                        response.refined?.text ||
+                        response.input?.address ||
+                        address;
+
+                    showSearchLocation(
+                        latitude,
+                        longitude,
+                        "주소 검색 위치",
+                        refinedAddress
+                    );
+
+                    setSearchMessage(
+                        `검색 완료: ${refinedAddress}`,
+                        "success"
+                    );
+                } catch (error) {
+                    console.error(error);
+
+                    setSearchMessage(
+                        `주소 검색 실패: ${error.message}`,
+                        "error"
+                    );
+                } finally {
+                    addressSearchButton.disabled = false;
+                }
+            }
+
+            async function runCoordinateSearch() {
+                const latitude =
+                    Number(latitudeInput.value);
+
+                const longitude =
+                    Number(longitudeInput.value);
+
+                if (
+                    !Number.isFinite(latitude) ||
+                    latitude < -90 ||
+                    latitude > 90
+                ) {
+                    setSearchMessage(
+                        "위도는 -90~90 범위의 숫자로 입력해 주세요.",
+                        "error"
+                    );
+                    latitudeInput.focus();
+                    return;
+                }
+
+                if (
+                    !Number.isFinite(longitude) ||
+                    longitude < -180 ||
+                    longitude > 180
+                ) {
+                    setSearchMessage(
+                        "경도는 -180~180 범위의 숫자로 입력해 주세요.",
+                        "error"
+                    );
+                    longitudeInput.focus();
+                    return;
+                }
+
+                coordinateSearchButton.disabled = true;
+                setSearchMessage(
+                    "좌표 위치와 주소를 확인하는 중입니다."
+                );
+
+                try {
+                    const address =
+                        await reverseGeocode(
+                            latitude,
+                            longitude
+                        );
+
+                    showSearchLocation(
+                        latitude,
+                        longitude,
+                        "좌표 검색 위치",
+                        address
+                    );
+
+                    setSearchMessage(
+                        address
+                            ? `이동 완료: ${address}`
+                            : "좌표 위치로 이동했습니다.",
+                        "success"
+                    );
+                } catch (error) {
+                    console.warn(error);
+
+                    showSearchLocation(
+                        latitude,
+                        longitude,
+                        "좌표 검색 위치"
+                    );
+
+                    setSearchMessage(
+                        "좌표 위치로 이동했지만 주소는 조회하지 못했습니다.",
+                        "error"
+                    );
+                } finally {
+                    coordinateSearchButton.disabled = false;
+                }
+            }
 
             /*
              * VWorld WMTS 공식 요청 형식
@@ -629,7 +1124,97 @@
                 });
 
             /* =====================================================
-               6. 지도 크기 재계산
+               6. 주소 및 좌표 검색 이벤트
+            ===================================================== */
+            addressSearchButton.addEventListener(
+                "click",
+                runAddressSearch
+            );
+
+            addressInput.addEventListener(
+                "keydown",
+                (event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        runAddressSearch();
+                    }
+                }
+            );
+
+            coordinateSearchButton.addEventListener(
+                "click",
+                runCoordinateSearch
+            );
+
+            longitudeInput.addEventListener(
+                "keydown",
+                (event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        runCoordinateSearch();
+                    }
+                }
+            );
+
+            /*
+             * 지도를 클릭하면 해당 지점의 위도·경도를 입력창에 넣고
+             * 마커와 주소를 표시합니다.
+             */
+            map.on("click", async (event) => {
+                const latitude =
+                    event.latlng.lat;
+
+                const longitude =
+                    event.latlng.lng;
+
+                latitudeInput.value =
+                    latitude.toFixed(7);
+
+                longitudeInput.value =
+                    longitude.toFixed(7);
+
+                setSearchMessage(
+                    "선택한 지점의 주소를 확인하는 중입니다."
+                );
+
+                try {
+                    const address =
+                        await reverseGeocode(
+                            latitude,
+                            longitude
+                        );
+
+                    showSearchLocation(
+                        latitude,
+                        longitude,
+                        "지도 선택 위치",
+                        address
+                    );
+
+                    setSearchMessage(
+                        address
+                            ? `선택 위치: ${address}`
+                            : "선택한 지점의 좌표를 입력했습니다.",
+                        "success"
+                    );
+                } catch (error) {
+                    console.warn(error);
+
+                    showSearchLocation(
+                        latitude,
+                        longitude,
+                        "지도 선택 위치"
+                    );
+
+                    setSearchMessage(
+                        "선택한 지점의 좌표를 입력했습니다.",
+                        "success"
+                    );
+                }
+            });
+
+            /* =====================================================
+               7. 지도 크기 재계산
             ===================================================== */
             window.addEventListener("resize", () => {
                 map.invalidateSize();
