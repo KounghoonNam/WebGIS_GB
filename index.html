@@ -295,6 +295,26 @@
             background: #1a9641;
         }
 
+
+        .raster-opacity-box {
+            margin-top: 10px;
+            padding-top: 9px;
+            border-top: 1px solid #dfe5ea;
+        }
+
+        .raster-opacity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #raster-opacity {
+            width: 100%;
+            cursor: pointer;
+        }
+
         /* =========================================================
            6. 스케일바 강조
         ========================================================= */
@@ -462,6 +482,23 @@
         <p id="scenario-info">
             Leaflet 라이브러리를 불러오는 중입니다.
         </p>
+
+        <div class="raster-opacity-box">
+            <div class="raster-opacity-header">
+                <span>위험지도 투명도</span>
+                <span id="raster-opacity-value">75%</span>
+            </div>
+
+            <input
+                id="raster-opacity"
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value="75"
+                aria-label="TRIGRS 위험지도 투명도"
+            >
+        </div>
     </section>
 
     <section id="legend">
@@ -965,7 +1002,7 @@
              */
             vworldBaseLayer.addTo(map);
 
-            L.control.layers(
+            const layerControl = L.control.layers(
                 {
                     "VWorld 일반지도": vworldBaseLayer,
                     "VWorld 영상지도": vworldSatelliteLayer,
@@ -1009,40 +1046,132 @@
             }, 500);
 
             /* =====================================================
-               4. 강우 시나리오
+               4. 강우 시나리오 및 TRIGRS XYZ 타일
+
+               타일 폴더:
+               data/trigrs/12/{z}/{x}/{y}.png
+               data/trigrs/24/{z}/{x}/{y}.png
+               ...
+               data/trigrs/72/{z}/{x}/{y}.png
             ===================================================== */
             const scenarios = {
                 "12": {
                     duration: 12,
-                    rainfall: 50
+                    rainfall: 50,
+                    folder: "12"
                 },
                 "24": {
                     duration: 24,
-                    rainfall: 100
+                    rainfall: 100,
+                    folder: "24"
                 },
                 "36": {
                     duration: 36,
-                    rainfall: 150
+                    rainfall: 150,
+                    folder: "36"
                 },
                 "48": {
                     duration: 48,
-                    rainfall: 200
+                    rainfall: 200,
+                    folder: "48"
                 },
                 "60": {
                     duration: 60,
-                    rainfall: 250
+                    rainfall: 250,
+                    folder: "60"
                 },
                 "72": {
                     duration: 72,
-                    rainfall: 300
+                    rainfall: 300,
+                    folder: "72"
                 }
             };
+
+            /*
+             * 배경지도 위, 행정경계 아래에 TRIGRS 타일을 표시합니다.
+             */
+            map.createPane("trigrsPane");
+            map.getPane("trigrsPane").style.zIndex = "430";
+            map.getPane("trigrsPane").style.pointerEvents = "none";
 
             const scenarioSelect =
                 document.getElementById("scenario-select");
 
-            scenarioSelect.addEventListener("change", function () {
-                const scenario = scenarios[this.value];
+            const rasterOpacity =
+                document.getElementById("raster-opacity");
+
+            const rasterOpacityValue =
+                document.getElementById("raster-opacity-value");
+
+            const trigrsTileLayers = {};
+            let activeTrigrsLayer = null;
+            let activeScenarioKey = "";
+            let tileErrorDisplayed = false;
+
+            Object.entries(scenarios).forEach(
+                ([scenarioKey, scenario]) => {
+                    const layer = L.tileLayer(
+                        `./data/trigrs/${scenario.folder}/{z}/{x}/{y}.png`,
+                        {
+                            minZoom: 7,
+                            maxNativeZoom: 12,
+                            maxZoom: 18,
+                            tileSize: 256,
+                            tms: false,
+                            noWrap: true,
+                            opacity:
+                                Number(rasterOpacity.value) / 100,
+                            pane: "trigrsPane",
+                            keepBuffer: 2,
+                            updateWhenIdle: false,
+                            attribution:
+                                "TRIGRS 사면안전율 분석 결과"
+                        }
+                    );
+
+                    layer.on("tileerror", (event) => {
+                        if (tileErrorDisplayed) {
+                            return;
+                        }
+
+                        tileErrorDisplayed = true;
+
+                        console.error(
+                            "TRIGRS 타일을 불러오지 못했습니다.",
+                            event
+                        );
+
+                        scenarioInfo.innerHTML = `
+                            <strong>타일 로드 실패</strong><br>
+                            선택 시나리오: ${scenario.duration}시간 /
+                            ${scenario.rainfall} mm<br>
+                            <code>data/trigrs/${scenario.folder}</code>
+                            폴더와 파일 경로를 확인해 주세요.
+                        `;
+                    });
+
+                    trigrsTileLayers[scenarioKey] = layer;
+                }
+            );
+
+            function removeActiveTrigrsLayer() {
+                if (
+                    activeTrigrsLayer &&
+                    map.hasLayer(activeTrigrsLayer)
+                ) {
+                    map.removeLayer(activeTrigrsLayer);
+                }
+
+                activeTrigrsLayer = null;
+                activeScenarioKey = "";
+            }
+
+            function showTrigrsScenario(scenarioKey) {
+                const scenario =
+                    scenarios[scenarioKey];
+
+                removeActiveTrigrsLayer();
+                tileErrorDisplayed = false;
 
                 if (!scenario) {
                     scenarioInfo.innerHTML =
@@ -1050,12 +1179,48 @@
                     return;
                 }
 
+                activeScenarioKey = scenarioKey;
+                activeTrigrsLayer =
+                    trigrsTileLayers[scenarioKey];
+
+                activeTrigrsLayer.setOpacity(
+                    Number(rasterOpacity.value) / 100
+                );
+
+                activeTrigrsLayer.addTo(map);
+
                 scenarioInfo.innerHTML = `
                     <strong>${scenario.duration}시간 시나리오</strong><br>
                     누적강우량: ${scenario.rainfall} mm<br>
-                    TRIGRS 결과 레이어는 다음 단계에서 연결합니다.
+                    표시 레이어:
+                    <code>TRfs_min_gb50300_${
+                        Number(scenarioKey) / 12
+                    }.asc</code><br>
+                    안전율 4등급 XYZ 타일
                 `;
-            });
+            }
+
+            scenarioSelect.addEventListener(
+                "change",
+                function () {
+                    showTrigrsScenario(this.value);
+                }
+            );
+
+            rasterOpacity.addEventListener(
+                "input",
+                function () {
+                    const opacity =
+                        Number(this.value) / 100;
+
+                    rasterOpacityValue.textContent =
+                        `${this.value}%`;
+
+                    if (activeTrigrsLayer) {
+                        activeTrigrsLayer.setOpacity(opacity);
+                    }
+                }
+            );
 
             /* =====================================================
                5. 경상북도 경계 GeoJSON
@@ -1075,7 +1240,13 @@
                     return response.json();
                 })
                 .then((data) => {
+                    map.createPane("boundaryPane");
+                    map.getPane("boundaryPane").style.zIndex = "460";
+                    map.getPane("boundaryPane").style.pointerEvents = "auto";
+
                     const boundaryLayer = L.geoJSON(data, {
+                        pane: "boundaryPane",
+
                         style: {
                             color: "#222222",
                             weight: 2,
@@ -1124,7 +1295,306 @@
                 });
 
             /* =====================================================
-               6. 주소 및 좌표 검색 이벤트
+               6. 경상북도 시군구 경계 GeoJSON
+
+               파일 위치:
+               data/boundary/gyeongbuk_sigungu.geojson
+
+               - EPSG:4326
+               - 시군구 경계
+               - 레이어 선택창에서 ON/OFF
+               - 기본값은 ON
+            ===================================================== */
+            fetch("./data/boundary/gyeongbuk_sigungu.geojson")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `시군구 경계 GeoJSON HTTP ${response.status}`
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then((data) => {
+                    if (!map.getPane("sigunguPane")) {
+                        map.createPane("sigunguPane");
+                    }
+
+                    /*
+                     * 읍면동 경계보다 위에 표시합니다.
+                     */
+                    map.getPane("sigunguPane").style.zIndex = "480";
+                    map.getPane("sigunguPane").style.pointerEvents = "auto";
+
+                    function getSigunguStyle() {
+                        const zoom = map.getZoom();
+
+                        return {
+                            color: "#174a7e",
+                            weight:
+                                zoom >= 12
+                                    ? 3.0
+                                    : zoom >= 10
+                                        ? 2.3
+                                        : 1.7,
+                            opacity: 1,
+                            fillColor: "#ffffff",
+                            fillOpacity: 0
+                        };
+                    }
+
+                    const sigunguLayer = L.geoJSON(data, {
+                        pane: "sigunguPane",
+
+                        style: getSigunguStyle,
+
+                        onEachFeature: (feature, layer) => {
+                            const properties =
+                                feature.properties || {};
+
+                            const sigunguName =
+                                properties.SIGUNGU_NM ||
+                                properties.SIG_KOR_NM ||
+                                properties.name ||
+                                "시군구명 없음";
+
+                            const sigunguCode =
+                                properties.SIGUNGU_CD ||
+                                properties.SIG_CD ||
+                                "-";
+
+                            const baseDate =
+                                properties.BASE_DATE ||
+                                "-";
+
+                            layer.bindPopup(`
+                                <strong>${escapeHtml(sigunguName)}</strong><br>
+                                시군구 코드: ${escapeHtml(sigunguCode)}<br>
+                                기준일: ${escapeHtml(baseDate)}
+                            `);
+
+                            layer.bindTooltip(
+                                escapeHtml(sigunguName),
+                                {
+                                    sticky: true,
+                                    direction: "top",
+                                    opacity: 0.95
+                                }
+                            );
+
+                            layer.on({
+                                mouseover: (event) => {
+                                    event.target.setStyle({
+                                        color: "#ff7f00",
+                                        weight: 3.5,
+                                        fillColor: "#ffcc80",
+                                        fillOpacity: 0.08
+                                    });
+                                },
+
+                                mouseout: (event) => {
+                                    sigunguLayer.resetStyle(
+                                        event.target
+                                    );
+                                },
+
+                                click: (event) => {
+                                    map.fitBounds(
+                                        event.target.getBounds(),
+                                        {
+                                            padding: [25, 25],
+                                            maxZoom: 11
+                                        }
+                                    );
+                                }
+                            });
+                        }
+                    });
+
+                    /*
+                     * 시군구 경계는 기본 표시합니다.
+                     */
+                    sigunguLayer.addTo(map);
+
+                    layerControl.addOverlay(
+                        sigunguLayer,
+                        "경상북도 시군구 경계"
+                    );
+
+                    map.on("zoomend", () => {
+                        if (map.hasLayer(sigunguLayer)) {
+                            sigunguLayer.setStyle(
+                                getSigunguStyle()
+                            );
+                        }
+                    });
+
+                    console.log(
+                        `시군구 경계 로드 완료: ${
+                            data.features?.length || 0
+                        }개`
+                    );
+                })
+                .catch((error) => {
+                    console.error(
+                        "시군구 경계 파일 로드 실패",
+                        error
+                    );
+                });
+
+            /* =====================================================
+               7. 경상북도 읍면동 경계 GeoJSON
+
+               파일 위치:
+               data/boundary/gyeongbuk_emd_simple.geojson
+
+               - EPSG:4326
+               - 525개 읍면동
+               - 레이어 선택창에서 ON/OFF
+               - 기본값은 OFF
+            ===================================================== */
+            fetch("./data/boundary/gyeongbuk_emd_simple.geojson")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `읍면동 경계 GeoJSON HTTP ${response.status}`
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then((data) => {
+                    if (!map.getPane("emdPane")) {
+                        map.createPane("emdPane");
+                    }
+
+                    map.getPane("emdPane").style.zIndex = "470";
+                    map.getPane("emdPane").style.pointerEvents = "auto";
+
+                    function getEmdStyle() {
+                        const zoom = map.getZoom();
+
+                        return {
+                            color: "#4b5563",
+                            weight:
+                                zoom >= 12
+                                    ? 1.2
+                                    : zoom >= 10
+                                        ? 0.8
+                                        : 0.45,
+                            opacity: 0.9,
+                            fillColor: "#ffffff",
+                            fillOpacity: 0.015
+                        };
+                    }
+
+                    const emdLayer = L.geoJSON(data, {
+                        pane: "emdPane",
+
+                        style: getEmdStyle,
+
+                        onEachFeature: (feature, layer) => {
+                            const properties =
+                                feature.properties || {};
+
+                            const emdName =
+                                properties.EMD_NM ||
+                                "읍면동명 없음";
+
+                            const emdCode =
+                                properties.EMD_CD ||
+                                "-";
+
+                            const sigunguCode =
+                                properties.COL_ADM_SE ||
+                                "-";
+
+                            layer.bindPopup(`
+                                <strong>${escapeHtml(emdName)}</strong><br>
+                                읍면동 코드: ${escapeHtml(emdCode)}<br>
+                                시군구 코드: ${escapeHtml(sigunguCode)}
+                            `);
+
+                            layer.bindTooltip(
+                                escapeHtml(emdName),
+                                {
+                                    sticky: true,
+                                    direction: "top",
+                                    opacity: 0.9
+                                }
+                            );
+
+                            layer.on({
+                                mouseover: (event) => {
+                                    event.target.setStyle({
+                                        color: "#005bbb",
+                                        weight: 2.2,
+                                        fillColor: "#6baed6",
+                                        fillOpacity: 0.14
+                                    });
+
+                                    event.target.bringToFront();
+                                },
+
+                                mouseout: (event) => {
+                                    emdLayer.resetStyle(
+                                        event.target
+                                    );
+                                },
+
+                                click: (event) => {
+                                    map.fitBounds(
+                                        event.target.getBounds(),
+                                        {
+                                            padding: [25, 25],
+                                            maxZoom: 13
+                                        }
+                                    );
+                                }
+                            });
+                        }
+                    });
+
+                    /*
+                     * 기본 화면에서는 경계를 표시하지 않고,
+                     * 왼쪽 위 레이어 버튼에서 사용자가 켜도록 합니다.
+                     */
+                    layerControl.addOverlay(
+                        emdLayer,
+                        "경상북도 읍면동 경계"
+                    );
+
+                    /*
+                     * 확대·축소할 때 선 굵기를 갱신합니다.
+                     */
+                    map.on("zoomend", () => {
+                        if (map.hasLayer(emdLayer)) {
+                            emdLayer.setStyle(
+                                getEmdStyle()
+                            );
+                        }
+                    });
+
+                    console.log(
+                        `읍면동 경계 로드 완료: ${
+                            data.features?.length || 0
+                        }개`
+                    );
+                })
+                .catch((error) => {
+                    console.error(
+                        "읍면동 경계 파일 로드 실패",
+                        error
+                    );
+
+                    /*
+                     * 읍면동 파일이 없더라도 나머지 WebGIS 기능은
+                     * 계속 사용할 수 있습니다.
+                     */
+                });
+
+            /* =====================================================
+               8. 주소 및 좌표 검색 이벤트
             ===================================================== */
             addressSearchButton.addEventListener(
                 "click",
@@ -1214,7 +1684,7 @@
             });
 
             /* =====================================================
-               7. 지도 크기 재계산
+               9. 지도 크기 재계산
             ===================================================== */
             window.addEventListener("resize", () => {
                 map.invalidateSize();
