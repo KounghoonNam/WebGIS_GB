@@ -132,6 +132,28 @@
             overflow-y: auto;
         }
 
+        #legend-toggle {
+            display: none;
+            position: absolute;
+            z-index: 1700;
+            right: 10px;
+            bottom: 18px;
+            min-width: 76px;
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 22px;
+            color: #ffffff;
+            background: #17324d;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.30);
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        #legend-toggle[aria-expanded="true"] {
+            background: #b42318;
+        }
+
         .panel-title {
             margin-bottom: 9px;
             font-size: 14px;
@@ -419,10 +441,25 @@
             }
 
             #legend {
+                display: none;
                 right: 10px;
-                bottom: 16px;
-                width: 210px;
-                max-height: 230px;
+                bottom: 70px;
+                width: min(280px, calc(100vw - 20px));
+                max-height: min(45vh, 360px);
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            #legend.mobile-open {
+                display: block;
+            }
+
+            #legend-toggle {
+                display: block;
+            }
+
+            .leaflet-control-scale {
+                margin-bottom: 72px !important;
             }
         }
     </style>
@@ -568,6 +605,16 @@
         </div>
     </section>
 
+    <button
+        id="legend-toggle"
+        type="button"
+        aria-controls="legend"
+        aria-expanded="false"
+        title="범례 열기"
+    >
+        범례
+    </button>
+
     <section id="legend" class="floating-panel">
         <div class="panel-title">범례</div>
 
@@ -610,7 +657,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-04";
+        const APP_VERSION = "20260714-06";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -666,6 +713,8 @@
             const debrisClearButton = document.getElementById("debris-clear-button");
             const layerStatus = document.getElementById("layer-status");
             const searchMessage = document.getElementById("search-message");
+            const legend = document.getElementById("legend");
+            const legendToggle = document.getElementById("legend-toggle");
             const addressInput = document.getElementById("address-input");
             const latitudeInput = document.getElementById("latitude-input");
             const longitudeInput = document.getElementById("longitude-input");
@@ -685,6 +734,82 @@
                 layerStatus.textContent = message;
                 layerStatus.className = type;
             }
+
+            function setMobileLegendOpen(isOpen) {
+                const mobileMode = window.matchMedia(
+                    "(max-width: 900px)"
+                ).matches;
+
+                if (!mobileMode) {
+                    legend.classList.remove("mobile-open");
+                    legendToggle.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+                    legendToggle.textContent = "범례";
+                    legendToggle.title = "범례 열기";
+                    return;
+                }
+
+                legend.classList.toggle(
+                    "mobile-open",
+                    isOpen
+                );
+
+                legendToggle.setAttribute(
+                    "aria-expanded",
+                    String(isOpen)
+                );
+
+                legendToggle.textContent =
+                    isOpen ? "닫기" : "범례";
+
+                legendToggle.title =
+                    isOpen ? "범례 닫기" : "범례 열기";
+            }
+
+            legendToggle.addEventListener(
+                "click",
+                event => {
+                    event.stopPropagation();
+
+                    const isOpen =
+                        legendToggle.getAttribute(
+                            "aria-expanded"
+                        ) === "true";
+
+                    setMobileLegendOpen(!isOpen);
+                }
+            );
+
+            legend.addEventListener(
+                "click",
+                event => {
+                    event.stopPropagation();
+                }
+            );
+
+            window.addEventListener(
+                "resize",
+                () => {
+                    setMobileLegendOpen(false);
+                }
+            );
+
+            map.on(
+                "click",
+                () => {
+                    if (
+                        window.matchMedia(
+                            "(max-width: 900px)"
+                        ).matches
+                    ) {
+                        setMobileLegendOpen(false);
+                    }
+                }
+            );
+
+            setMobileLegendOpen(false);
 
             function setSearchMessage(message, type = "") {
                 searchMessage.textContent = message;
@@ -1166,13 +1291,75 @@
                     return response.json();
                 })
                 .then(data => {
+                    const features =
+                        Array.isArray(data?.features)
+                            ? data.features
+                            : [];
+
+                    const expectedCount = 415;
+
+                    if (
+                        features.length
+                        !== expectedCount
+                    ) {
+                        throw new Error(
+                            `인명피해 GeoJSON 지점 수가 ` +
+                            `${features.length}개입니다. ` +
+                            `검증된 파일은 ${expectedCount}개여야 합니다.`
+                        );
+                    }
+
+                    const invalidCoordinates =
+                        features.filter(feature => {
+                            const coordinates =
+                                feature?.geometry
+                                    ?.coordinates;
+
+                            if (
+                                !Array.isArray(
+                                    coordinates
+                                )
+                                || coordinates.length < 2
+                            ) {
+                                return true;
+                            }
+
+                            const longitude =
+                                Number(coordinates[0]);
+                            const latitude =
+                                Number(coordinates[1]);
+
+                            return !(
+                                Number.isFinite(
+                                    longitude
+                                )
+                                && Number.isFinite(
+                                    latitude
+                                )
+                                && latitude >= 35.40
+                                && latitude <= 37.70
+                                && longitude >= 127.60
+                                && longitude <= 132.10
+                            );
+                        });
+
+                    if (
+                        invalidCoordinates.length
+                        > 0
+                    ) {
+                        throw new Error(
+                            `경북 1차 좌표 범위 밖 지점이 ` +
+                            `${invalidCoordinates.length}개 있습니다.`
+                        );
+                    }
+
+                    humanDamageLayer.clearLayers();
                     humanDamageLayer.addData(
                         data
                     );
 
                     humanDamageCount =
-                        data?.features?.length
-                        || 0;
+                        features.length;
 
                     console.log(
                         "경상북도 인명피해:",
