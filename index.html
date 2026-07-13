@@ -588,6 +588,18 @@
             <div class="legend-row"><span class="legend-color" style="background:#1a9641"></span><span>5등급 · 매우 낮음</span></div>
         </div>
 
+        <div id="legend-watershed" class="legend-section">
+            <div class="legend-title">경상북도 소유역 경계</div>
+            <div class="legend-row">
+                <span class="line-sample" style="border-top-width:3px;border-top-color:#2563eb"></span>
+                <span>5,000셀 기준 · 2,201개</span>
+            </div>
+            <div class="legend-row">
+                <span class="legend-color" style="background:rgba(96,165,250,0.22);border:1px solid #2563eb"></span>
+                <span>하천 시작 집수면적 4.5㎢</span>
+            </div>
+        </div>
+
         <div id="legend-debris" class="legend-section">
             <div class="legend-title">토석류 위험구간</div>
             <div class="legend-row"><span class="line-sample" style="border-top-width:4px;border-top-color:#d7191c"></span><span>RedZone</span></div>
@@ -598,7 +610,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-03";
+        const APP_VERSION = "20260714-04";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -691,6 +703,7 @@
             [
                 ["susceptibilityPane", 410, "none"],
                 ["trigrsPane", 420, "none"],
+                ["watershedPane", 455, "auto"],
                 ["sigunguPane", 480, "auto"],
                 ["emdPane", 490, "auto"],
                 ["debrisPane", 540, "auto"],
@@ -752,6 +765,264 @@
                 imperial: false,
                 maxWidth: 220
             }).addTo(map);
+
+            /*
+             * 경상북도 전체 DEM 기반 소유역 경계
+             * - 흐름누적 기준: 5,000셀
+             * - 하천 시작 집수면적: 4.5㎢
+             * - 소유역: 2,201개
+             * - GeoJSON: 약 32.48MB
+             *
+             * 대용량 파일이므로 페이지 시작 시에는 불러오지 않고,
+             * 레이어 버튼을 처음 체크할 때 한 번만 불러옵니다.
+             */
+            const watershedRenderer = L.canvas({
+                padding: 0.5,
+                tolerance: 3
+            });
+
+            let watershedLoaded = false;
+            let watershedLoading = false;
+            let watershedCount = 0;
+
+            function formatWatershedNumber(
+                value,
+                digits = 2
+            ) {
+                const number = Number(value);
+
+                if (!Number.isFinite(number)) {
+                    return "-";
+                }
+
+                return number.toLocaleString(
+                    "ko-KR",
+                    {
+                        minimumFractionDigits: digits,
+                        maximumFractionDigits: digits
+                    }
+                );
+            }
+
+            const watershedLayer = L.geoJSON(
+                null,
+                {
+                    pane: "watershedPane",
+                    renderer: watershedRenderer,
+                    bubblingMouseEvents: false,
+                    smoothFactor: 1.0,
+
+                    style: {
+                        color: "#2563eb",
+                        weight: 0.9,
+                        opacity: 0.9,
+                        fillColor: "#60a5fa",
+                        fillOpacity: 0.07
+                    },
+
+                    onEachFeature: (
+                        feature,
+                        layer
+                    ) => {
+                        const p =
+                            feature.properties
+                            || {};
+
+                        const basinId =
+                            p["BASIN_ID"]
+                            ?? "-";
+
+                        const areaKm2 =
+                            formatWatershedNumber(
+                                p["AREA_KM2"],
+                                3
+                            );
+
+                        layer.bindTooltip(
+                            `소유역 ${escapeHtml(basinId)}` +
+                            ` · ${areaKm2}㎢`,
+                            {
+                                sticky: true,
+                                direction: "top"
+                            }
+                        );
+
+                        layer.bindPopup(`
+                            <strong>
+                                경상북도 소유역
+                                ${escapeHtml(basinId)}
+                            </strong><br>
+                            소유역 면적:
+                            ${areaKm2}㎢<br>
+                            격자 수:
+                            ${formatWatershedNumber(
+                                p["CELL_COUNT"],
+                                0
+                            )}셀<br>
+                            Polygon 면적:
+                            ${formatWatershedNumber(
+                                p["GEOM_AREA_KM2"],
+                                3
+                            )}㎢<br>
+                            경계 길이:
+                            ${formatWatershedNumber(
+                                p["PERIM_KM"],
+                                3
+                            )}km<br>
+                            하천 추출 기준:
+                            ${formatWatershedNumber(
+                                p["THRESHOLD_CELLS"],
+                                0
+                            )}셀<br>
+                            하천 시작 집수면적:
+                            ${formatWatershedNumber(
+                                p["STREAM_START_KM2"],
+                                2
+                            )}㎢<br>
+                            중심점:
+                            ${formatWatershedNumber(
+                                p["CENTROID_LAT"],
+                                6
+                            )},
+                            ${formatWatershedNumber(
+                                p["CENTROID_LON"],
+                                6
+                            )}
+                        `, {
+                            maxWidth: 340
+                        });
+                    }
+                }
+            );
+
+            /*
+             * 좌측 Leaflet 레이어 버튼에 추가되는 항목
+             */
+            layerControl.addOverlay(
+                watershedLayer,
+                "경상북도 소유역 경계(2,201)"
+            );
+
+            async function loadWatershedLayer() {
+                if (
+                    watershedLoaded
+                    || watershedLoading
+                ) {
+                    return;
+                }
+
+                watershedLoading = true;
+
+                setLayerStatus(
+                    "경상북도 소유역 경계 2,201개를 불러오는 중입니다. " +
+                    "파일 크기가 약 32.48MB이므로 잠시 기다려 주세요."
+                );
+
+                try {
+                    const response = await fetch(
+                        `./data/watershed/` +
+                        `gyeongbuk_subbasins_5000.geojson` +
+                        `?v=${APP_VERSION}`
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+                    }
+
+                    const data =
+                        await response.json();
+
+                    watershedLayer.clearLayers();
+                    watershedLayer.addData(data);
+
+                    watershedCount =
+                        data?.features?.length
+                        || watershedLayer
+                            .getLayers()
+                            .length;
+
+                    watershedLoaded = true;
+
+                    setLayerStatus(
+                        `경상북도 소유역 경계 ` +
+                        `${watershedCount.toLocaleString("ko-KR")}` +
+                        `개를 표시했습니다.`,
+                        "success"
+                    );
+
+                    if (
+                        map.hasLayer(
+                            watershedLayer
+                        )
+                        && watershedLayer
+                            .getBounds()
+                            .isValid()
+                    ) {
+                        map.fitBounds(
+                            watershedLayer
+                                .getBounds(),
+                            {
+                                padding: [18, 18],
+                                maxZoom: 9
+                            }
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        "소유역 GeoJSON 로드 실패:",
+                        error
+                    );
+
+                    setLayerStatus(
+                        `소유역 GeoJSON 로드 실패: ` +
+                        `${error.message}`,
+                        "error"
+                    );
+
+                    if (
+                        map.hasLayer(
+                            watershedLayer
+                        )
+                    ) {
+                        map.removeLayer(
+                            watershedLayer
+                        );
+                    }
+                } finally {
+                    watershedLoading = false;
+                }
+            }
+
+            map.on(
+                "overlayadd",
+                event => {
+                    if (
+                        event.layer
+                        === watershedLayer
+                    ) {
+                        updateLegendVisibility();
+                        loadWatershedLayer();
+                    }
+                }
+            );
+
+            map.on(
+                "overlayremove",
+                event => {
+                    if (
+                        event.layer
+                        === watershedLayer
+                    ) {
+                        updateLegendVisibility();
+
+                        setLayerStatus(
+                            "경상북도 소유역 경계 레이어를 숨겼습니다."
+                        );
+                    }
+                }
+            );
 
             /*
              * 경상북도 인명피해 우려지역 415개 지점
@@ -1073,6 +1344,10 @@
                 document.getElementById("legend-susceptibility").classList.toggle(
                     "active",
                     susceptibilityEnabled.checked
+                );
+                document.getElementById("legend-watershed").classList.toggle(
+                    "active",
+                    map.hasLayer(watershedLayer)
                 );
                 document.getElementById("legend-debris").classList.toggle(
                     "active",

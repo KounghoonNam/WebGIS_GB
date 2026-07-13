@@ -1,0 +1,41 @@
+{
+  "title": "경상북도 소유역 경계",
+  "method": "D8 streams-based subbasins",
+  "dem": "C:\\Users\\user\\Downloads\\nam\\2026_gb\\trigrs_30m_all\\final_vworld\\DEM_filled_gb.tif",
+  "dem_info": {
+    "crs": "EPSG:32652",
+    "epsg": 32652,
+    "width": 5346,
+    "height": 5844,
+    "cell_count": 31242024,
+    "resolution": [
+      30.0,
+      30.0
+    ],
+    "nodata": -9999.0,
+    "bounds": [
+      392310.0,
+      3935910.0,
+      552690.0,
+      4111230.0
+    ],
+    "dtype": "float64"
+  },
+  "flow_accumulation_threshold_cells": 5000,
+  "cell_area_m2": 900.0,
+  "stream_start_area_km2": 4.5,
+  "subbasin_count": 2201,
+  "minimum_output_area_km2": 0.0,
+  "area_statistics_km2": {
+    "minimum": 0.0009,
+    "median": 6.8085,
+    "mean": 8.124565788278055,
+    "maximum": 51.0462,
+    "total": 17882.169299999998
+  },
+  "output_crs": "EPSG:4326",
+  "simplification": false,
+  "geojson_file": "gyeongbuk_subbasins_5000.geojson",
+  "geojson_size_mb": 32.47750759124756,
+  "leaflet_url": "./data/watershed/gyeongbuk_subbasins_5000.geojson"
+}
