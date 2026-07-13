@@ -1,0 +1,84 @@
+{
+  "title": "경상북도 산사태 취약성 지도",
+  "source_raster": "C:\\Users\\user\\Documents\\GitHub\\WebGIS_GB\\ls47\\47_32652_30m.tif",
+  "boundary_source": "C:\\Users\\user\\Documents\\GitHub\\WebGIS_GB_repo\\data\\boundary\\gyeongbuk_sigungu.geojson",
+  "boundary_feature_count_before_dissolve": 23,
+  "raster": {
+    "crs": "EPSG:32652",
+    "epsg": 32652,
+    "width": 12083,
+    "height": 7393,
+    "resolution": [
+      30.0,
+      30.0
+    ],
+    "nodata": 127.0,
+    "bounds_source_crs": [
+      392328.25014427316,
+      3935948.2843284355,
+      754818.2501442732,
+      4157738.2843284355
+    ],
+    "bounds_epsg4326": [
+      127.78089854471693,
+      35.53445098859029,
+      131.88377616686884,
+      37.566641284680244
+    ]
+  },
+  "classes": {
+    "1": {
+      "label": "1등급 - 매우 높음",
+      "cell_count": 1285111,
+      "area_km2": 1156.5999,
+      "valid_percent": 8.928242169148968,
+      "color": "#d7191c"
+    },
+    "2": {
+      "label": "2등급 - 높음",
+      "cell_count": 2706553,
+      "area_km2": 2435.8977,
+      "valid_percent": 18.80363690578996,
+      "color": "#fdae61"
+    },
+    "3": {
+      "label": "3등급 - 보통",
+      "cell_count": 5333201,
+      "area_km2": 4799.8809,
+      "valid_percent": 37.05213795909259,
+      "color": "#ffffbf"
+    },
+    "4": {
+      "label": "4등급 - 낮음",
+      "cell_count": 4076201,
+      "area_km2": 3668.5809,
+      "valid_percent": 28.31919550772438,
+      "color": "#a6d96a"
+    },
+    "5": {
+      "label": "5등급 - 매우 낮음",
+      "cell_count": 992708,
+      "area_km2": 893.4372,
+      "valid_percent": 6.896787458244099,
+      "color": "#1a9641"
+    }
+  },
+  "valid_cells": 14393774,
+  "tiles": {
+    "scheme": "WebMercatorQuad",
+    "convention": "XYZ",
+    "min_zoom": 7,
+    "max_zoom": 12,
+    "png_count": 542,
+    "url_template": "./data/landslide_susceptibility/{z}/{x}/{y}.png",
+    "sample": "10/875/399.png",
+    "band_count": 4,
+    "color_interpretation": [
+      "red",
+      "green",
+      "blue",
+      "alpha"
+    ],
+    "has_alpha": true
+  }
+}
