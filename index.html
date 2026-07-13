@@ -598,7 +598,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260713-05";
+        const APP_VERSION = "20260714-03";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -693,7 +693,8 @@
                 ["trigrsPane", 420, "none"],
                 ["sigunguPane", 480, "auto"],
                 ["emdPane", 490, "auto"],
-                ["debrisPane", 540, "auto"]
+                ["debrisPane", 540, "auto"],
+                ["humanDamagePane", 560, "auto"]
             ].forEach(([name, zIndex, pointerEvents]) => {
                 if (!map.getPane(name)) {
                     map.createPane(name);
@@ -751,6 +752,205 @@
                 imperial: false,
                 maxWidth: 220
             }).addTo(map);
+
+            /*
+             * 경상북도 인명피해 우려지역 415개 지점
+             * 기본값은 OFF이며 레이어 버튼에서 켜고 끌 수 있습니다.
+             */
+            const humanDamageRenderer = L.canvas({
+                padding: 0.5
+            });
+
+            let humanDamageCount = 0;
+
+            const humanDamageLayer = L.geoJSON(
+                null,
+                {
+                    pane: "humanDamagePane",
+                    renderer:
+                        humanDamageRenderer,
+                    bubblingMouseEvents:
+                        false,
+
+                    pointToLayer:
+                        (feature, latlng) => {
+                            return L.circleMarker(
+                                latlng,
+                                {
+                                    pane:
+                                        "humanDamagePane",
+                                    radius: 6,
+                                    color:
+                                        "#7f1d1d",
+                                    weight: 1.5,
+                                    opacity: 1,
+                                    fillColor:
+                                        "#dc2626",
+                                    fillOpacity:
+                                        0.88
+                                }
+                            );
+                        },
+
+                    onEachFeature:
+                        (feature, layer) => {
+                            const p =
+                                feature.properties
+                                || {};
+
+                            const region = [
+                                p["시군구명"],
+                                p["읍면동"]
+                            ]
+                                .filter(Boolean)
+                                .join(" ");
+
+                            const address =
+                                p["주소(지번)"]
+                                || p["주소(도로명)"]
+                                || p["전체주소"]
+                                || p["주소"]
+                                || "-";
+
+                            const title =
+                                p["우려지역명"]
+                                || "인명피해 우려지역";
+
+                            layer.bindTooltip(
+                                escapeHtml(title),
+                                {
+                                    sticky: true,
+                                    direction: "top"
+                                }
+                            );
+
+                            layer.bindPopup(`
+                                <strong>
+                                    ${escapeHtml(title)}
+                                </strong><br>
+                                지역:
+                                ${escapeHtml(region || "-")}
+                                <br>
+                                재해우려지역코드:
+                                ${escapeHtml(
+                                    p["재해우려지역코드"]
+                                    || "-"
+                                )}
+                                <br>
+                                세분류:
+                                ${escapeHtml(
+                                    p["세분류"]
+                                    || p["분류"]
+                                    || "-"
+                                )}
+                                <br>
+                                위험요인:
+                                ${escapeHtml(
+                                    p["위험요인(지정사유)"]
+                                    || "-"
+                                )}
+                                <br>
+                                주소:
+                                ${escapeHtml(address)}
+                                <br>
+                                위도:
+                                ${Number(
+                                    p["위도"]
+                                ).toFixed(7)}
+                                <br>
+                                경도:
+                                ${Number(
+                                    p["경도"]
+                                ).toFixed(7)}
+                            `, {
+                                maxWidth: 380
+                            });
+                        }
+                }
+            );
+
+            /*
+             * 사용자 요청 레이어 버튼 문구
+             */
+            layerControl.addOverlay(
+                humanDamageLayer,
+                "경상북도 인명피해(415)"
+            );
+
+            fetch(
+                `./data/human_damage/` +
+                `gyeongbuk_human_damage.geojson` +
+                `?v=${APP_VERSION}`,
+                {
+                    cache: "no-store"
+                }
+            )
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    humanDamageLayer.addData(
+                        data
+                    );
+
+                    humanDamageCount =
+                        data?.features?.length
+                        || 0;
+
+                    console.log(
+                        "경상북도 인명피해:",
+                        `${humanDamageCount}개 지점`
+                    );
+                })
+                .catch(error => {
+                    console.error(
+                        "인명피해 GeoJSON 로드 실패:",
+                        error
+                    );
+
+                    setLayerStatus(
+                        `인명피해 GeoJSON 로드 실패: ` +
+                        `${error.message}`,
+                        "error"
+                    );
+                });
+
+            map.on(
+                "overlayadd",
+                event => {
+                    if (
+                        event.layer
+                        === humanDamageLayer
+                    ) {
+                        setLayerStatus(
+                            `경상북도 인명피해 ` +
+                            `${humanDamageCount.toLocaleString()}` +
+                            `개 지점을 표시했습니다.`,
+                            "success"
+                        );
+                    }
+                }
+            );
+
+            map.on(
+                "overlayremove",
+                event => {
+                    if (
+                        event.layer
+                        === humanDamageLayer
+                    ) {
+                        setLayerStatus(
+                            "경상북도 인명피해 레이어를 숨겼습니다."
+                        );
+                    }
+                }
+            );
 
             const GYEONGBUK_BOUNDS = L.latLngBounds(
                 [35.55, 127.75],
