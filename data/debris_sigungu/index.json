@@ -1,0 +1,418 @@
+{
+  "title": "경상북도 시군구별 토석류 위험구간",
+  "geometry_type": "LineString",
+  "source_crs": "EPSG:5174",
+  "analysis_crs": "EPSG:32652",
+  "output_crs": "EPSG:4326",
+  "simplification": false,
+  "coordinate_rounding": false,
+  "class_definition": {
+    "1": "RedZone",
+    "2": "YellowZone"
+  },
+  "style": {
+    "1": {
+      "color": "#d7191c",
+      "weight": 3,
+      "opacity": 0.9
+    },
+    "2": {
+      "color": "#f6c945",
+      "weight": 2.5,
+      "opacity": 0.85
+    }
+  },
+  "sigungu": [
+    {
+      "sigungu_code": "001",
+      "sigungu_name": "경산시",
+      "file": "001_경산시.geojson",
+      "url": "./data/debris_sigungu/001_경산시.geojson",
+      "red_count": 790,
+      "yellow_count": 813,
+      "feature_count": 1603,
+      "total_length_km": 1553.428047763186,
+      "file_size_mb": 11.89447021484375,
+      "bounds_epsg4326": [
+        128.69176573124074,
+        35.70532402916747,
+        128.96701837751183,
+        35.98739599723483
+      ]
+    },
+    {
+      "sigungu_code": "002",
+      "sigungu_name": "경주시",
+      "file": "002_경주시.geojson",
+      "url": "./data/debris_sigungu/002_경주시.geojson",
+      "red_count": 3003,
+      "yellow_count": 3107,
+      "feature_count": 6110,
+      "total_length_km": 4312.296861413995,
+      "file_size_mb": 35.4221830368042,
+      "bounds_epsg4326": [
+        128.9747345690138,
+        35.64578991738917,
+        129.51576157604208,
+        36.07401073952302
+      ]
+    },
+    {
+      "sigungu_code": "003",
+      "sigungu_name": "고령군",
+      "file": "003_고령군.geojson",
+      "url": "./data/debris_sigungu/003_고령군.geojson",
+      "red_count": 1051,
+      "yellow_count": 1089,
+      "feature_count": 2140,
+      "total_length_km": 1431.199780858531,
+      "file_size_mb": 10.922224998474121,
+      "bounds_epsg4326": [
+        128.16348885740774,
+        35.621182801283766,
+        128.4430842719559,
+        35.849379990508325
+      ]
+    },
+    {
+      "sigungu_code": "004",
+      "sigungu_name": "구미시",
+      "file": "004_구미시.geojson",
+      "url": "./data/debris_sigungu/004_구미시.geojson",
+      "red_count": 1188,
+      "yellow_count": 1301,
+      "feature_count": 2489,
+      "total_length_km": 1724.3287713491284,
+      "file_size_mb": 13.3082857131958,
+      "bounds_epsg4326": [
+        128.1363876716616,
+        36.06513458123366,
+        128.56058931358103,
+        36.356844530005674
+      ]
+    },
+    {
+      "sigungu_code": "005",
+      "sigungu_name": "김천시",
+      "file": "005_김천시.geojson",
+      "url": "./data/debris_sigungu/005_김천시.geojson",
+      "red_count": 2348,
+      "yellow_count": 2599,
+      "feature_count": 4947,
+      "total_length_km": 4412.728187724846,
+      "file_size_mb": 31.839160919189453,
+      "bounds_epsg4326": [
+        127.88246843522751,
+        35.84091748194307,
+        128.30057116349164,
+        36.255490254561835
+      ]
+    },
+    {
+      "sigungu_code": "006",
+      "sigungu_name": "문경시",
+      "file": "006_문경시.geojson",
+      "url": "./data/debris_sigungu/006_문경시.geojson",
+      "red_count": 2002,
+      "yellow_count": 2039,
+      "feature_count": 4041,
+      "total_length_km": 4022.3698954242186,
+      "file_size_mb": 31.14073657989502,
+      "bounds_epsg4326": [
+        127.8756293971018,
+        36.51697220761087,
+        128.36610166003845,
+        36.86967521655151
+      ]
+    },
+    {
+      "sigungu_code": "007",
+      "sigungu_name": "봉화군",
+      "file": "007_봉화군.geojson",
+      "url": "./data/debris_sigungu/007_봉화군.geojson",
+      "red_count": 2736,
+      "yellow_count": 2813,
+      "feature_count": 5549,
+      "total_length_km": 5215.436378314107,
+      "file_size_mb": 41.82425403594971,
+      "bounds_epsg4326": [
+        128.64086941190274,
+        36.74892238111993,
+        129.15716766441406,
+        37.08588402742213
+      ]
+    },
+    {
+      "sigungu_code": "008",
+      "sigungu_name": "상주시",
+      "file": "008_상주시.geojson",
+      "url": "./data/debris_sigungu/008_상주시.geojson",
+      "red_count": 2557,
+      "yellow_count": 2723,
+      "feature_count": 5280,
+      "total_length_km": 4027.9247104446576,
+      "file_size_mb": 31.771221160888672,
+      "bounds_epsg4326": [
+        127.79685762543764,
+        36.2397525045663,
+        128.33034816631195,
+        36.65639631793079
+      ]
+    },
+    {
+      "sigungu_code": "009",
+      "sigungu_name": "성주군",
+      "file": "009_성주군.geojson",
+      "url": "./data/debris_sigungu/009_성주군.geojson",
+      "red_count": 1327,
+      "yellow_count": 1470,
+      "feature_count": 2797,
+      "total_length_km": 1849.5128134362362,
+      "file_size_mb": 14.708380699157715,
+      "bounds_epsg4326": [
+        128.0518738678131,
+        35.78659350445533,
+        128.39754288421534,
+        36.05397578798465
+      ]
+    },
+    {
+      "sigungu_code": "010",
+      "sigungu_name": "안동시",
+      "file": "010_안동시.geojson",
+      "url": "./data/debris_sigungu/010_안동시.geojson",
+      "red_count": 3701,
+      "yellow_count": 3823,
+      "feature_count": 7524,
+      "total_length_km": 4998.245644033056,
+      "file_size_mb": 39.561631202697754,
+      "bounds_epsg4326": [
+        128.42850527189194,
+        36.29727123852621,
+        128.99692783455134,
+        36.81720744200485
+      ]
+    },
+    {
+      "sigungu_code": "011",
+      "sigungu_name": "영덕군",
+      "file": "011_영덕군.geojson",
+      "url": "./data/debris_sigungu/011_영덕군.geojson",
+      "red_count": 1748,
+      "yellow_count": 1817,
+      "feature_count": 3565,
+      "total_length_km": 2266.2784177254753,
+      "file_size_mb": 19.574750900268555,
+      "bounds_epsg4326": [
+        129.15488608031788,
+        36.268444674152356,
+        129.44396416258704,
+        36.66638242265265
+      ]
+    },
+    {
+      "sigungu_code": "012",
+      "sigungu_name": "영양군",
+      "file": "012_영양군.geojson",
+      "url": "./data/debris_sigungu/012_영양군.geojson",
+      "red_count": 2044,
+      "yellow_count": 2103,
+      "feature_count": 4147,
+      "total_length_km": 3253.2770092519913,
+      "file_size_mb": 24.16770362854004,
+      "bounds_epsg4326": [
+        128.98806484880078,
+        36.49083367259683,
+        129.29617344838235,
+        36.87770357173063
+      ]
+    },
+    {
+      "sigungu_code": "013",
+      "sigungu_name": "영주시",
+      "file": "013_영주시.geojson",
+      "url": "./data/debris_sigungu/013_영주시.geojson",
+      "red_count": 1353,
+      "yellow_count": 1388,
+      "feature_count": 2741,
+      "total_length_km": 2488.723248855428,
+      "file_size_mb": 20.828646659851074,
+      "bounds_epsg4326": [
+        128.4352848972032,
+        36.697953279145395,
+        128.74083295968617,
+        37.05456670094396
+      ]
+    },
+    {
+      "sigungu_code": "014",
+      "sigungu_name": "영천시",
+      "file": "014_영천시.geojson",
+      "url": "./data/debris_sigungu/014_영천시.geojson",
+      "red_count": 2408,
+      "yellow_count": 2504,
+      "feature_count": 4912,
+      "total_length_km": 2326.210024512491,
+      "file_size_mb": 19.96780300140381,
+      "bounds_epsg4326": [
+        128.70676083386348,
+        35.83702584872901,
+        129.1422505582416,
+        36.17134886348763
+      ]
+    },
+    {
+      "sigungu_code": "015",
+      "sigungu_name": "예천군",
+      "file": "015_예천군.geojson",
+      "url": "./data/debris_sigungu/015_예천군.geojson",
+      "red_count": 1277,
+      "yellow_count": 1352,
+      "feature_count": 2629,
+      "total_length_km": 2531.935819318562,
+      "file_size_mb": 18.96733856201172,
+      "bounds_epsg4326": [
+        128.26200711402757,
+        36.45453695537371,
+        128.60779482779586,
+        36.84289484212853
+      ]
+    },
+    {
+      "sigungu_code": "016",
+      "sigungu_name": "울릉군",
+      "file": "016_울릉군.geojson",
+      "url": "./data/debris_sigungu/016_울릉군.geojson",
+      "red_count": 51,
+      "yellow_count": 106,
+      "feature_count": 157,
+      "total_length_km": 114.26624877388056,
+      "file_size_mb": 0.8195781707763672,
+      "bounds_epsg4326": [
+        130.80340697651158,
+        37.460133949662335,
+        130.91372266806954,
+        37.54135879516951
+      ]
+    },
+    {
+      "sigungu_code": "017",
+      "sigungu_name": "울진군",
+      "file": "017_울진군.geojson",
+      "url": "./data/debris_sigungu/017_울진군.geojson",
+      "red_count": 1890,
+      "yellow_count": 1989,
+      "feature_count": 3879,
+      "total_length_km": 2614.9543345858096,
+      "file_size_mb": 19.958179473876953,
+      "bounds_epsg4326": [
+        129.07733635966932,
+        36.64351738491045,
+        129.47550825776432,
+        37.14511744054092
+      ]
+    },
+    {
+      "sigungu_code": "018",
+      "sigungu_name": "의성군",
+      "file": "018_의성군.geojson",
+      "url": "./data/debris_sigungu/018_의성군.geojson",
+      "red_count": 3075,
+      "yellow_count": 3274,
+      "feature_count": 6349,
+      "total_length_km": 4047.020248290388,
+      "file_size_mb": 34.51419544219971,
+      "bounds_epsg4326": [
+        128.2970858087713,
+        36.196744780944876,
+        128.89345203190962,
+        36.524590142844076
+      ]
+    },
+    {
+      "sigungu_code": "019",
+      "sigungu_name": "청도군",
+      "file": "019_청도군.geojson",
+      "url": "./data/debris_sigungu/019_청도군.geojson",
+      "red_count": 1398,
+      "yellow_count": 1459,
+      "feature_count": 2857,
+      "total_length_km": 2176.702398444268,
+      "file_size_mb": 18.449052810668945,
+      "bounds_epsg4326": [
+        128.52988803373697,
+        35.57046164402627,
+        129.0312531134705,
+        35.84022301867389
+      ]
+    },
+    {
+      "sigungu_code": "020",
+      "sigungu_name": "청송군",
+      "file": "020_청송군.geojson",
+      "url": "./data/debris_sigungu/020_청송군.geojson",
+      "red_count": 2029,
+      "yellow_count": 2087,
+      "feature_count": 4116,
+      "total_length_km": 2868.87927235026,
+      "file_size_mb": 22.314302444458008,
+      "bounds_epsg4326": [
+        128.85388616655362,
+        36.173946802733816,
+        129.2527939154841,
+        36.589549216612745
+      ]
+    },
+    {
+      "sigungu_code": "021",
+      "sigungu_name": "칠곡군",
+      "file": "021_칠곡군.geojson",
+      "url": "./data/debris_sigungu/021_칠곡군.geojson",
+      "red_count": 1046,
+      "yellow_count": 1112,
+      "feature_count": 2158,
+      "total_length_km": 1783.4485525521027,
+      "file_size_mb": 13.579630851745605,
+      "bounds_epsg4326": [
+        128.2950922147713,
+        35.88967026264413,
+        128.6320614144736,
+        36.11965987082884
+      ]
+    },
+    {
+      "sigungu_code": "022",
+      "sigungu_name": "포항시 남구",
+      "file": "022_포항시_남구.geojson",
+      "url": "./data/debris_sigungu/022_포항시_남구.geojson",
+      "red_count": 857,
+      "yellow_count": 903,
+      "feature_count": 1760,
+      "total_length_km": 734.3907624445478,
+      "file_size_mb": 7.166033744812012,
+      "bounds_epsg4326": [
+        129.28256518001228,
+        35.83986090531855,
+        129.57747857601717,
+        36.07466704433107
+      ]
+    },
+    {
+      "sigungu_code": "023",
+      "sigungu_name": "포항시 북구",
+      "file": "023_포항시_북구.geojson",
+      "url": "./data/debris_sigungu/023_포항시_북구.geojson",
+      "red_count": 1497,
+      "yellow_count": 1549,
+      "feature_count": 3046,
+      "total_length_km": 2145.969750885665,
+      "file_size_mb": 17.668225288391113,
+      "bounds_epsg4326": [
+        129.00524968111534,
+        36.02927412836732,
+        129.42543430084987,
+        36.33260484708338
+      ]
+    }
+  ]
+}
