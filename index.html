@@ -447,7 +447,7 @@
 
             <select id="scenario-select">
                 <option value="">선택</option>
-                <option value="12">12시간 / 50 mm</option>
+                <option value="12" selected>12시간 / 50 mm</option>
                 <option value="24">24시간 / 100 mm</option>
                 <option value="36">36시간 / 150 mm</option>
                 <option value="48">48시간 / 200 mm</option>
@@ -1122,6 +1122,37 @@
             };
 
             /*
+             * GitHub Pages와 로컬 서버 모두에서 올바른 절대 URL을 만듭니다.
+             * 예:
+             * https://kounghoonnam.github.io/WebGIS_GB/data/trigrs/
+             */
+            const TRIGRS_TILE_ROOT =
+                new URL("./data/trigrs/", document.baseURI).href;
+
+            /*
+             * 원본 ASC(EPSG:32652)의 경계를 EPSG:4326으로 변환한 범위입니다.
+             * 타일 요청을 경북 본토 범위 안으로 제한하여 불필요한 404를 줄입니다.
+             */
+            const TRIGRS_BOUNDS = L.latLngBounds(
+                [35.561016, 127.787453],
+                [37.145968, 129.593315]
+            );
+
+            /*
+             * GitHub Pages와 브라우저 캐시를 갱신하기 위한 버전 문자열입니다.
+             * index.html을 수정할 때 값만 바꾸면 이전 타일 캐시를 우회합니다.
+             */
+            const TRIGRS_DEPLOY_VERSION = "20260713-03";
+
+            /*
+             * 실제 저장소에 존재하는 대표 타일입니다.
+             * 페이지 실행 시 이 파일이 접근 가능한지 자동 검사합니다.
+             */
+            const TRIGRS_TEST_TILE =
+                `${TRIGRS_TILE_ROOT}12/10/878/400.png` +
+                `?v=${TRIGRS_DEPLOY_VERSION}`;
+
+            /*
              * 배경지도 위, 행정경계 아래에 TRIGRS 타일을 표시합니다.
              */
             map.createPane("trigrsPane");
@@ -1144,20 +1175,29 @@
 
             Object.entries(scenarios).forEach(
                 ([scenarioKey, scenario]) => {
+                    const tileUrl =
+                        `${TRIGRS_TILE_ROOT}${scenario.folder}` +
+                        `/{z}/{x}/{y}.png` +
+                        `?v=${TRIGRS_DEPLOY_VERSION}`;
+
                     const layer = L.tileLayer(
-                        `./data/trigrs/${scenario.folder}/{z}/{x}/{y}.png`,
+                        tileUrl,
                         {
                             minZoom: 7,
+                            minNativeZoom: 7,
                             maxNativeZoom: 12,
                             maxZoom: 18,
                             tileSize: 256,
                             tms: false,
                             noWrap: true,
+                            bounds: TRIGRS_BOUNDS,
                             opacity:
                                 Number(rasterOpacity.value) / 100,
                             pane: "trigrsPane",
-                            keepBuffer: 2,
+                            keepBuffer: 3,
                             updateWhenIdle: false,
+                            updateWhenZooming: true,
+                            crossOrigin: false,
                             attribution:
                                 "TRIGRS 사면안전율 분석 결과"
                         }
@@ -1170,18 +1210,42 @@
 
                         tileErrorDisplayed = true;
 
+                        const failedUrl =
+                            event?.tile?.src ||
+                            `${TRIGRS_TILE_ROOT}${scenario.folder}`;
+
                         console.error(
                             "TRIGRS 타일을 불러오지 못했습니다.",
+                            failedUrl,
                             event
                         );
 
                         scenarioInfo.innerHTML = `
-                            <strong>타일 로드 실패</strong><br>
-                            선택 시나리오: ${scenario.duration}시간 /
+                            <strong>TRIGRS 타일 로드 실패</strong><br>
+                            선택 시나리오:
+                            ${scenario.duration}시간 /
                             ${scenario.rainfall} mm<br>
-                            <code>data/trigrs/${scenario.folder}</code>
-                            폴더와 파일 경로를 확인해 주세요.
+                            실패 URL:<br>
+                            <small style="word-break:break-all;">
+                                ${escapeHtml(failedUrl)}
+                            </small><br>
+                            배포 완료 여부와 파일 경로를 확인해 주세요.
                         `;
+                    });
+
+                    let firstTileLoaded = false;
+
+                    layer.on("tileload", () => {
+                        if (firstTileLoaded) {
+                            return;
+                        }
+
+                        firstTileLoaded = true;
+
+                        console.log(
+                            `TRIGRS ${scenario.duration}시간 ` +
+                            "첫 타일 로드 성공"
+                        );
                     });
 
                     trigrsTileLayers[scenarioKey] = layer;
@@ -1222,6 +1286,28 @@
                 );
 
                 activeTrigrsLayer.addTo(map);
+                activeTrigrsLayer.bringToFront();
+
+                /*
+                 * 타일 범위가 화면 밖에 있으면 보이지 않는 것처럼 느껴질 수
+                 * 있으므로 선택 즉시 경북 본토 범위로 이동합니다.
+                 */
+                map.fitBounds(
+                    TRIGRS_BOUNDS,
+                    {
+                        padding: [20, 20],
+                        maxZoom: 9
+                    }
+                );
+
+                /*
+                 * GitHub Pages 배포 직후 또는 화면 크기 변경 후에도
+                 * 타일을 다시 계산하도록 강제합니다.
+                 */
+                setTimeout(() => {
+                    map.invalidateSize();
+                    activeTrigrsLayer.redraw();
+                }, 150);
 
                 scenarioInfo.innerHTML = `
                     <strong>${scenario.duration}시간 시나리오</strong><br>
@@ -1255,6 +1341,52 @@
                     }
                 }
             );
+
+            /*
+             * GitHub Pages가 대표 타일을 실제로 제공하는지 먼저 검사합니다.
+             */
+            fetch(
+                TRIGRS_TEST_TILE,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            )
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+                    }
+
+                    console.log(
+                        "TRIGRS 대표 타일 접근 성공:",
+                        TRIGRS_TEST_TILE
+                    );
+
+                    /*
+                     * 초기 화면에서 12시간 결과를 자동 표시합니다.
+                     */
+                    scenarioSelect.value = "12";
+                    showTrigrsScenario("12");
+                })
+                .catch((error) => {
+                    console.error(
+                        "TRIGRS 대표 타일 접근 실패:",
+                        TRIGRS_TEST_TILE,
+                        error
+                    );
+
+                    scenarioInfo.innerHTML = `
+                        <strong>TRIGRS 대표 타일 접근 실패</strong><br>
+                        다음 주소가 GitHub Pages에서 아직 배포되지 않았거나
+                        경로가 다릅니다.<br>
+                        <small style="word-break:break-all;">
+                            ${escapeHtml(TRIGRS_TEST_TILE)}
+                        </small><br>
+                        오류: ${escapeHtml(error.message)}
+                    `;
+                });
 
             /* =====================================================
                5. 경상북도 경계 GeoJSON
