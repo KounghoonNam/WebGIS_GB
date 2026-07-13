@@ -3,23 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경상북도 산사태 위험 통합 WebGIS</title>
 
-    <title>경상북도 TRIGRS 산사태 위험 WebGIS</title>
-
-    <!--
-        Leaflet CSS
-        기존 unpkg + integrity 방식 대신 jsDelivr를 사용하여
-        CDN 또는 무결성 검증 문제로 지도가 비어 보이는 현상을 줄였습니다.
-    -->
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
     >
 
     <style>
-        /* =========================================================
-           1. 전체 화면
-        ========================================================= */
         * {
             box-sizing: border-box;
         }
@@ -29,86 +20,78 @@
             width: 100%;
             height: 100%;
             margin: 0;
-            padding: 0;
             overflow: hidden;
             font-family: "Malgun Gothic", "Noto Sans KR", Arial, sans-serif;
+            color: #1f2937;
         }
 
-        /* =========================================================
-           2. 상단 제목 및 시나리오 선택
-        ========================================================= */
         #header {
             position: relative;
             z-index: 2000;
-
             width: 100%;
-            height: 76px;
+            height: 78px;
             padding: 10px 18px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 20px;
-
             color: #ffffff;
             background: #17324d;
         }
 
         #header h1 {
-            margin: 0 0 4px 0;
+            margin: 0 0 4px;
             font-size: 22px;
         }
 
         #header p {
             margin: 0;
             font-size: 13px;
-            opacity: 0.85;
+            opacity: 0.86;
         }
 
-        .controls {
+        .header-controls {
             display: flex;
             align-items: center;
             gap: 9px;
         }
 
-        .controls label {
+        .header-controls label {
             font-size: 14px;
             font-weight: 700;
             white-space: nowrap;
         }
 
-        #scenario-select {
-            min-width: 230px;
-            padding: 9px 11px;
-
-            border: 1px solid #d0d7de;
-            border-radius: 6px;
-
-            background: #ffffff;
-            font-size: 14px;
+        select,
+        input,
+        button {
+            font: inherit;
         }
 
-        /* =========================================================
-           3. 지도
-        ========================================================= */
+        #scenario-select {
+            min-width: 220px;
+            padding: 8px 10px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
         #map {
             position: relative;
             width: 100%;
-            height: calc(100% - 76px);
+            height: calc(100% - 78px);
             background: #e8eef3;
         }
 
-        /* Leaflet이 로드되지 않았을 때 안내문 */
         #map-error {
             display: none;
             position: absolute;
             z-index: 3000;
             left: 50%;
             top: 50%;
-            width: min(520px, calc(100% - 40px));
+            width: min(540px, calc(100% - 40px));
             padding: 22px;
             transform: translate(-50%, -50%);
-
             color: #842029;
             background: #f8d7da;
             border: 1px solid #f5c2c7;
@@ -117,30 +100,43 @@
             line-height: 1.6;
         }
 
-
-        /* =========================================================
-           4. 주소 및 좌표 검색 패널
-        ========================================================= */
-        #search-panel {
+        .floating-panel {
             position: absolute;
-            top: 92px;
-            left: 70px;
             z-index: 1500;
-
-            width: 390px;
             padding: 13px;
-
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.97);
-            box-shadow: 0 2px 9px rgba(0, 0, 0, 0.24);
-
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.24);
             font-size: 13px;
         }
 
-        .search-title {
-            margin-bottom: 8px;
+        #search-panel {
+            top: 94px;
+            left: 68px;
+            width: 390px;
+        }
+
+        #layer-panel {
+            top: 94px;
+            right: 16px;
+            width: 320px;
+            max-height: calc(100vh - 190px);
+            overflow-y: auto;
+        }
+
+        #legend {
+            right: 16px;
+            bottom: 22px;
+            width: 260px;
+            max-height: 310px;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            margin-bottom: 9px;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
+            color: #17324d;
         }
 
         .search-row,
@@ -152,14 +148,13 @@
 
         #address-input,
         #latitude-input,
-        #longitude-input {
+        #longitude-input,
+        #debris-sigungu-select {
             min-width: 0;
             padding: 8px 9px;
-
             border: 1px solid #b8c2cc;
             border-radius: 5px;
             background: #ffffff;
-            font-size: 13px;
         }
 
         #address-input {
@@ -172,186 +167,196 @@
             flex: 1 1 0;
         }
 
-        #address-search-button,
-        #coordinate-search-button {
+        .primary-button,
+        .secondary-button {
             flex: 0 0 auto;
             padding: 8px 11px;
-
-            color: #ffffff;
-            background: #1f5f8b;
-            border: 0;
             border-radius: 5px;
-
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
         }
 
-        #address-search-button:hover,
-        #coordinate-search-button:hover {
+        .primary-button {
+            color: #ffffff;
+            background: #1f5f8b;
+            border: 0;
+        }
+
+        .primary-button:hover {
             background: #174968;
         }
 
-        #address-search-button:disabled,
-        #coordinate-search-button:disabled {
-            opacity: 0.6;
+        .secondary-button {
+            color: #243447;
+            background: #eef2f6;
+            border: 1px solid #c9d2dc;
+        }
+
+        button:disabled {
+            opacity: 0.58;
             cursor: wait;
         }
 
-        #search-message {
+        #search-message,
+        #layer-status {
             min-height: 20px;
             margin-top: 8px;
-            color: #3d4a57;
             line-height: 1.45;
         }
 
-        #search-message.error {
+        #search-message.error,
+        #layer-status.error {
             color: #b42318;
         }
 
-        #search-message.success {
+        #search-message.success,
+        #layer-status.success {
             color: #176b3a;
         }
 
-        .search-help {
+        .help-text {
             margin-top: 6px;
             color: #66727e;
             font-size: 11px;
             line-height: 1.45;
         }
 
-        /* =========================================================
-           5. 정보 패널 및 범례
-        ========================================================= */
-        #info-panel,
-        #legend {
-            position: absolute;
-            right: 16px;
-            z-index: 1500;
-
-            width: 245px;
-            padding: 13px;
-
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 2px 9px rgba(0, 0, 0, 0.24);
-
-            font-size: 13px;
-            line-height: 1.65;
+        .layer-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dfe5ea;
         }
 
-        #info-panel {
-            top: 92px;
+        .layer-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: 0;
         }
 
-        #scenario-info {
-            margin: 7px 0 0 0;
+        .layer-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 7px;
         }
 
-        #legend {
-            bottom: 24px;
+        .layer-check-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 800;
+            cursor: pointer;
         }
 
-        #info-panel > strong,
-        .legend-title {
-            font-size: 14px;
+        .layer-check-label input,
+        .inline-checks input {
+            accent-color: #1f5f8b;
+        }
+
+        .opacity-row {
+            display: grid;
+            grid-template-columns: 76px 1fr 38px;
+            align-items: center;
+            gap: 7px;
+            margin-top: 7px;
+            font-size: 12px;
+        }
+
+        .opacity-row input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .inline-checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .inline-checks label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
             font-weight: 700;
         }
 
+        #debris-sigungu-select {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        .button-row button {
+            flex: 1 1 0;
+        }
+
+        .legend-section {
+            display: none;
+            margin-top: 9px;
+            padding-top: 8px;
+            border-top: 1px solid #dfe5ea;
+        }
+
+        .legend-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: 0;
+        }
+
+        .legend-section.active {
+            display: block;
+        }
+
         .legend-title {
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 800;
         }
 
         .legend-row {
             display: flex;
             align-items: center;
             gap: 8px;
-            min-height: 25px;
+            min-height: 23px;
+            font-size: 12px;
         }
 
         .legend-color {
-            display: inline-block;
             width: 20px;
             height: 13px;
             flex: 0 0 auto;
-
-            border: 1px solid rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(0, 0, 0, 0.32);
         }
 
-        /* 안전율 4등급 */
-        .fs1 {
-            background: #d7191c;
+        .line-sample {
+            width: 25px;
+            height: 0;
+            flex: 0 0 auto;
+            border-top-style: solid;
         }
 
-        .fs2 {
-            background: #fdae61;
-        }
-
-        .fs3 {
-            background: #a6d96a;
-        }
-
-        .fs4 {
-            background: #1a9641;
-        }
-
-
-        .raster-opacity-box {
-            margin-top: 10px;
-            padding-top: 9px;
-            border-top: 1px solid #dfe5ea;
-        }
-
-        .raster-opacity-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        #raster-opacity {
-            width: 100%;
-            cursor: pointer;
-        }
-
-
-        /* 시군구 + 읍면동 통합 툴팁 */
-        .admin-area-tooltip {
-            min-width: 125px;
-            padding: 7px 9px;
-
+        .admin-tooltip {
+            min-width: 110px;
+            padding: 6px 8px;
             color: #1f2937;
             background: rgba(255, 255, 255, 0.97);
-
             border: 1px solid #4b5563;
             border-radius: 5px;
-
             font-size: 12px;
-            line-height: 1.45;
+            font-weight: 700;
             text-align: center;
-
             box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
         }
 
-        .admin-area-tooltip::before {
-            border-top-color: #4b5563 !important;
-        }
-
-        .admin-tooltip-sigungu {
-            color: #174a7e;
-            font-weight: 700;
-        }
-
-        .admin-tooltip-emd {
-            color: #111827;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        /* =========================================================
-           6. 스케일바 강조
-        ========================================================= */
         .leaflet-control-scale {
             margin-left: 15px !important;
             margin-bottom: 18px !important;
@@ -360,31 +365,21 @@
         .leaflet-control-scale-line {
             min-width: 75px;
             padding: 3px 8px 2px;
-
             color: #111111;
             background: rgba(255, 255, 255, 0.94);
-
             border: 2px solid #222222;
             border-top: none;
-
             font-size: 13px;
             font-weight: 700;
-            line-height: 1.35;
             text-align: center;
-
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
         }
 
-        /* 확대·축소 및 레이어 버튼이 패널보다 위에 표시되도록 설정 */
         .leaflet-top,
         .leaflet-bottom {
             z-index: 1600;
         }
 
-        /* =========================================================
-           7. 모바일 화면
-        ========================================================= */
-        @media screen and (max-width: 720px) {
+        @media screen and (max-width: 900px) {
             #header {
                 height: 118px;
                 display: block;
@@ -395,8 +390,8 @@
                 font-size: 18px;
             }
 
-            .controls {
-                margin-top: 10px;
+            .header-controls {
+                margin-top: 9px;
             }
 
             #scenario-select {
@@ -415,21 +410,19 @@
                 width: auto;
             }
 
-            #info-panel {
-                top: 342px;
+            #layer-panel {
+                top: 326px;
+                left: 10px;
                 right: 10px;
-                width: 215px;
+                width: auto;
+                max-height: 300px;
             }
 
             #legend {
                 right: 10px;
-                bottom: 18px;
-                width: 180px;
-            }
-
-            .leaflet-control-scale {
-                margin-left: 10px !important;
-                margin-bottom: 12px !important;
+                bottom: 16px;
+                width: 210px;
+                max-height: 230px;
             }
         }
     </style>
@@ -438,16 +431,14 @@
 <body>
     <header id="header">
         <div>
-            <h1>경상북도 TRIGRS 산사태 위험 WebGIS</h1>
-            <p>누적강우 시나리오별 사면안전율(FS) 분석</p>
+            <h1>경상북도 산사태 위험 통합 WebGIS</h1>
+            <p>TRIGRS 사면안전율 · 산사태 취약성 · 토석류 위험구간</p>
         </div>
 
-        <div class="controls">
+        <div class="header-controls">
             <label for="scenario-select">강우 시나리오</label>
-
             <select id="scenario-select">
-                <option value="">선택</option>
-                <option value="12" selected>12시간 / 50 mm</option>
+                <option value="12">12시간 / 50 mm</option>
                 <option value="24">24시간 / 100 mm</option>
                 <option value="36">36시간 / 150 mm</option>
                 <option value="48">48시간 / 200 mm</option>
@@ -464,9 +455,8 @@
         </div>
     </main>
 
-
-    <section id="search-panel">
-        <div class="search-title">주소 및 좌표 검색</div>
+    <section id="search-panel" class="floating-panel">
+        <div class="panel-title">주소 및 좌표 검색</div>
 
         <div class="search-row">
             <input
@@ -474,29 +464,16 @@
                 type="search"
                 placeholder="예: 경상북도 예천군 감천면 포리 688"
                 autocomplete="off"
-                aria-label="검색할 주소"
             >
-            <button id="address-search-button" type="button">
+            <button id="address-search-button" class="primary-button" type="button">
                 주소검색
             </button>
         </div>
 
         <div class="coordinate-row">
-            <input
-                id="latitude-input"
-                type="number"
-                step="any"
-                placeholder="위도 36.35"
-                aria-label="위도"
-            >
-            <input
-                id="longitude-input"
-                type="number"
-                step="any"
-                placeholder="경도 128.75"
-                aria-label="경도"
-            >
-            <button id="coordinate-search-button" type="button">
+            <input id="latitude-input" type="number" step="any" placeholder="위도 36.35">
+            <input id="longitude-input" type="number" step="any" placeholder="경도 128.75">
+            <button id="coordinate-search-button" class="primary-button" type="button">
                 좌표이동
             </button>
         </div>
@@ -505,71 +482,124 @@
             주소를 입력하거나 지도에서 원하는 지점을 클릭해 주세요.
         </div>
 
-        <div class="search-help">
+        <div class="help-text">
             좌표계: WGS84(EPSG:4326) · 위도(Y), 경도(X) 순서
         </div>
     </section>
 
-    <section id="info-panel">
-        <strong>분석정보</strong>
+    <section id="layer-panel" class="floating-panel">
+        <div class="panel-title">분석 레이어</div>
 
-        <p id="scenario-info">
-            Leaflet 라이브러리를 불러오는 중입니다.
-        </p>
-
-        <div class="raster-opacity-box">
-            <div class="raster-opacity-header">
-                <span>위험지도 투명도</span>
-                <span id="raster-opacity-value">75%</span>
+        <div class="layer-section">
+            <div class="layer-title-row">
+                <label class="layer-check-label">
+                    <input id="trigrs-enabled" type="checkbox" checked>
+                    TRIGRS 사면안전율
+                </label>
             </div>
 
-            <input
-                id="raster-opacity"
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value="75"
-                aria-label="TRIGRS 위험지도 투명도"
-            >
+            <div class="opacity-row">
+                <span>투명도</span>
+                <input id="trigrs-opacity" type="range" min="0" max="100" step="5" value="75">
+                <span id="trigrs-opacity-value">75%</span>
+            </div>
+        </div>
+
+        <div class="layer-section">
+            <div class="layer-title-row">
+                <label class="layer-check-label">
+                    <input id="susceptibility-enabled" type="checkbox">
+                    산사태 취약성 지도
+                </label>
+            </div>
+
+            <div class="opacity-row">
+                <span>투명도</span>
+                <input id="susceptibility-opacity" type="range" min="0" max="100" step="5" value="70">
+                <span id="susceptibility-opacity-value">70%</span>
+            </div>
+        </div>
+
+        <div class="layer-section">
+            <div class="layer-title-row">
+                <label class="layer-check-label">
+                    <input id="debris-enabled" type="checkbox">
+                    토석류 위험구간
+                </label>
+            </div>
+
+            <select id="debris-sigungu-select" disabled>
+                <option value="">시군구 목록을 불러오는 중...</option>
+            </select>
+
+            <div class="inline-checks">
+                <label>
+                    <input id="debris-red-enabled" type="checkbox" checked>
+                    RedZone
+                </label>
+                <label>
+                    <input id="debris-yellow-enabled" type="checkbox" checked>
+                    YellowZone
+                </label>
+            </div>
+
+            <div class="opacity-row">
+                <span>선 투명도</span>
+                <input id="debris-opacity" type="range" min="10" max="100" step="5" value="90">
+                <span id="debris-opacity-value">90%</span>
+            </div>
+
+            <div class="button-row">
+                <button id="debris-load-button" class="primary-button" type="button" disabled>
+                    선택지역 불러오기
+                </button>
+                <button id="debris-clear-button" class="secondary-button" type="button" disabled>
+                    제거
+                </button>
+            </div>
+
+            <div class="help-text">
+                대용량 자료이므로 선택한 시군구 한 곳만 불러옵니다.
+            </div>
+        </div>
+
+        <div id="layer-status">
+            분석 레이어를 준비하는 중입니다.
         </div>
     </section>
 
-    <section id="legend">
-        <div class="legend-title">안전율 FS</div>
+    <section id="legend" class="floating-panel">
+        <div class="panel-title">범례</div>
 
-        <div class="legend-row">
-            <span class="legend-color fs1"></span>
-            <span>FS &lt; 1.0</span>
+        <div id="legend-trigrs" class="legend-section active">
+            <div class="legend-title">TRIGRS 안전율 FS</div>
+            <div class="legend-row"><span class="legend-color" style="background:#d7191c"></span><span>FS &lt; 1.0</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#fdae61"></span><span>1.0 ≤ FS &lt; 1.3</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#a6d96a"></span><span>1.3 ≤ FS &lt; 1.5</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#1a9641"></span><span>FS ≥ 1.5</span></div>
         </div>
 
-        <div class="legend-row">
-            <span class="legend-color fs2"></span>
-            <span>1.0 ≤ FS &lt; 1.3</span>
+        <div id="legend-susceptibility" class="legend-section">
+            <div class="legend-title">산사태 취약성 등급</div>
+            <div class="legend-row"><span class="legend-color" style="background:#d7191c"></span><span>1등급 · 매우 높음</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#fdae61"></span><span>2등급 · 높음</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#ffffbf"></span><span>3등급 · 보통</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#a6d96a"></span><span>4등급 · 낮음</span></div>
+            <div class="legend-row"><span class="legend-color" style="background:#1a9641"></span><span>5등급 · 매우 낮음</span></div>
         </div>
 
-        <div class="legend-row">
-            <span class="legend-color fs3"></span>
-            <span>1.3 ≤ FS &lt; 1.5</span>
-        </div>
-
-        <div class="legend-row">
-            <span class="legend-color fs4"></span>
-            <span>FS ≥ 1.5</span>
+        <div id="legend-debris" class="legend-section">
+            <div class="legend-title">토석류 위험구간</div>
+            <div class="legend-row"><span class="line-sample" style="border-top-width:4px;border-top-color:#d7191c"></span><span>RedZone</span></div>
+            <div class="legend-row"><span class="line-sample" style="border-top-width:4px;border-top-color:#f6c945"></span><span>YellowZone</span></div>
         </div>
     </section>
 
     <script>
         "use strict";
 
-        /*
-         * Leaflet JavaScript를 순차적으로 불러옵니다.
-         * 1순위: jsDelivr
-         * 2순위: cdnjs
-         * 3순위: unpkg
-         *
-         * 하나의 CDN이 차단되거나 응답하지 않아도 다음 주소를 시도합니다.
-         */
+        const APP_VERSION = "20260713-05";
+
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js",
@@ -581,13 +611,11 @@
                 const script = document.createElement("script");
                 script.src = src;
                 script.async = true;
-
                 script.onload = () => resolve(src);
                 script.onerror = () => {
                     script.remove();
                     reject(new Error(`스크립트 로드 실패: ${src}`));
                 };
-
                 document.head.appendChild(script);
             });
         }
@@ -596,78 +624,44 @@
             for (const src of leafletSources) {
                 try {
                     await loadExternalScript(src);
-
                     if (typeof window.L !== "undefined") {
-                        console.log(`Leaflet 로드 성공: ${src}`);
                         return;
                     }
                 } catch (error) {
                     console.warn(error.message);
                 }
             }
-
             throw new Error("모든 Leaflet CDN 로드에 실패했습니다.");
         }
 
         function initializeWebGIS() {
-            const scenarioInfo =
-                document.getElementById("scenario-info");
+            const VWORLD_API_KEY = "6476C315-830A-3C00-9E28-033BD2561DAF";
 
-            const searchMessage =
-                document.getElementById("search-message");
-
-            const addressInput =
-                document.getElementById("address-input");
-
-            const latitudeInput =
-                document.getElementById("latitude-input");
-
-            const longitudeInput =
-                document.getElementById("longitude-input");
-
-            const addressSearchButton =
-                document.getElementById("address-search-button");
-
-            const coordinateSearchButton =
-                document.getElementById("coordinate-search-button");
-
-            /* =====================================================
-               1. 지도 생성
-            ===================================================== */
-            const map = L.map("map", {
-                center: [36.35, 128.75],
-                zoom: 8,
-                minZoom: 6,
-                maxZoom: 18,
-                zoomControl: true,
-                preferCanvas: true
-            });
-
-            /* =====================================================
-               2. 배경지도
-               - VWorld 일반지도
-               - VWorld 영상지도
-               - VWorld 영상 + 지명
-               - OpenStreetMap
-            ===================================================== */
-
-            const VWORLD_API_KEY =
-                "6476C315-830A-3C00-9E28-033BD2561DAF";
-
-            /*
-             * VWorld Geocoder는 브라우저에서 JSONP 방식으로 호출합니다.
-             * 주소검색: ROAD 검색 후 실패하면 PARCEL을 자동 재검색합니다.
-             * 좌표검색: 입력 좌표로 이동한 뒤 역지오코딩으로 주소를 표시합니다.
-             */
-            let searchMarker = null;
-
-            function setSearchMessage(message, type = "") {
-                searchMessage.textContent = message;
-                searchMessage.className = type;
-            }
+            const scenarioSelect = document.getElementById("scenario-select");
+            const trigrsEnabled = document.getElementById("trigrs-enabled");
+            const trigrsOpacity = document.getElementById("trigrs-opacity");
+            const trigrsOpacityValue = document.getElementById("trigrs-opacity-value");
+            const susceptibilityEnabled = document.getElementById("susceptibility-enabled");
+            const susceptibilityOpacity = document.getElementById("susceptibility-opacity");
+            const susceptibilityOpacityValue = document.getElementById("susceptibility-opacity-value");
+            const debrisEnabled = document.getElementById("debris-enabled");
+            const debrisSelect = document.getElementById("debris-sigungu-select");
+            const debrisRedEnabled = document.getElementById("debris-red-enabled");
+            const debrisYellowEnabled = document.getElementById("debris-yellow-enabled");
+            const debrisOpacity = document.getElementById("debris-opacity");
+            const debrisOpacityValue = document.getElementById("debris-opacity-value");
+            const debrisLoadButton = document.getElementById("debris-load-button");
+            const debrisClearButton = document.getElementById("debris-clear-button");
+            const layerStatus = document.getElementById("layer-status");
+            const searchMessage = document.getElementById("search-message");
+            const addressInput = document.getElementById("address-input");
+            const latitudeInput = document.getElementById("latitude-input");
+            const longitudeInput = document.getElementById("longitude-input");
+            const addressSearchButton = document.getElementById("address-search-button");
+            const coordinateSearchButton = document.getElementById("coordinate-search-button");
 
             function escapeHtml(value) {
-                return String(value)
+                return String(value ?? "")
                     .replaceAll("&", "&amp;")
                     .replaceAll("<", "&lt;")
                     .replaceAll(">", "&gt;")
@@ -675,27 +669,631 @@
                     .replaceAll("'", "&#039;");
             }
 
+            function setLayerStatus(message, type = "") {
+                layerStatus.textContent = message;
+                layerStatus.className = type;
+            }
+
+            function setSearchMessage(message, type = "") {
+                searchMessage.textContent = message;
+                searchMessage.className = type;
+            }
+
+            const map = L.map("map", {
+                center: [36.35, 128.75],
+                zoom: 8,
+                minZoom: 6,
+                maxZoom: 19,
+                zoomControl: true,
+                preferCanvas: true
+            });
+
+            [
+                ["susceptibilityPane", 410, "none"],
+                ["trigrsPane", 420, "none"],
+                ["sigunguPane", 480, "auto"],
+                ["emdPane", 490, "auto"],
+                ["debrisPane", 540, "auto"]
+            ].forEach(([name, zIndex, pointerEvents]) => {
+                if (!map.getPane(name)) {
+                    map.createPane(name);
+                }
+                map.getPane(name).style.zIndex = String(zIndex);
+                map.getPane(name).style.pointerEvents = pointerEvents;
+            });
+
+            const vworldBaseLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Base/{z}/{y}/{x}.png`,
+                { minZoom: 6, maxZoom: 19, attribution: "&copy; VWorld" }
+            );
+
+            const vworldSatelliteLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
+                { minZoom: 6, maxZoom: 19, attribution: "&copy; VWorld" }
+            );
+
+            const vworldSatelliteForHybrid = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
+                { minZoom: 6, maxZoom: 19, attribution: "&copy; VWorld" }
+            );
+
+            const vworldHybridLabelLayer = L.tileLayer(
+                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Hybrid/{z}/{y}/{x}.png`,
+                { minZoom: 6, maxZoom: 19, attribution: "&copy; VWorld" }
+            );
+
+            const vworldHybridLayer = L.layerGroup([
+                vworldSatelliteForHybrid,
+                vworldHybridLabelLayer
+            ]);
+
+            const osmLayer = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
+            );
+
+            vworldBaseLayer.addTo(map);
+
+            const layerControl = L.control.layers(
+                {
+                    "VWorld 일반지도": vworldBaseLayer,
+                    "VWorld 영상지도": vworldSatelliteLayer,
+                    "VWorld 영상 + 지명": vworldHybridLayer,
+                    "OpenStreetMap": osmLayer
+                },
+                {},
+                { position: "topleft", collapsed: true }
+            ).addTo(map);
+
+            L.control.scale({
+                position: "bottomleft",
+                metric: true,
+                imperial: false,
+                maxWidth: 220
+            }).addTo(map);
+
+            const GYEONGBUK_BOUNDS = L.latLngBounds(
+                [35.55, 127.75],
+                [37.60, 131.95]
+            );
+
+            const scenarios = {
+                "12": { duration: 12, rainfall: 50, folder: "12", source: "TRfs_min_gb50300_1.asc" },
+                "24": { duration: 24, rainfall: 100, folder: "24", source: "TRfs_min_gb50300_2.asc" },
+                "36": { duration: 36, rainfall: 150, folder: "36", source: "TRfs_min_gb50300_3.asc" },
+                "48": { duration: 48, rainfall: 200, folder: "48", source: "TRfs_min_gb50300_4.asc" },
+                "60": { duration: 60, rainfall: 250, folder: "60", source: "TRfs_min_gb50300_5.asc" },
+                "72": { duration: 72, rainfall: 300, folder: "72", source: "TRfs_min_gb50300_6.asc" }
+            };
+
+            const trigrsRoot = new URL("./data/trigrs/", document.baseURI).href;
+            const trigrsLayers = {};
+            let activeTrigrsLayer = null;
+
+            Object.entries(scenarios).forEach(([key, scenario]) => {
+                const layer = L.tileLayer(
+                    `${trigrsRoot}${scenario.folder}/{z}/{x}/{y}.png?v=${APP_VERSION}`,
+                    {
+                        minZoom: 7,
+                        minNativeZoom: 7,
+                        maxNativeZoom: 12,
+                        maxZoom: 19,
+                        noWrap: true,
+                        opacity: Number(trigrsOpacity.value) / 100,
+                        pane: "trigrsPane",
+                        keepBuffer: 3,
+                        updateWhenIdle: false,
+                        attribution: "TRIGRS 사면안전율"
+                    }
+                );
+
+                layer.on("tileerror", event => {
+                    console.warn("TRIGRS 타일 로드 실패", event?.tile?.src);
+                });
+
+                trigrsLayers[key] = layer;
+            });
+
+            function showTrigrsScenario(key, fitMap = false) {
+                if (activeTrigrsLayer && map.hasLayer(activeTrigrsLayer)) {
+                    map.removeLayer(activeTrigrsLayer);
+                }
+
+                activeTrigrsLayer = trigrsLayers[key] || null;
+
+                if (!trigrsEnabled.checked || !activeTrigrsLayer) {
+                    updateLegendVisibility();
+                    return;
+                }
+
+                activeTrigrsLayer.setOpacity(Number(trigrsOpacity.value) / 100);
+                activeTrigrsLayer.addTo(map);
+
+                const scenario = scenarios[key];
+                setLayerStatus(
+                    `TRIGRS ${scenario.duration}시간 / ${scenario.rainfall} mm 표시 · ${scenario.source}`,
+                    "success"
+                );
+
+                if (fitMap) {
+                    map.fitBounds(GYEONGBUK_BOUNDS, { padding: [18, 18], maxZoom: 9 });
+                }
+
+                updateLegendVisibility();
+            }
+
+            const susceptibilityRoot = new URL(
+                "./data/landslide_susceptibility/",
+                document.baseURI
+            ).href;
+
+            const susceptibilityLayer = L.tileLayer(
+                `${susceptibilityRoot}{z}/{x}/{y}.png?v=${APP_VERSION}`,
+                {
+                    minZoom: 7,
+                    minNativeZoom: 7,
+                    maxNativeZoom: 12,
+                    maxZoom: 19,
+                    noWrap: true,
+                    opacity: Number(susceptibilityOpacity.value) / 100,
+                    pane: "susceptibilityPane",
+                    keepBuffer: 3,
+                    updateWhenIdle: false,
+                    attribution: "산사태 취약성 지도"
+                }
+            );
+
+            susceptibilityLayer.on("tileerror", event => {
+                console.warn("산사태 취약성 타일 로드 실패", event?.tile?.src);
+            });
+
+            function updateSusceptibilityLayer(fitMap = false) {
+                if (susceptibilityEnabled.checked) {
+                    susceptibilityLayer.setOpacity(
+                        Number(susceptibilityOpacity.value) / 100
+                    );
+                    if (!map.hasLayer(susceptibilityLayer)) {
+                        susceptibilityLayer.addTo(map);
+                    }
+                    setLayerStatus("산사태 취약성 1~5등급 지도를 표시했습니다.", "success");
+                    if (fitMap) {
+                        map.fitBounds(GYEONGBUK_BOUNDS, { padding: [18, 18], maxZoom: 9 });
+                    }
+                } else if (map.hasLayer(susceptibilityLayer)) {
+                    map.removeLayer(susceptibilityLayer);
+                }
+                updateLegendVisibility();
+            }
+
+            function updateLegendVisibility() {
+                document.getElementById("legend-trigrs").classList.toggle(
+                    "active",
+                    trigrsEnabled.checked
+                );
+                document.getElementById("legend-susceptibility").classList.toggle(
+                    "active",
+                    susceptibilityEnabled.checked
+                );
+                document.getElementById("legend-debris").classList.toggle(
+                    "active",
+                    debrisEnabled.checked && (debrisRedEnabled.checked || debrisYellowEnabled.checked)
+                );
+            }
+
+            scenarioSelect.addEventListener("change", () => {
+                showTrigrsScenario(scenarioSelect.value, true);
+            });
+
+            trigrsEnabled.addEventListener("change", () => {
+                showTrigrsScenario(scenarioSelect.value, false);
+                if (!trigrsEnabled.checked) {
+                    setLayerStatus("TRIGRS 레이어를 숨겼습니다.");
+                }
+            });
+
+            trigrsOpacity.addEventListener("input", () => {
+                const value = Number(trigrsOpacity.value);
+                trigrsOpacityValue.textContent = `${value}%`;
+                if (activeTrigrsLayer) {
+                    activeTrigrsLayer.setOpacity(value / 100);
+                }
+            });
+
+            susceptibilityEnabled.addEventListener("change", () => {
+                updateSusceptibilityLayer(true);
+            });
+
+            susceptibilityOpacity.addEventListener("input", () => {
+                const value = Number(susceptibilityOpacity.value);
+                susceptibilityOpacityValue.textContent = `${value}%`;
+                susceptibilityLayer.setOpacity(value / 100);
+            });
+
+            const debrisRenderer = L.canvas({
+                padding: 0.5,
+                tolerance: 5
+            });
+
+            let debrisIndex = [];
+            let debrisIndexByFile = new Map();
+            let debrisRedLayer = null;
+            let debrisYellowLayer = null;
+            let debrisAbortController = null;
+            let loadedDebrisFile = "";
+            let loadedDebrisName = "";
+
+            function debrisPopupHtml(feature) {
+                const p = feature.properties || {};
+                const length = Number(p.LENGTH_M);
+                return `
+                    <strong>${escapeHtml(p.ZONE || "토석류 위험구간")}</strong><br>
+                    시군구: ${escapeHtml(p.SIGUNGU || "-")}<br>
+                    객체번호: ${escapeHtml(p.ID_NUM ?? "-")}<br>
+                    구간 길이: ${Number.isFinite(length) ? length.toFixed(1) : "-"} m<br>
+                    관리기관: ${escapeHtml(p.MANAGER || "-")}
+                `;
+            }
+
+            function buildDebrisLayer(featureCollection, classValue) {
+                const isRed = classValue === 1;
+                const opacity = Number(debrisOpacity.value) / 100;
+
+                return L.geoJSON(featureCollection, {
+                    pane: "debrisPane",
+                    renderer: debrisRenderer,
+                    bubblingMouseEvents: false,
+                    style: {
+                        color: isRed ? "#d7191c" : "#f6c945",
+                        weight: isRed ? 3.2 : 2.7,
+                        opacity,
+                        lineCap: "round",
+                        lineJoin: "round"
+                    },
+                    onEachFeature: (feature, layer) => {
+                        layer.bindPopup(debrisPopupHtml(feature), { maxWidth: 310 });
+                    }
+                });
+            }
+
+            function clearDebrisLayers(updateStatus = true) {
+                if (debrisAbortController) {
+                    debrisAbortController.abort();
+                    debrisAbortController = null;
+                }
+
+                [debrisRedLayer, debrisYellowLayer].forEach(layer => {
+                    if (layer && map.hasLayer(layer)) {
+                        map.removeLayer(layer);
+                    }
+                    if (layer) {
+                        layer.clearLayers();
+                    }
+                });
+
+                debrisRedLayer = null;
+                debrisYellowLayer = null;
+                loadedDebrisFile = "";
+                loadedDebrisName = "";
+                debrisClearButton.disabled = true;
+
+                if (updateStatus) {
+                    setLayerStatus("토석류 레이어를 제거했습니다.");
+                }
+            }
+
+            function updateDebrisVisibility() {
+                if (!debrisEnabled.checked) {
+                    [debrisRedLayer, debrisYellowLayer].forEach(layer => {
+                        if (layer && map.hasLayer(layer)) {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    updateLegendVisibility();
+                    return;
+                }
+
+                if (debrisRedLayer) {
+                    if (debrisRedEnabled.checked && !map.hasLayer(debrisRedLayer)) {
+                        debrisRedLayer.addTo(map);
+                    } else if (!debrisRedEnabled.checked && map.hasLayer(debrisRedLayer)) {
+                        map.removeLayer(debrisRedLayer);
+                    }
+                }
+
+                if (debrisYellowLayer) {
+                    if (debrisYellowEnabled.checked && !map.hasLayer(debrisYellowLayer)) {
+                        debrisYellowLayer.addTo(map);
+                    } else if (!debrisYellowEnabled.checked && map.hasLayer(debrisYellowLayer)) {
+                        map.removeLayer(debrisYellowLayer);
+                    }
+                }
+
+                updateLegendVisibility();
+            }
+
+            async function loadSelectedDebris() {
+                const file = debrisSelect.value;
+                const row = debrisIndexByFile.get(file);
+
+                if (!debrisEnabled.checked) {
+                    setLayerStatus("먼저 ‘토석류 위험구간’을 체크해 주세요.", "error");
+                    return;
+                }
+
+                if (!row) {
+                    setLayerStatus("불러올 시군구를 선택해 주세요.", "error");
+                    return;
+                }
+
+                if (loadedDebrisFile === file && (debrisRedLayer || debrisYellowLayer)) {
+                    updateDebrisVisibility();
+                    setLayerStatus(`${row.sigungu_name} 토석류 자료가 이미 로드되어 있습니다.`, "success");
+                    return;
+                }
+
+                clearDebrisLayers(false);
+                debrisAbortController = new AbortController();
+                debrisLoadButton.disabled = true;
+                debrisSelect.disabled = true;
+                setLayerStatus(
+                    `${row.sigungu_name} 토석류 GeoJSON ${Number(row.file_size_mb).toFixed(2)} MB를 불러오는 중입니다. 잠시 기다려 주세요.`
+                );
+
+                try {
+                    const url = new URL(
+                        row.url || `./data/debris_sigungu/${row.file}`,
+                        document.baseURI
+                    );
+                    url.searchParams.set("v", APP_VERSION);
+
+                    const response = await fetch(url.href, {
+                        signal: debrisAbortController.signal,
+                        cache: "force-cache"
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const features = Array.isArray(data.features) ? data.features : [];
+                    const redFeatures = [];
+                    const yellowFeatures = [];
+
+                    features.forEach(feature => {
+                        const classValue = Number(feature?.properties?.CLASS);
+                        if (classValue === 1) {
+                            redFeatures.push(feature);
+                        } else if (classValue === 2) {
+                            yellowFeatures.push(feature);
+                        }
+                    });
+
+                    debrisRedLayer = buildDebrisLayer(
+                        { type: "FeatureCollection", features: redFeatures },
+                        1
+                    );
+                    debrisYellowLayer = buildDebrisLayer(
+                        { type: "FeatureCollection", features: yellowFeatures },
+                        2
+                    );
+
+                    loadedDebrisFile = file;
+                    loadedDebrisName = row.sigungu_name;
+                    debrisClearButton.disabled = false;
+                    updateDebrisVisibility();
+
+                    const bounds = row.bounds_epsg4326;
+                    if (Array.isArray(bounds) && bounds.length === 4) {
+                        map.fitBounds(
+                            [[bounds[1], bounds[0]], [bounds[3], bounds[2]]],
+                            { padding: [25, 25], maxZoom: 12 }
+                        );
+                    } else {
+                        const visibleLayer = debrisRedEnabled.checked
+                            ? debrisRedLayer
+                            : debrisYellowLayer;
+                        if (visibleLayer?.getBounds().isValid()) {
+                            map.fitBounds(visibleLayer.getBounds(), { padding: [25, 25], maxZoom: 12 });
+                        }
+                    }
+
+                    setLayerStatus(
+                        `${row.sigungu_name} 토석류 로드 완료 · Red ${redFeatures.length.toLocaleString()}개 · Yellow ${yellowFeatures.length.toLocaleString()}개`,
+                        "success"
+                    );
+                } catch (error) {
+                    if (error.name === "AbortError") {
+                        setLayerStatus("토석류 자료 불러오기를 취소했습니다.");
+                    } else {
+                        console.error(error);
+                        setLayerStatus(`토석류 GeoJSON 로드 실패: ${error.message}`, "error");
+                    }
+                } finally {
+                    debrisAbortController = null;
+                    debrisSelect.disabled = debrisIndex.length === 0;
+                    debrisLoadButton.disabled = debrisIndex.length === 0;
+                }
+            }
+
+            fetch(`./data/debris_sigungu/index.json?v=${APP_VERSION}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    debrisIndex = Array.isArray(data.sigungu) ? data.sigungu : [];
+                    debrisIndexByFile = new Map(
+                        debrisIndex.map(row => [row.file, row])
+                    );
+
+                    debrisSelect.innerHTML = '<option value="">시군구 선택</option>';
+                    debrisIndex.forEach(row => {
+                        const option = document.createElement("option");
+                        option.value = row.file;
+                        option.textContent = `${row.sigungu_name} (${Number(row.file_size_mb).toFixed(2)} MB)`;
+                        debrisSelect.appendChild(option);
+                    });
+
+                    debrisSelect.disabled = false;
+                    debrisLoadButton.disabled = false;
+                    setLayerStatus(`토석류 시군구 목록 ${debrisIndex.length}개를 불러왔습니다.`, "success");
+                })
+                .catch(error => {
+                    console.error(error);
+                    debrisSelect.innerHTML = '<option value="">목록 파일 로드 실패</option>';
+                    setLayerStatus(`토석류 index.json 로드 실패: ${error.message}`, "error");
+                });
+
+            debrisEnabled.addEventListener("change", () => {
+                if (debrisEnabled.checked) {
+                    updateDebrisVisibility();
+                    setLayerStatus("시군구를 선택한 뒤 ‘선택지역 불러오기’를 누르세요.");
+                } else {
+                    updateDebrisVisibility();
+                    setLayerStatus("토석류 레이어를 숨겼습니다.");
+                }
+            });
+
+            debrisLoadButton.addEventListener("click", loadSelectedDebris);
+            debrisClearButton.addEventListener("click", () => clearDebrisLayers(true));
+            debrisRedEnabled.addEventListener("change", updateDebrisVisibility);
+            debrisYellowEnabled.addEventListener("change", updateDebrisVisibility);
+
+            debrisOpacity.addEventListener("input", () => {
+                const value = Number(debrisOpacity.value);
+                debrisOpacityValue.textContent = `${value}%`;
+                const opacity = value / 100;
+                if (debrisRedLayer) {
+                    debrisRedLayer.setStyle({ opacity });
+                }
+                if (debrisYellowLayer) {
+                    debrisYellowLayer.setStyle({ opacity });
+                }
+            });
+
+            let sigunguLayer = null;
+
+            fetch(`./data/boundary/gyeongbuk_sigungu.geojson?v=${APP_VERSION}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    function sigunguStyle() {
+                        const zoom = map.getZoom();
+                        return {
+                            color: "#174a7e",
+                            weight: zoom >= 12 ? 3 : zoom >= 10 ? 2.2 : 1.6,
+                            opacity: 1,
+                            fillColor: "#ffffff",
+                            fillOpacity: 0
+                        };
+                    }
+
+                    sigunguLayer = L.geoJSON(data, {
+                        pane: "sigunguPane",
+                        style: sigunguStyle,
+                        onEachFeature: (feature, layer) => {
+                            const p = feature.properties || {};
+                            const name = p.SIGUNGU_NM || p.SIG_KOR_NM || p.NAME || p.name || "시군구";
+                            layer.bindTooltip(escapeHtml(name), {
+                                sticky: true,
+                                direction: "top",
+                                className: "admin-tooltip"
+                            });
+                            layer.bindPopup(`<strong>${escapeHtml(name)}</strong><br>토석류 자료는 우측 패널에서 선택해 불러옵니다.`);
+                            layer.on("click", () => {
+                                const match = debrisIndex.find(row => row.sigungu_name === name);
+                                if (match) {
+                                    debrisSelect.value = match.file;
+                                    setLayerStatus(`${name}이 선택되었습니다. 토석류 불러오기 버튼을 누르세요.`);
+                                }
+                                map.fitBounds(layer.getBounds(), { padding: [25, 25], maxZoom: 11 });
+                            });
+                        }
+                    }).addTo(map);
+
+                    layerControl.addOverlay(sigunguLayer, "경상북도 시군구 경계");
+                    if (sigunguLayer.getBounds().isValid()) {
+                        map.fitBounds(sigunguLayer.getBounds(), { padding: [18, 18], maxZoom: 9 });
+                    }
+
+                    map.on("zoomend", () => {
+                        if (sigunguLayer && map.hasLayer(sigunguLayer)) {
+                            sigunguLayer.setStyle(sigunguStyle());
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("시군구 경계 로드 실패", error);
+                });
+
+            fetch(`./data/boundary/gyeongbuk_emd_simple.geojson?v=${APP_VERSION}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    function emdStyle() {
+                        const zoom = map.getZoom();
+                        return {
+                            color: "#4b5563",
+                            weight: zoom >= 12 ? 1.2 : zoom >= 10 ? 0.8 : 0.45,
+                            opacity: 0.9,
+                            fillColor: "#ffffff",
+                            fillOpacity: 0.01
+                        };
+                    }
+
+                    const emdLayer = L.geoJSON(data, {
+                        pane: "emdPane",
+                        style: emdStyle,
+                        onEachFeature: (feature, layer) => {
+                            const p = feature.properties || {};
+                            const name = p.EMD_NM || p.NAME || "읍면동";
+                            layer.bindTooltip(escapeHtml(name), {
+                                sticky: true,
+                                direction: "top",
+                                className: "admin-tooltip"
+                            });
+                            layer.on("click", () => {
+                                map.fitBounds(layer.getBounds(), { padding: [25, 25], maxZoom: 14 });
+                            });
+                        }
+                    });
+
+                    layerControl.addOverlay(emdLayer, "경상북도 읍면동 경계");
+                    map.on("zoomend", () => {
+                        if (map.hasLayer(emdLayer)) {
+                            emdLayer.setStyle(emdStyle());
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.warn("읍면동 경계 로드 실패", error);
+                });
+
+            let searchMarker = null;
+
             function requestVWorldJsonp(parameters) {
                 return new Promise((resolve, reject) => {
-                    const callbackName =
-                        `vworldCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-
-                    const script =
-                        document.createElement("script");
-
+                    const callbackName = `vworldCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+                    const script = document.createElement("script");
                     const timeoutId = window.setTimeout(() => {
                         cleanup();
-                        reject(
-                            new Error(
-                                "VWorld 검색 응답 시간이 초과되었습니다."
-                            )
-                        );
+                        reject(new Error("VWorld 검색 응답 시간이 초과되었습니다."));
                     }, 12000);
 
                     function cleanup() {
                         window.clearTimeout(timeoutId);
                         script.remove();
-
                         try {
                             delete window[callbackName];
                         } catch (error) {
@@ -703,18 +1301,14 @@
                         }
                     }
 
-                    window[callbackName] = (result) => {
+                    window[callbackName] = result => {
                         cleanup();
                         resolve(result);
                     };
 
                     script.onerror = () => {
                         cleanup();
-                        reject(
-                            new Error(
-                                "VWorld 검색 API를 불러오지 못했습니다."
-                            )
-                        );
+                        reject(new Error("VWorld 검색 API를 불러오지 못했습니다."));
                     };
 
                     const query = new URLSearchParams({
@@ -727,19 +1321,17 @@
                         ...parameters
                     });
 
-                    script.src =
-                        `https://api.vworld.kr/req/address?${query.toString()}`;
-
+                    script.src = `https://api.vworld.kr/req/address?${query.toString()}`;
                     document.head.appendChild(script);
                 });
             }
 
-            async function geocodeAddress(address, addressType) {
+            async function geocodeAddress(address, type) {
                 return requestVWorldJsonp({
                     request: "getCoord",
                     crs: "EPSG:4326",
-                    type: addressType,
-                    address: address,
+                    type,
+                    address,
                     refine: "true",
                     simple: "false"
                 });
@@ -756,1234 +1348,146 @@
                 });
 
                 const response = result?.response;
-
                 if (response?.status !== "OK") {
                     return "";
                 }
 
-                const items = Array.isArray(response.result)
-                    ? response.result
-                    : [];
-
-                const roadAddress =
-                    items.find((item) => item.type === "ROAD")?.text;
-
-                const parcelAddress =
-                    items.find((item) => item.type === "PARCEL")?.text;
-
-                return roadAddress || parcelAddress || items[0]?.text || "";
+                const items = Array.isArray(response.result) ? response.result : [];
+                return items.find(item => item.type === "ROAD")?.text
+                    || items.find(item => item.type === "PARCEL")?.text
+                    || items[0]?.text
+                    || "";
             }
 
-            function showSearchLocation(
-                latitude,
-                longitude,
-                title,
-                description = ""
-            ) {
+            function showSearchLocation(latitude, longitude, title, description = "") {
                 if (searchMarker) {
                     map.removeLayer(searchMarker);
                 }
 
-                searchMarker = L.marker(
-                    [latitude, longitude],
-                    {
-                        title: title
-                    }
-                ).addTo(map);
-
-                const popupHtml = `
+                searchMarker = L.marker([latitude, longitude], { title }).addTo(map);
+                searchMarker.bindPopup(`
                     <strong>${escapeHtml(title)}</strong><br>
-                    ${description
-                        ? `${escapeHtml(description)}<br>`
-                        : ""}
+                    ${description ? `${escapeHtml(description)}<br>` : ""}
                     위도: ${latitude.toFixed(7)}<br>
                     경도: ${longitude.toFixed(7)}
-                `;
+                `).openPopup();
 
-                searchMarker
-                    .bindPopup(popupHtml)
-                    .openPopup();
-
-                map.setView(
-                    [latitude, longitude],
-                    Math.max(map.getZoom(), 16)
-                );
-
-                latitudeInput.value =
-                    latitude.toFixed(7);
-
-                longitudeInput.value =
-                    longitude.toFixed(7);
+                map.setView([latitude, longitude], Math.max(map.getZoom(), 16));
+                latitudeInput.value = latitude.toFixed(7);
+                longitudeInput.value = longitude.toFixed(7);
             }
 
             async function runAddressSearch() {
                 const address = addressInput.value.trim();
-
                 if (!address) {
-                    setSearchMessage(
-                        "검색할 주소를 입력해 주세요.",
-                        "error"
-                    );
-                    addressInput.focus();
+                    setSearchMessage("검색할 주소를 입력해 주세요.", "error");
                     return;
                 }
 
                 addressSearchButton.disabled = true;
-                setSearchMessage(
-                    "주소를 검색하는 중입니다."
-                );
+                setSearchMessage("주소를 검색하는 중입니다.");
 
                 try {
-                    let result =
-                        await geocodeAddress(address, "ROAD");
-
+                    let result = await geocodeAddress(address, "ROAD");
                     if (result?.response?.status !== "OK") {
-                        result =
-                            await geocodeAddress(address, "PARCEL");
+                        result = await geocodeAddress(address, "PARCEL");
                     }
 
                     const response = result?.response;
-
                     if (response?.status !== "OK") {
-                        const errorText =
-                            response?.error?.text ||
-                            "검색 결과가 없습니다.";
-
-                        throw new Error(errorText);
+                        throw new Error(response?.error?.text || "검색 결과가 없습니다.");
                     }
 
-                    const point =
-                        response.result?.point;
-
-                    const longitude =
-                        Number(point?.x);
-
-                    const latitude =
-                        Number(point?.y);
-
-                    if (
-                        !Number.isFinite(latitude) ||
-                        !Number.isFinite(longitude)
-                    ) {
-                        throw new Error(
-                            "검색 결과의 좌표가 올바르지 않습니다."
-                        );
+                    const longitude = Number(response.result?.point?.x);
+                    const latitude = Number(response.result?.point?.y);
+                    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                        throw new Error("검색 결과 좌표가 올바르지 않습니다.");
                     }
 
-                    const refinedAddress =
-                        response.refined?.text ||
-                        response.input?.address ||
-                        address;
-
-                    showSearchLocation(
-                        latitude,
-                        longitude,
-                        "주소 검색 위치",
-                        refinedAddress
-                    );
-
-                    setSearchMessage(
-                        `검색 완료: ${refinedAddress}`,
-                        "success"
-                    );
+                    const refinedAddress = response.refined?.text || address;
+                    showSearchLocation(latitude, longitude, "주소 검색 위치", refinedAddress);
+                    setSearchMessage(`검색 완료: ${refinedAddress}`, "success");
                 } catch (error) {
-                    console.error(error);
-
-                    setSearchMessage(
-                        `주소 검색 실패: ${error.message}`,
-                        "error"
-                    );
+                    setSearchMessage(`주소 검색 실패: ${error.message}`, "error");
                 } finally {
                     addressSearchButton.disabled = false;
                 }
             }
 
             async function runCoordinateSearch() {
-                const latitude =
-                    Number(latitudeInput.value);
+                const latitude = Number(latitudeInput.value);
+                const longitude = Number(longitudeInput.value);
 
-                const longitude =
-                    Number(longitudeInput.value);
-
-                if (
-                    !Number.isFinite(latitude) ||
-                    latitude < -90 ||
-                    latitude > 90
-                ) {
-                    setSearchMessage(
-                        "위도는 -90~90 범위의 숫자로 입력해 주세요.",
-                        "error"
-                    );
-                    latitudeInput.focus();
+                if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+                    setSearchMessage("위도는 -90~90 범위로 입력해 주세요.", "error");
                     return;
                 }
-
-                if (
-                    !Number.isFinite(longitude) ||
-                    longitude < -180 ||
-                    longitude > 180
-                ) {
-                    setSearchMessage(
-                        "경도는 -180~180 범위의 숫자로 입력해 주세요.",
-                        "error"
-                    );
-                    longitudeInput.focus();
+                if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+                    setSearchMessage("경도는 -180~180 범위로 입력해 주세요.", "error");
                     return;
                 }
 
                 coordinateSearchButton.disabled = true;
-                setSearchMessage(
-                    "좌표 위치와 주소를 확인하는 중입니다."
-                );
+                setSearchMessage("좌표 위치와 주소를 확인하는 중입니다.");
 
                 try {
-                    const address =
-                        await reverseGeocode(
-                            latitude,
-                            longitude
-                        );
-
-                    showSearchLocation(
-                        latitude,
-                        longitude,
-                        "좌표 검색 위치",
-                        address
-                    );
-
-                    setSearchMessage(
-                        address
-                            ? `이동 완료: ${address}`
-                            : "좌표 위치로 이동했습니다.",
-                        "success"
-                    );
+                    const address = await reverseGeocode(latitude, longitude);
+                    showSearchLocation(latitude, longitude, "좌표 검색 위치", address);
+                    setSearchMessage(address ? `이동 완료: ${address}` : "좌표 위치로 이동했습니다.", "success");
                 } catch (error) {
-                    console.warn(error);
-
-                    showSearchLocation(
-                        latitude,
-                        longitude,
-                        "좌표 검색 위치"
-                    );
-
-                    setSearchMessage(
-                        "좌표 위치로 이동했지만 주소는 조회하지 못했습니다.",
-                        "error"
-                    );
+                    showSearchLocation(latitude, longitude, "좌표 검색 위치");
+                    setSearchMessage("좌표 위치로 이동했지만 주소는 조회하지 못했습니다.", "error");
                 } finally {
                     coordinateSearchButton.disabled = false;
                 }
             }
 
-            /*
-             * VWorld WMTS 공식 요청 형식
-             * /{key}/{layer}/{z}/{y}/{x}.확장자
-             */
-            const vworldBaseLayer = L.tileLayer(
-                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Base/{z}/{y}/{x}.png`,
-                {
-                    minZoom: 6,
-                    maxZoom: 19,
-                    tileSize: 256,
-                    attribution: "&copy; VWorld"
+            addressSearchButton.addEventListener("click", runAddressSearch);
+            addressInput.addEventListener("keydown", event => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    runAddressSearch();
                 }
-            );
-
-            const vworldSatelliteLayer = L.tileLayer(
-                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
-                {
-                    minZoom: 6,
-                    maxZoom: 19,
-                    tileSize: 256,
-                    attribution: "&copy; VWorld"
+            });
+            coordinateSearchButton.addEventListener("click", runCoordinateSearch);
+            longitudeInput.addEventListener("keydown", event => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    runCoordinateSearch();
                 }
-            );
-
-            const vworldSatelliteForHybrid = L.tileLayer(
-                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Satellite/{z}/{y}/{x}.jpeg`,
-                {
-                    minZoom: 6,
-                    maxZoom: 19,
-                    tileSize: 256,
-                    attribution: "&copy; VWorld"
-                }
-            );
-
-            const vworldHybridLabelLayer = L.tileLayer(
-                `https://api.vworld.kr/req/wmts/1.0.0/${VWORLD_API_KEY}/Hybrid/{z}/{y}/{x}.png`,
-                {
-                    minZoom: 6,
-                    maxZoom: 19,
-                    tileSize: 256,
-                    attribution: "&copy; VWorld"
-                }
-            );
-
-            const vworldSatelliteHybridLayer = L.layerGroup([
-                vworldSatelliteForHybrid,
-                vworldHybridLabelLayer
-            ]);
-
-            const osmLayer = L.tileLayer(
-                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-                    maxZoom: 19,
-                    attribution: "&copy; OpenStreetMap contributors"
-                }
-            );
-
-            /*
-             * 기본 배경지도는 VWorld 일반지도입니다.
-             */
-            vworldBaseLayer.addTo(map);
-
-            const layerControl = L.control.layers(
-                {
-                    "VWorld 일반지도": vworldBaseLayer,
-                    "VWorld 영상지도": vworldSatelliteLayer,
-                    "VWorld 영상 + 지명": vworldSatelliteHybridLayer,
-                    "OpenStreetMap": osmLayer
-                },
-                {},
-                {
-                    position: "topleft",
-                    collapsed: true
-                }
-            ).addTo(map);
-
-
-            /* =====================================================
-               3. 스케일바
-               - 왼쪽 아래
-               - 미터 및 킬로미터만 표시
-               - 마일 단위는 표시하지 않음
-            ===================================================== */
-            const scaleControl = L.control.scale({
-                position: "bottomleft",
-                metric: true,
-                imperial: false,
-                maxWidth: 220,
-                updateWhenIdle: false
             });
 
-            scaleControl.addTo(map);
-
-            /* 스케일바가 DOM에 생성됐는지 확인 */
-            setTimeout(() => {
-                const scaleElement =
-                    document.querySelector(".leaflet-control-scale");
-
-                if (!scaleElement) {
-                    console.error("스케일바 생성에 실패했습니다.");
-                    scenarioInfo.innerHTML =
-                        "지도는 실행되었지만 스케일바 생성에 실패했습니다.";
-                }
-            }, 500);
-
-            /* =====================================================
-               4. 강우 시나리오 및 TRIGRS XYZ 타일
-
-               타일 폴더:
-               data/trigrs/12/{z}/{x}/{y}.png
-               data/trigrs/24/{z}/{x}/{y}.png
-               ...
-               data/trigrs/72/{z}/{x}/{y}.png
-            ===================================================== */
-            const scenarios = {
-                "12": {
-                    duration: 12,
-                    rainfall: 50,
-                    folder: "12"
-                },
-                "24": {
-                    duration: 24,
-                    rainfall: 100,
-                    folder: "24"
-                },
-                "36": {
-                    duration: 36,
-                    rainfall: 150,
-                    folder: "36"
-                },
-                "48": {
-                    duration: 48,
-                    rainfall: 200,
-                    folder: "48"
-                },
-                "60": {
-                    duration: 60,
-                    rainfall: 250,
-                    folder: "60"
-                },
-                "72": {
-                    duration: 72,
-                    rainfall: 300,
-                    folder: "72"
-                }
-            };
-
-            /*
-             * GitHub Pages와 로컬 서버 모두에서 올바른 절대 URL을 만듭니다.
-             * 예:
-             * https://kounghoonnam.github.io/WebGIS_GB/data/trigrs/
-             */
-            const TRIGRS_TILE_ROOT =
-                new URL("./data/trigrs/", document.baseURI).href;
-
-            /*
-             * 원본 ASC(EPSG:32652)의 경계를 EPSG:4326으로 변환한 범위입니다.
-             * 타일 요청을 경북 본토 범위 안으로 제한하여 불필요한 404를 줄입니다.
-             */
-            const TRIGRS_BOUNDS = L.latLngBounds(
-                [35.561016, 127.787453],
-                [37.145968, 129.593315]
-            );
-
-            /*
-             * GitHub Pages와 브라우저 캐시를 갱신하기 위한 버전 문자열입니다.
-             * index.html을 수정할 때 값만 바꾸면 이전 타일 캐시를 우회합니다.
-             */
-            const TRIGRS_DEPLOY_VERSION = "20260713-03";
-
-            /*
-             * 실제 저장소에 존재하는 대표 타일입니다.
-             * 페이지 실행 시 이 파일이 접근 가능한지 자동 검사합니다.
-             */
-            const TRIGRS_TEST_TILE =
-                `${TRIGRS_TILE_ROOT}12/10/878/400.png` +
-                `?v=${TRIGRS_DEPLOY_VERSION}`;
-
-            /*
-             * 배경지도 위, 행정경계 아래에 TRIGRS 타일을 표시합니다.
-             */
-            map.createPane("trigrsPane");
-            map.getPane("trigrsPane").style.zIndex = "430";
-            map.getPane("trigrsPane").style.pointerEvents = "none";
-
-            const scenarioSelect =
-                document.getElementById("scenario-select");
-
-            const rasterOpacity =
-                document.getElementById("raster-opacity");
-
-            const rasterOpacityValue =
-                document.getElementById("raster-opacity-value");
-
-            const trigrsTileLayers = {};
-            let activeTrigrsLayer = null;
-            let activeScenarioKey = "";
-            let tileErrorDisplayed = false;
-
-            Object.entries(scenarios).forEach(
-                ([scenarioKey, scenario]) => {
-                    const tileUrl =
-                        `${TRIGRS_TILE_ROOT}${scenario.folder}` +
-                        `/{z}/{x}/{y}.png` +
-                        `?v=${TRIGRS_DEPLOY_VERSION}`;
-
-                    const layer = L.tileLayer(
-                        tileUrl,
-                        {
-                            minZoom: 7,
-                            minNativeZoom: 7,
-                            maxNativeZoom: 12,
-                            maxZoom: 18,
-                            tileSize: 256,
-                            tms: false,
-                            noWrap: true,
-                            bounds: TRIGRS_BOUNDS,
-                            opacity:
-                                Number(rasterOpacity.value) / 100,
-                            pane: "trigrsPane",
-                            keepBuffer: 3,
-                            updateWhenIdle: false,
-                            updateWhenZooming: true,
-                            crossOrigin: false,
-                            attribution:
-                                "TRIGRS 사면안전율 분석 결과"
-                        }
-                    );
-
-                    layer.on("tileerror", (event) => {
-                        if (tileErrorDisplayed) {
-                            return;
-                        }
-
-                        tileErrorDisplayed = true;
-
-                        const failedUrl =
-                            event?.tile?.src ||
-                            `${TRIGRS_TILE_ROOT}${scenario.folder}`;
-
-                        console.error(
-                            "TRIGRS 타일을 불러오지 못했습니다.",
-                            failedUrl,
-                            event
-                        );
-
-                        scenarioInfo.innerHTML = `
-                            <strong>TRIGRS 타일 로드 실패</strong><br>
-                            선택 시나리오:
-                            ${scenario.duration}시간 /
-                            ${scenario.rainfall} mm<br>
-                            실패 URL:<br>
-                            <small style="word-break:break-all;">
-                                ${escapeHtml(failedUrl)}
-                            </small><br>
-                            배포 완료 여부와 파일 경로를 확인해 주세요.
-                        `;
-                    });
-
-                    let firstTileLoaded = false;
-
-                    layer.on("tileload", () => {
-                        if (firstTileLoaded) {
-                            return;
-                        }
-
-                        firstTileLoaded = true;
-
-                        console.log(
-                            `TRIGRS ${scenario.duration}시간 ` +
-                            "첫 타일 로드 성공"
-                        );
-                    });
-
-                    trigrsTileLayers[scenarioKey] = layer;
-                }
-            );
-
-            function removeActiveTrigrsLayer() {
-                if (
-                    activeTrigrsLayer &&
-                    map.hasLayer(activeTrigrsLayer)
-                ) {
-                    map.removeLayer(activeTrigrsLayer);
-                }
-
-                activeTrigrsLayer = null;
-                activeScenarioKey = "";
-            }
-
-            function showTrigrsScenario(scenarioKey) {
-                const scenario =
-                    scenarios[scenarioKey];
-
-                removeActiveTrigrsLayer();
-                tileErrorDisplayed = false;
-
-                if (!scenario) {
-                    scenarioInfo.innerHTML =
-                        "강우 시나리오를 선택해 주세요.";
-                    return;
-                }
-
-                activeScenarioKey = scenarioKey;
-                activeTrigrsLayer =
-                    trigrsTileLayers[scenarioKey];
-
-                activeTrigrsLayer.setOpacity(
-                    Number(rasterOpacity.value) / 100
-                );
-
-                activeTrigrsLayer.addTo(map);
-                activeTrigrsLayer.bringToFront();
-
-                /*
-                 * 타일 범위가 화면 밖에 있으면 보이지 않는 것처럼 느껴질 수
-                 * 있으므로 선택 즉시 경북 본토 범위로 이동합니다.
-                 */
-                map.fitBounds(
-                    TRIGRS_BOUNDS,
-                    {
-                        padding: [20, 20],
-                        maxZoom: 9
-                    }
-                );
-
-                /*
-                 * GitHub Pages 배포 직후 또는 화면 크기 변경 후에도
-                 * 타일을 다시 계산하도록 강제합니다.
-                 */
-                setTimeout(() => {
-                    map.invalidateSize();
-                    activeTrigrsLayer.redraw();
-                }, 150);
-
-                scenarioInfo.innerHTML = `
-                    <strong>${scenario.duration}시간 시나리오</strong><br>
-                    누적강우량: ${scenario.rainfall} mm<br>
-                    표시 레이어:
-                    <code>TRfs_min_gb50300_${
-                        Number(scenarioKey) / 12
-                    }.asc</code><br>
-                    안전율 4등급 XYZ 타일
-                `;
-            }
-
-            scenarioSelect.addEventListener(
-                "change",
-                function () {
-                    showTrigrsScenario(this.value);
-                }
-            );
-
-            rasterOpacity.addEventListener(
-                "input",
-                function () {
-                    const opacity =
-                        Number(this.value) / 100;
-
-                    rasterOpacityValue.textContent =
-                        `${this.value}%`;
-
-                    if (activeTrigrsLayer) {
-                        activeTrigrsLayer.setOpacity(opacity);
-                    }
-                }
-            );
-
-            /*
-             * GitHub Pages가 대표 타일을 실제로 제공하는지 먼저 검사합니다.
-             */
-            fetch(
-                TRIGRS_TEST_TILE,
-                {
-                    method: "GET",
-                    cache: "no-store"
-                }
-            )
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `HTTP ${response.status}`
-                        );
-                    }
-
-                    console.log(
-                        "TRIGRS 대표 타일 접근 성공:",
-                        TRIGRS_TEST_TILE
-                    );
-
-                    /*
-                     * 초기 화면에서 12시간 결과를 자동 표시합니다.
-                     */
-                    scenarioSelect.value = "12";
-                    showTrigrsScenario("12");
-                })
-                .catch((error) => {
-                    console.error(
-                        "TRIGRS 대표 타일 접근 실패:",
-                        TRIGRS_TEST_TILE,
-                        error
-                    );
-
-                    scenarioInfo.innerHTML = `
-                        <strong>TRIGRS 대표 타일 접근 실패</strong><br>
-                        다음 주소가 GitHub Pages에서 아직 배포되지 않았거나
-                        경로가 다릅니다.<br>
-                        <small style="word-break:break-all;">
-                            ${escapeHtml(TRIGRS_TEST_TILE)}
-                        </small><br>
-                        오류: ${escapeHtml(error.message)}
-                    `;
-                });
-
-            /* =====================================================
-               5. 경상북도 경계 GeoJSON
-               업로드 위치:
-               data/boundary/gyeongbuk.geojson
-               좌표계:
-               EPSG:4326
-            ===================================================== */
-            fetch("./data/boundary/gyeongbuk.geojson")
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `경북 경계 GeoJSON HTTP ${response.status}`
-                        );
-                    }
-
-                    return response.json();
-                })
-                .then((data) => {
-                    map.createPane("boundaryPane");
-                    map.getPane("boundaryPane").style.zIndex = "460";
-                    map.getPane("boundaryPane").style.pointerEvents = "auto";
-
-                    const boundaryLayer = L.geoJSON(data, {
-                        pane: "boundaryPane",
-
-                        style: {
-                            color: "#222222",
-                            weight: 2,
-                            opacity: 1,
-                            fillColor: "#ffffff",
-                            fillOpacity: 0.04
-                        },
-
-                        onEachFeature: (feature, layer) => {
-                            const properties =
-                                feature.properties || {};
-
-                            const name =
-                                properties.CTP_KOR_NM ||
-                                properties.name ||
-                                properties.NAME ||
-                                "경상북도";
-
-                            layer.bindPopup(
-                                `<strong>${name}</strong>`
-                            );
-                        }
-                    }).addTo(map);
-
-                    if (boundaryLayer.getBounds().isValid()) {
-                        map.fitBounds(
-                            boundaryLayer.getBounds(),
-                            {
-                                padding: [15, 15]
-                            }
-                        );
-                    }
-
-                    scenarioInfo.innerHTML =
-                        "경상북도 경계 GeoJSON을 정상적으로 불러왔습니다.";
-                })
-                .catch((error) => {
-                    console.info(
-                        "경상북도 경계 파일은 아직 없습니다.",
-                        error
-                    );
-
-                    scenarioInfo.innerHTML =
-                        "VWorld 배경지도와 스케일바가 실행되었습니다.<br>" +
-                        "다음 단계는 경상북도 경계 GeoJSON을 추가하는 것입니다.";
-                });
-
-            /*
-             * 읍면동 GeoJSON의 COL_ADM_SE 코드에 대응하는
-             * 경상북도 22개 시군구명입니다.
-             *
-             * 포항시 남구·북구의 읍면동도 COL_ADM_SE는 47110으로
-             * 통합되어 있으므로 화면에는 "포항시"로 표시합니다.
-             */
-            const gyeongbukSigunguNameByCode = {
-                "47110": "포항시",
-                "47130": "경주시",
-                "47150": "김천시",
-                "47170": "안동시",
-                "47190": "구미시",
-                "47210": "영주시",
-                "47230": "영천시",
-                "47250": "상주시",
-                "47280": "문경시",
-                "47290": "경산시",
-                "47730": "의성군",
-                "47750": "청송군",
-                "47760": "영양군",
-                "47770": "영덕군",
-                "47820": "청도군",
-                "47830": "고령군",
-                "47840": "성주군",
-                "47850": "칠곡군",
-                "47900": "예천군",
-                "47920": "봉화군",
-                "47930": "울진군",
-                "47940": "울릉군"
-            };
-
-            /* =====================================================
-               6. 경상북도 시군구 경계 GeoJSON
-
-               파일 위치:
-               data/boundary/gyeongbuk_sigungu.geojson
-
-               - EPSG:4326
-               - 시군구 경계
-               - 레이어 선택창에서 ON/OFF
-               - 기본값은 ON
-            ===================================================== */
-            fetch("./data/boundary/gyeongbuk_sigungu.geojson")
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `시군구 경계 GeoJSON HTTP ${response.status}`
-                        );
-                    }
-
-                    return response.json();
-                })
-                .then((data) => {
-                    if (!map.getPane("sigunguPane")) {
-                        map.createPane("sigunguPane");
-                    }
-
-                    /*
-                     * 읍면동 경계보다 위에 표시합니다.
-                     */
-                    map.getPane("sigunguPane").style.zIndex = "480";
-                    map.getPane("sigunguPane").style.pointerEvents = "auto";
-
-                    function getSigunguStyle() {
-                        const zoom = map.getZoom();
-
-                        return {
-                            color: "#174a7e",
-                            weight:
-                                zoom >= 12
-                                    ? 3.0
-                                    : zoom >= 10
-                                        ? 2.3
-                                        : 1.7,
-                            opacity: 1,
-                            fillColor: "#ffffff",
-                            fillOpacity: 0
-                        };
-                    }
-
-                    const sigunguLayer = L.geoJSON(data, {
-                        pane: "sigunguPane",
-
-                        style: getSigunguStyle,
-
-                        onEachFeature: (feature, layer) => {
-                            const properties =
-                                feature.properties || {};
-
-                            const sigunguName =
-                                properties.SIGUNGU_NM ||
-                                properties.SIG_KOR_NM ||
-                                properties.name ||
-                                "시군구명 없음";
-
-                            const sigunguCode =
-                                properties.SIGUNGU_CD ||
-                                properties.SIG_CD ||
-                                "-";
-
-                            const baseDate =
-                                properties.BASE_DATE ||
-                                "-";
-
-                            layer.bindPopup(`
-                                <strong>${escapeHtml(sigunguName)}</strong><br>
-                                시군구 코드: ${escapeHtml(sigunguCode)}<br>
-                                기준일: ${escapeHtml(baseDate)}
-                            `);
-
-                            layer.bindTooltip(
-                                `
-                                    <span class="admin-tooltip-sigungu">
-                                        ${escapeHtml(sigunguName)}
-                                    </span>
-                                `,
-                                {
-                                    sticky: true,
-                                    direction: "top",
-                                    opacity: 0.97,
-                                    className: "admin-area-tooltip"
-                                }
-                            );
-
-                            layer.on({
-                                mouseover: (event) => {
-                                    event.target.setStyle({
-                                        color: "#ff7f00",
-                                        weight: 3.5,
-                                        fillColor: "#ffcc80",
-                                        fillOpacity: 0.08
-                                    });
-                                },
-
-                                mouseout: (event) => {
-                                    sigunguLayer.resetStyle(
-                                        event.target
-                                    );
-                                },
-
-                                click: (event) => {
-                                    map.fitBounds(
-                                        event.target.getBounds(),
-                                        {
-                                            padding: [25, 25],
-                                            maxZoom: 11
-                                        }
-                                    );
-                                }
-                            });
-                        }
-                    });
-
-                    /*
-                     * 시군구 경계는 기본 표시합니다.
-                     */
-                    sigunguLayer.addTo(map);
-
-                    layerControl.addOverlay(
-                        sigunguLayer,
-                        "경상북도 시군구 경계"
-                    );
-
-                    map.on("zoomend", () => {
-                        if (map.hasLayer(sigunguLayer)) {
-                            sigunguLayer.setStyle(
-                                getSigunguStyle()
-                            );
-                        }
-                    });
-
-                    console.log(
-                        `시군구 경계 로드 완료: ${
-                            data.features?.length || 0
-                        }개`
-                    );
-                })
-                .catch((error) => {
-                    console.error(
-                        "시군구 경계 파일 로드 실패",
-                        error
-                    );
-                });
-
-            /* =====================================================
-               7. 경상북도 읍면동 경계 GeoJSON
-
-               파일 위치:
-               data/boundary/gyeongbuk_emd_simple.geojson
-
-               - EPSG:4326
-               - 525개 읍면동
-               - 레이어 선택창에서 ON/OFF
-               - 기본값은 OFF
-            ===================================================== */
-            fetch("./data/boundary/gyeongbuk_emd_simple.geojson")
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `읍면동 경계 GeoJSON HTTP ${response.status}`
-                        );
-                    }
-
-                    return response.json();
-                })
-                .then((data) => {
-                    if (!map.getPane("emdPane")) {
-                        map.createPane("emdPane");
-                    }
-
-                    map.getPane("emdPane").style.zIndex = "470";
-                    map.getPane("emdPane").style.pointerEvents = "auto";
-
-                    function getEmdStyle() {
-                        const zoom = map.getZoom();
-
-                        return {
-                            color: "#4b5563",
-                            weight:
-                                zoom >= 12
-                                    ? 1.2
-                                    : zoom >= 10
-                                        ? 0.8
-                                        : 0.45,
-                            opacity: 0.9,
-                            fillColor: "#ffffff",
-                            fillOpacity: 0.015
-                        };
-                    }
-
-                    const emdLayer = L.geoJSON(data, {
-                        pane: "emdPane",
-
-                        style: getEmdStyle,
-
-                        onEachFeature: (feature, layer) => {
-                            const properties =
-                                feature.properties || {};
-
-                            const emdName =
-                                properties.EMD_NM ||
-                                "읍면동명 없음";
-
-                            const emdCode =
-                                properties.EMD_CD ||
-                                "-";
-
-                            const sigunguCode =
-                                properties.COL_ADM_SE ||
-                                "-";
-
-                            const sigunguName =
-                                gyeongbukSigunguNameByCode[
-                                    String(sigunguCode)
-                                ] ||
-                                `시군구 ${sigunguCode}`;
-
-                            layer.bindPopup(`
-                                <strong>
-                                    ${escapeHtml(sigunguName)}
-                                    ${escapeHtml(emdName)}
-                                </strong><br>
-                                시군구: ${escapeHtml(sigunguName)}<br>
-                                읍면동: ${escapeHtml(emdName)}<br>
-                                읍면동 코드: ${escapeHtml(emdCode)}<br>
-                                시군구 코드: ${escapeHtml(sigunguCode)}
-                            `);
-
-                            /*
-                             * 읍면동 레이어에서 시군구명과 읍면동명을
-                             * 하나의 툴팁으로 동시에 표시합니다.
-                             */
-                            layer.bindTooltip(
-                                `
-                                    <span class="admin-tooltip-sigungu">
-                                        ${escapeHtml(sigunguName)}
-                                    </span><br>
-                                    <span class="admin-tooltip-emd">
-                                        ${escapeHtml(emdName)}
-                                    </span>
-                                `,
-                                {
-                                    sticky: true,
-                                    direction: "top",
-                                    opacity: 0.97,
-                                    className: "admin-area-tooltip"
-                                }
-                            );
-
-                            layer.on({
-                                mouseover: (event) => {
-                                    event.target.setStyle({
-                                        color: "#005bbb",
-                                        weight: 2.2,
-                                        fillColor: "#6baed6",
-                                        fillOpacity: 0.14
-                                    });
-
-                                    event.target.bringToFront();
-                                },
-
-                                mouseout: (event) => {
-                                    emdLayer.resetStyle(
-                                        event.target
-                                    );
-                                },
-
-                                click: (event) => {
-                                    map.fitBounds(
-                                        event.target.getBounds(),
-                                        {
-                                            padding: [25, 25],
-                                            maxZoom: 13
-                                        }
-                                    );
-                                }
-                            });
-                        }
-                    });
-
-                    /*
-                     * 기본 화면에서는 경계를 표시하지 않고,
-                     * 왼쪽 위 레이어 버튼에서 사용자가 켜도록 합니다.
-                     */
-                    layerControl.addOverlay(
-                        emdLayer,
-                        "경상북도 읍면동 경계"
-                    );
-
-                    /*
-                     * 핵심 수정:
-                     *
-                     * 시군구 폴리곤은 읍면동보다 위에 있으므로,
-                     * 내부가 투명해도 마우스 이벤트를 먼저 가져갑니다.
-                     *
-                     * 읍면동 레이어가 켜질 때는 시군구 pane의
-                     * pointer-events를 none으로 바꾸어 마우스가
-                     * 읍면동 레이어까지 전달되도록 합니다.
-                     *
-                     * 읍면동 레이어를 끄면 다시 시군구 툴팁과
-                     * 클릭 기능이 작동하도록 auto로 되돌립니다.
-                     */
-                    function updateAdministrativePointerEvents() {
-                        const sigunguPane =
-                            map.getPane("sigunguPane");
-
-                        if (!sigunguPane) {
-                            return;
-                        }
-
-                        sigunguPane.style.pointerEvents =
-                            map.hasLayer(emdLayer)
-                                ? "none"
-                                : "auto";
-                    }
-
-                    map.on(
-                        "overlayadd",
-                        (event) => {
-                            if (event.layer === emdLayer) {
-                                updateAdministrativePointerEvents();
-                            }
-                        }
-                    );
-
-                    map.on(
-                        "overlayremove",
-                        (event) => {
-                            if (event.layer === emdLayer) {
-                                updateAdministrativePointerEvents();
-                            }
-                        }
-                    );
-
-                    /*
-                     * 초기 상태에도 적용합니다.
-                     */
-                    updateAdministrativePointerEvents();
-
-                    /*
-                     * 확대·축소할 때 선 굵기를 갱신합니다.
-                     */
-                    map.on("zoomend", () => {
-                        if (map.hasLayer(emdLayer)) {
-                            emdLayer.setStyle(
-                                getEmdStyle()
-                            );
-                        }
-                    });
-
-                    console.log(
-                        `읍면동 경계 로드 완료: ${
-                            data.features?.length || 0
-                        }개`
-                    );
-                })
-                .catch((error) => {
-                    console.error(
-                        "읍면동 경계 파일 로드 실패",
-                        error
-                    );
-
-                    /*
-                     * 읍면동 파일이 없더라도 나머지 WebGIS 기능은
-                     * 계속 사용할 수 있습니다.
-                     */
-                });
-
-            /* =====================================================
-               8. 주소 및 좌표 검색 이벤트
-            ===================================================== */
-            addressSearchButton.addEventListener(
-                "click",
-                runAddressSearch
-            );
-
-            addressInput.addEventListener(
-                "keydown",
-                (event) => {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        runAddressSearch();
-                    }
-                }
-            );
-
-            coordinateSearchButton.addEventListener(
-                "click",
-                runCoordinateSearch
-            );
-
-            longitudeInput.addEventListener(
-                "keydown",
-                (event) => {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        runCoordinateSearch();
-                    }
-                }
-            );
-
-            /*
-             * 지도를 클릭하면 해당 지점의 위도·경도를 입력창에 넣고
-             * 마커와 주소를 표시합니다.
-             */
-            map.on("click", async (event) => {
-                const latitude =
-                    event.latlng.lat;
-
-                const longitude =
-                    event.latlng.lng;
-
-                latitudeInput.value =
-                    latitude.toFixed(7);
-
-                longitudeInput.value =
-                    longitude.toFixed(7);
-
-                setSearchMessage(
-                    "선택한 지점의 주소를 확인하는 중입니다."
-                );
+            map.on("click", async event => {
+                const latitude = event.latlng.lat;
+                const longitude = event.latlng.lng;
+                latitudeInput.value = latitude.toFixed(7);
+                longitudeInput.value = longitude.toFixed(7);
+                setSearchMessage("선택한 지점의 주소를 확인하는 중입니다.");
 
                 try {
-                    const address =
-                        await reverseGeocode(
-                            latitude,
-                            longitude
-                        );
-
-                    showSearchLocation(
-                        latitude,
-                        longitude,
-                        "지도 선택 위치",
-                        address
-                    );
-
-                    setSearchMessage(
-                        address
-                            ? `선택 위치: ${address}`
-                            : "선택한 지점의 좌표를 입력했습니다.",
-                        "success"
-                    );
+                    const address = await reverseGeocode(latitude, longitude);
+                    showSearchLocation(latitude, longitude, "지도 선택 위치", address);
+                    setSearchMessage(address ? `선택 위치: ${address}` : "선택 지점 좌표를 입력했습니다.", "success");
                 } catch (error) {
-                    console.warn(error);
-
-                    showSearchLocation(
-                        latitude,
-                        longitude,
-                        "지도 선택 위치"
-                    );
-
-                    setSearchMessage(
-                        "선택한 지점의 좌표를 입력했습니다.",
-                        "success"
-                    );
+                    showSearchLocation(latitude, longitude, "지도 선택 위치");
+                    setSearchMessage("선택 지점 좌표를 입력했습니다.", "success");
                 }
             });
 
-            /* =====================================================
-               9. 지도 크기 재계산
-            ===================================================== */
-            window.addEventListener("resize", () => {
-                map.invalidateSize();
-            });
+            showTrigrsScenario("12", false);
+            updateLegendVisibility();
 
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 300);
+            window.addEventListener("resize", () => map.invalidateSize());
+            setTimeout(() => map.invalidateSize(), 300);
         }
 
         loadLeaflet()
-            .then(() => {
-                initializeWebGIS();
-            })
-            .catch((error) => {
+            .then(initializeWebGIS)
+            .catch(error => {
                 console.error(error);
-
-                document.getElementById("map-error").style.display =
-                    "block";
-
-                document.getElementById("scenario-info").innerHTML =
-                    "Leaflet 라이브러리를 불러오지 못했습니다.<br>" +
-                    "인터넷 연결 또는 CDN 접근 상태를 확인해 주세요.";
+                document.getElementById("map-error").style.display = "block";
+                document.getElementById("layer-status").textContent =
+                    "Leaflet 라이브러리를 불러오지 못했습니다.";
             });
     </script>
 </body>
