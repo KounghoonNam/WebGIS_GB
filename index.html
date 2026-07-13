@@ -687,7 +687,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-08";
+        const APP_VERSION = "20260714-09";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -1497,10 +1497,36 @@
                 }
             );
 
-            const GYEONGBUK_BOUNDS = L.latLngBounds(
-                [35.55, 127.75],
-                [37.60, 131.95]
+            /*
+             * 경상북도 본토 초기 표시 범위
+             * 울릉도는 데이터에서 삭제하지 않고,
+             * 첫 화면의 자동 확대 범위에서만 제외합니다.
+             */
+            const GYEONGBUK_MAINLAND_BOUNDS = L.latLngBounds(
+                [35.52, 127.72],
+                [37.18, 129.67]
             );
+
+            function fitGyeongbukMainland() {
+                const mobileMode = window.matchMedia(
+                    "(max-width: 900px)"
+                ).matches;
+
+                map.fitBounds(
+                    GYEONGBUK_MAINLAND_BOUNDS,
+                    mobileMode
+                        ? {
+                            paddingTopLeft: [18, 18],
+                            paddingBottomRight: [18, 82],
+                            maxZoom: 9
+                        }
+                        : {
+                            paddingTopLeft: [470, 55],
+                            paddingBottomRight: [350, 45],
+                            maxZoom: 9
+                        }
+                );
+            }
 
             const scenarios = {
                 "12": { duration: 12, rainfall: 50, folder: "12", source: "TRfs_min_gb50300_1.asc" },
@@ -1561,7 +1587,7 @@
                 );
 
                 if (fitMap) {
-                    map.fitBounds(GYEONGBUK_BOUNDS, { padding: [18, 18], maxZoom: 9 });
+                    fitGyeongbukMainland();
                 }
 
                 updateLegendVisibility();
@@ -1602,7 +1628,7 @@
                     }
                     setLayerStatus("산사태 취약성 1~5등급 지도를 표시했습니다.", "success");
                     if (fitMap) {
-                        map.fitBounds(GYEONGBUK_BOUNDS, { padding: [18, 18], maxZoom: 9 });
+                        fitGyeongbukMainland();
                     }
                 } else if (map.hasLayer(susceptibilityLayer)) {
                     map.removeLayer(susceptibilityLayer);
@@ -2225,6 +2251,16 @@
 
             showTrigrsScenario("12", false);
             updateLegendVisibility();
+
+            /*
+             * 첫 접속 화면은 울릉도를 제외한 경북 본토에 맞춥니다.
+             */
+            window.requestAnimationFrame(
+                () => {
+                    map.invalidateSize(false);
+                    fitGyeongbukMainland();
+                }
+            );
 
             window.addEventListener("resize", () => map.invalidateSize());
             setTimeout(() => map.invalidateSize(), 300);
