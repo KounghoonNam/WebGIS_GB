@@ -657,7 +657,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-06";
+        const APP_VERSION = "20260714-07";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -796,6 +796,20 @@
                 }
             );
 
+            function setSearchMessage(message, type = "") {
+                searchMessage.textContent = message;
+                searchMessage.className = type;
+            }
+
+            const map = L.map("map", {
+                center: [36.35, 128.75],
+                zoom: 8,
+                minZoom: 6,
+                maxZoom: 19,
+                zoomControl: true,
+                preferCanvas: true
+            });
+
             map.on(
                 "click",
                 () => {
@@ -810,20 +824,6 @@
             );
 
             setMobileLegendOpen(false);
-
-            function setSearchMessage(message, type = "") {
-                searchMessage.textContent = message;
-                searchMessage.className = type;
-            }
-
-            const map = L.map("map", {
-                center: [36.35, 128.75],
-                zoom: 8,
-                minZoom: 6,
-                maxZoom: 19,
-                zoomControl: true,
-                preferCanvas: true
-            });
 
             [
                 ["susceptibilityPane", 410, "none"],
