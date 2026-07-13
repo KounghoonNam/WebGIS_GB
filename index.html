@@ -132,14 +132,18 @@
             overflow-y: auto;
         }
 
-        #legend-toggle {
+        #mobile-panel-buttons {
             display: none;
             position: absolute;
-            z-index: 1700;
+            z-index: 1750;
             right: 10px;
-            bottom: 18px;
-            min-width: 76px;
-            padding: 10px 14px;
+            bottom: 16px;
+            gap: 7px;
+        }
+
+        .mobile-panel-toggle {
+            min-width: 70px;
+            padding: 10px 13px;
             border: 0;
             border-radius: 22px;
             color: #ffffff;
@@ -150,7 +154,7 @@
             cursor: pointer;
         }
 
-        #legend-toggle[aria-expanded="true"] {
+        .mobile-panel-toggle[aria-expanded="true"] {
             background: #b42318;
         }
 
@@ -425,41 +429,42 @@
                 height: calc(100% - 118px);
             }
 
-            #search-panel {
-                top: 130px;
-                left: 10px;
-                right: 10px;
-                width: auto;
-            }
-
-            #layer-panel {
-                top: 326px;
-                left: 10px;
-                right: 10px;
-                width: auto;
-                max-height: 300px;
-            }
-
+            #search-panel,
+            #layer-panel,
             #legend {
                 display: none;
+                left: 10px;
                 right: 10px;
-                bottom: 70px;
-                width: min(280px, calc(100vw - 20px));
-                max-height: min(45vh, 360px);
+                top: auto;
+                bottom: 72px;
+                width: auto;
+                max-height: min(64vh, 520px);
                 overflow-y: auto;
                 overscroll-behavior: contain;
             }
 
+            #search-panel.mobile-open,
+            #layer-panel.mobile-open,
             #legend.mobile-open {
                 display: block;
             }
 
-            #legend-toggle {
-                display: block;
+            #search-panel {
+                max-height: min(52vh, 370px);
+            }
+
+            #legend {
+                left: auto;
+                width: min(300px, calc(100vw - 20px));
+                max-height: min(48vh, 380px);
+            }
+
+            #mobile-panel-buttons {
+                display: flex;
             }
 
             .leaflet-control-scale {
-                margin-bottom: 72px !important;
+                margin-bottom: 74px !important;
             }
         }
     </style>
@@ -605,15 +610,40 @@
         </div>
     </section>
 
-    <button
-        id="legend-toggle"
-        type="button"
-        aria-controls="legend"
-        aria-expanded="false"
-        title="범례 열기"
-    >
-        범례
-    </button>
+    <div id="mobile-panel-buttons" aria-label="모바일 도구">
+        <button
+            id="search-toggle"
+            class="mobile-panel-toggle"
+            type="button"
+            aria-controls="search-panel"
+            aria-expanded="false"
+            title="검색 패널 열기"
+        >
+            검색
+        </button>
+
+        <button
+            id="layer-toggle"
+            class="mobile-panel-toggle"
+            type="button"
+            aria-controls="layer-panel"
+            aria-expanded="false"
+            title="분석 레이어 열기"
+        >
+            레이어
+        </button>
+
+        <button
+            id="legend-toggle"
+            class="mobile-panel-toggle"
+            type="button"
+            aria-controls="legend"
+            aria-expanded="false"
+            title="범례 열기"
+        >
+            범례
+        </button>
+    </div>
 
     <section id="legend" class="floating-panel">
         <div class="panel-title">범례</div>
@@ -657,7 +687,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-07";
+        const APP_VERSION = "20260714-08";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -713,7 +743,11 @@
             const debrisClearButton = document.getElementById("debris-clear-button");
             const layerStatus = document.getElementById("layer-status");
             const searchMessage = document.getElementById("search-message");
+            const searchPanel = document.getElementById("search-panel");
+            const layerPanel = document.getElementById("layer-panel");
             const legend = document.getElementById("legend");
+            const searchToggle = document.getElementById("search-toggle");
+            const layerToggle = document.getElementById("layer-toggle");
             const legendToggle = document.getElementById("legend-toggle");
             const addressInput = document.getElementById("address-input");
             const latitudeInput = document.getElementById("latitude-input");
@@ -735,64 +769,121 @@
                 layerStatus.className = type;
             }
 
-            function setMobileLegendOpen(isOpen) {
-                const mobileMode = window.matchMedia(
+            const mobilePanels = {
+                search: {
+                    panel: searchPanel,
+                    button: searchToggle,
+                    openLabel: "닫기",
+                    closedLabel: "검색",
+                    openTitle: "검색 패널 닫기",
+                    closedTitle: "검색 패널 열기"
+                },
+                layer: {
+                    panel: layerPanel,
+                    button: layerToggle,
+                    openLabel: "닫기",
+                    closedLabel: "레이어",
+                    openTitle: "분석 레이어 닫기",
+                    closedTitle: "분석 레이어 열기"
+                },
+                legend: {
+                    panel: legend,
+                    button: legendToggle,
+                    openLabel: "닫기",
+                    closedLabel: "범례",
+                    openTitle: "범례 닫기",
+                    closedTitle: "범례 열기"
+                }
+            };
+
+            function isMobileMode() {
+                return window.matchMedia(
                     "(max-width: 900px)"
                 ).matches;
+            }
 
-                if (!mobileMode) {
-                    legend.classList.remove("mobile-open");
-                    legendToggle.setAttribute(
-                        "aria-expanded",
-                        "false"
-                    );
-                    legendToggle.textContent = "범례";
-                    legendToggle.title = "범례 열기";
+            function setMobilePanelState(
+                targetName = null
+            ) {
+                const mobileMode =
+                    isMobileMode();
+
+                Object.entries(
+                    mobilePanels
+                ).forEach(
+                    ([name, item]) => {
+                        const isOpen =
+                            mobileMode
+                            && name === targetName;
+
+                        item.panel.classList.toggle(
+                            "mobile-open",
+                            isOpen
+                        );
+
+                        item.button.setAttribute(
+                            "aria-expanded",
+                            String(isOpen)
+                        );
+
+                        item.button.textContent =
+                            isOpen
+                                ? item.openLabel
+                                : item.closedLabel;
+
+                        item.button.title =
+                            isOpen
+                                ? item.openTitle
+                                : item.closedTitle;
+                    }
+                );
+            }
+
+            function toggleMobilePanel(
+                panelName
+            ) {
+                if (!isMobileMode()) {
                     return;
                 }
 
-                legend.classList.toggle(
-                    "mobile-open",
-                    isOpen
+                const item =
+                    mobilePanels[panelName];
+
+                const isOpen =
+                    item.button.getAttribute(
+                        "aria-expanded"
+                    ) === "true";
+
+                setMobilePanelState(
+                    isOpen ? null : panelName
                 );
-
-                legendToggle.setAttribute(
-                    "aria-expanded",
-                    String(isOpen)
-                );
-
-                legendToggle.textContent =
-                    isOpen ? "닫기" : "범례";
-
-                legendToggle.title =
-                    isOpen ? "범례 닫기" : "범례 열기";
             }
 
-            legendToggle.addEventListener(
-                "click",
-                event => {
-                    event.stopPropagation();
+            Object.entries(
+                mobilePanels
+            ).forEach(
+                ([name, item]) => {
+                    item.button.addEventListener(
+                        "click",
+                        event => {
+                            event.stopPropagation();
+                            toggleMobilePanel(name);
+                        }
+                    );
 
-                    const isOpen =
-                        legendToggle.getAttribute(
-                            "aria-expanded"
-                        ) === "true";
-
-                    setMobileLegendOpen(!isOpen);
-                }
-            );
-
-            legend.addEventListener(
-                "click",
-                event => {
-                    event.stopPropagation();
+                    item.panel.addEventListener(
+                        "click",
+                        event => {
+                            event.stopPropagation();
+                        }
+                    );
                 }
             );
 
             window.addEventListener(
                 "resize",
                 () => {
-                    setMobileLegendOpen(false);
+                    setMobilePanelState(null);
                 }
             );
 
@@ -813,17 +904,13 @@
             map.on(
                 "click",
                 () => {
-                    if (
-                        window.matchMedia(
-                            "(max-width: 900px)"
-                        ).matches
-                    ) {
-                        setMobileLegendOpen(false);
+                    if (isMobileMode()) {
+                        setMobilePanelState(null);
                     }
                 }
             );
 
-            setMobileLegendOpen(false);
+            setMobilePanelState(null);
 
             [
                 ["susceptibilityPane", 410, "none"],
