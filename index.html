@@ -139,12 +139,20 @@
         }
 
         #mobile-panel-buttons {
-            display: none;
+            display: flex;
             position: absolute;
             z-index: 1750;
-            right: 10px;
-            bottom: 16px;
+            left: 50%;
+            right: auto;
+            bottom: 18px;
+            transform: translateX(-50%);
+            justify-content: center;
+            flex-wrap: wrap;
             gap: 7px;
+        }
+
+        .floating-panel.desktop-hidden {
+            display: none !important;
         }
 
         .mobile-panel-toggle {
@@ -402,6 +410,12 @@
             pointer-events: none;
         }
 
+        /* 면적 도형 정보 상자: 도형의 왼쪽 상단에 배치 */
+        .measurement-map-label.area-label-top-left {
+            transform: translate(12px, 12px);
+            text-align: left;
+        }
+
         .measurement-start-marker {
             width: 12px;
             height: 12px;
@@ -585,6 +599,13 @@
 
             #mobile-panel-buttons {
                 display: flex;
+                left: auto;
+                right: 10px;
+                bottom: 16px;
+                transform: none;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                max-width: calc(100vw - 20px);
             }
 
             .leaflet-control-scale {
@@ -1507,7 +1528,7 @@
             aria-expanded="false"
             title="측정 패널 열기"
         >
-            측정
+            측정·편집
         </button>
 
         <button
@@ -1518,7 +1539,7 @@
             aria-expanded="false"
             title="분석 레이어 열기"
         >
-            레이어
+            분석 레이어
         </button>
 
         <button
@@ -1828,7 +1849,7 @@
                 search: {
                     panel: searchPanel,
                     button: searchToggle,
-                    openLabel: "닫기",
+                    openLabel: "검색 닫기",
                     closedLabel: "검색",
                     openTitle: "검색 패널 닫기",
                     closedTitle: "검색 패널 열기"
@@ -1836,23 +1857,23 @@
                 measure: {
                     panel: measurePanel,
                     button: measureToggle,
-                    openLabel: "닫기",
-                    closedLabel: "측정",
+                    openLabel: "측정 닫기",
+                    closedLabel: "측정·편집",
                     openTitle: "측정 패널 닫기",
                     closedTitle: "측정 패널 열기"
                 },
                 layer: {
                     panel: layerPanel,
                     button: layerToggle,
-                    openLabel: "닫기",
-                    closedLabel: "레이어",
+                    openLabel: "레이어 닫기",
+                    closedLabel: "분석 레이어",
                     openTitle: "분석 레이어 닫기",
                     closedTitle: "분석 레이어 열기"
                 },
                 legend: {
                     panel: legend,
                     button: legendToggle,
-                    openLabel: "닫기",
+                    openLabel: "범례 닫기",
                     closedLabel: "범례",
                     openTitle: "범례 닫기",
                     closedTitle: "범례 열기"
@@ -1865,90 +1886,73 @@
                 ).matches;
             }
 
-            function setMobilePanelState(
-                targetName = null
-            ) {
-                const mobileMode =
-                    isMobileMode();
-
-                Object.entries(
-                    mobilePanels
-                ).forEach(
-                    ([name, item]) => {
-                        const isOpen =
-                            mobileMode
-                            && name === targetName;
-
-                        item.panel.classList.toggle(
-                            "mobile-open",
-                            isOpen
-                        );
-
-                        item.button.setAttribute(
-                            "aria-expanded",
-                            String(isOpen)
-                        );
-
-                        item.button.textContent =
-                            isOpen
-                                ? item.openLabel
-                                : item.closedLabel;
-
-                        item.button.title =
-                            isOpen
-                                ? item.openTitle
-                                : item.closedTitle;
-                    }
-                );
+            function updatePanelButton(item, isOpen) {
+                item.button.setAttribute("aria-expanded", String(isOpen));
+                item.button.textContent = isOpen ? item.openLabel : item.closedLabel;
+                item.button.title = isOpen ? item.openTitle : item.closedTitle;
             }
 
-            function toggleMobilePanel(
-                panelName
-            ) {
+            function setMobilePanelState(targetName = null) {
                 if (!isMobileMode()) {
+                    Object.values(mobilePanels).forEach(item => {
+                        item.panel.classList.remove("mobile-open");
+                        updatePanelButton(
+                            item,
+                            !item.panel.classList.contains("desktop-hidden")
+                        );
+                    });
                     return;
                 }
 
-                const item =
-                    mobilePanels[panelName];
-
-                const isOpen =
-                    item.button.getAttribute(
-                        "aria-expanded"
-                    ) === "true";
-
-                setMobilePanelState(
-                    isOpen ? null : panelName
-                );
+                Object.entries(mobilePanels).forEach(([name, item]) => {
+                    item.panel.classList.remove("desktop-hidden");
+                    const isOpen = name === targetName;
+                    item.panel.classList.toggle("mobile-open", isOpen);
+                    updatePanelButton(item, isOpen);
+                });
             }
 
-            Object.entries(
-                mobilePanels
-            ).forEach(
-                ([name, item]) => {
-                    item.button.addEventListener(
-                        "click",
-                        event => {
-                            event.stopPropagation();
-                            toggleMobilePanel(name);
-                        }
-                    );
-
-                    item.panel.addEventListener(
-                        "click",
-                        event => {
-                            event.stopPropagation();
-                        }
-                    );
+            function togglePanel(panelName) {
+                const item = mobilePanels[panelName];
+                if (!item) {
+                    return;
                 }
-            );
 
-            window.addEventListener(
-                "resize",
-                () => {
+                if (isMobileMode()) {
+                    const isOpen = item.panel.classList.contains("mobile-open");
+                    setMobilePanelState(isOpen ? null : panelName);
+                    return;
+                }
+
+                item.panel.classList.remove("mobile-open");
+                const willHide = !item.panel.classList.contains("desktop-hidden");
+                item.panel.classList.toggle("desktop-hidden", willHide);
+                updatePanelButton(item, !willHide);
+                window.setTimeout(() => map?.invalidateSize?.(false), 0);
+            }
+
+            Object.entries(mobilePanels).forEach(([name, item]) => {
+                item.button.addEventListener("click", event => {
+                    event.stopPropagation();
+                    togglePanel(name);
+                });
+
+                item.panel.addEventListener("click", event => {
+                    event.stopPropagation();
+                });
+            });
+
+            window.addEventListener("resize", () => {
+                if (isMobileMode()) {
                     setMobilePanelState(null);
+                } else {
+                    Object.values(mobilePanels).forEach(item => {
+                        item.panel.classList.remove("mobile-open", "desktop-hidden");
+                        updatePanelButton(item, true);
+                    });
+                    window.setTimeout(() => map?.invalidateSize?.(false), 0);
                 }
-            );
+            });
 
             function setSearchMessage(message, type = "") {
                 searchMessage.textContent = message;
@@ -2710,9 +2714,11 @@
             function formatAreaValue(areaM2) {
                 const value = Number(areaM2);
                 if (!Number.isFinite(value)) return "-";
-                if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString("ko-KR", { maximumFractionDigits: 3 })}㎢`;
-                if (value >= 10_000) return `${(value / 10_000).toLocaleString("ko-KR", { maximumFractionDigits: 3 })}ha`;
-                return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`;
+                const squareKilometers = value / 1_000_000;
+                return `${squareKilometers.toLocaleString("ko-KR", {
+                    minimumFractionDigits: 3,
+                    maximumFractionDigits: 3
+                })}㎢`;
             }
 
             function formatDistanceValue(distanceM) {
@@ -4396,15 +4402,12 @@
                 if (!Number.isFinite(squareMeters)) {
                     return "-";
                 }
-                return `${squareMeters.toLocaleString("ko-KR", {
-                    minimumFractionDigits: squareMeters < 1000 ? 1 : 0,
-                    maximumFractionDigits: 1
-                })} ㎡ · ${(squareMeters / 10000).toLocaleString("ko-KR", {
+
+                // ㎢만 표시하며 소수점 넷째 자리에서 반올림합니다.
+                const squareKilometers = squareMeters / 1000000;
+                return `${squareKilometers.toLocaleString("ko-KR", {
                     minimumFractionDigits: 3,
                     maximumFractionDigits: 3
-                })} ha · ${(squareMeters / 1000000).toLocaleString("ko-KR", {
-                    minimumFractionDigits: 4,
-                    maximumFractionDigits: 4
                 })} ㎢`;
             }
 
@@ -4554,23 +4557,31 @@
                 return marker;
             }
 
-            function createLabel(latlng, html, selected = false) {
+            function createLabel(latlng, html, selected = false, placement = "center") {
+                const placementClass = placement === "top-left"
+                    ? " area-label-top-left"
+                    : "";
+
                 return L.marker(latlng, {
                     pane: "measurementPane",
                     interactive: false,
                     keyboard: false,
                     icon: createMeasurementDivIcon(
-                        `<div class="measurement-map-label${selected ? " selected-label" : ""}">${html}</div>`,
+                        `<div class="measurement-map-label${placementClass}${selected ? " selected-label" : ""}">${html}</div>`,
                         [1, 1],
                         [0, 0]
                     )
                 });
             }
 
-            function updateLabel(marker, latlng, html, selected = false) {
+            function updateLabel(marker, latlng, html, selected = false, placement = "center") {
+                const placementClass = placement === "top-left"
+                    ? " area-label-top-left"
+                    : "";
+
                 marker.setLatLng(latlng);
                 marker.setIcon(createMeasurementDivIcon(
-                    `<div class="measurement-map-label${selected ? " selected-label" : ""}">${html}</div>`,
+                    `<div class="measurement-map-label${placementClass}${selected ? " selected-label" : ""}">${html}</div>`,
                     [1, 1],
                     [0, 0]
                 ));
@@ -4789,7 +4800,10 @@
             function updateObjectLabel(object, position) {
                 const selected = objectIsSelected(object);
                 const html = objectDetailsHtml(object);
-                updateLabel(object.label, position, html, selected);
+                const placement = ["circle", "square", "rectangle", "polygon"].includes(object.type)
+                    ? "top-left"
+                    : "center";
+                updateLabel(object.label, position, html, selected, placement);
             }
 
             function createMeasurementObject(state, selectAfter = true) {
@@ -4857,7 +4871,10 @@
                         const current = object.params.points.map(arrayLatLng);
                         shape.setLatLngs(current);
                         handles.forEach((handle, index) => handle.setLatLng(current[index]));
-                        updateObjectLabel(object, averagePoint(current));
+                        updateObjectLabel(
+                            object,
+                            isPolygon ? shape.getBounds().getNorthWest() : averagePoint(current)
+                        );
                         object.updateStyle();
                     };
                 } else if (object.type === "circle") {
@@ -4900,7 +4917,7 @@
                         shape.setLatLng(currentCenter).setRadius(radius);
                         centerHandle.setLatLng(currentCenter);
                         radiusHandle.setLatLng(destinationPoint(currentCenter, radius, Number(object.params.bearing) || 90));
-                        updateObjectLabel(object, currentCenter);
+                        updateObjectLabel(object, shape.getBounds().getNorthWest());
                         object.updateStyle();
                     };
                 } else if (object.type === "square" || object.type === "rectangle") {
@@ -4959,7 +4976,7 @@
                         centerHandle.setLatLng(currentCenter);
                         sizeHandle.setLatLng(rectangleResizeHandle(currentCenter, currentWidth, currentHeight, rotation));
                         rotationHandle.setLatLng(rotationHandlePoint(currentCenter, currentWidth, currentHeight, rotation));
-                        updateObjectLabel(object, currentCenter);
+                        updateObjectLabel(object, shape.getBounds().getNorthWest());
                         object.updateStyle();
                     };
                 } else {
