@@ -116,6 +116,12 @@
             width: 390px;
         }
 
+        #measure-panel {
+            top: 282px;
+            left: 68px;
+            width: 285px;
+        }
+
         #layer-panel {
             top: 94px;
             right: 16px;
@@ -325,6 +331,87 @@
             flex: 1 1 0;
         }
 
+        .measure-tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .measure-tool-button {
+            min-height: 39px;
+            padding: 8px 7px;
+            border: 1px solid #b8c2cc;
+            border-radius: 6px;
+            color: #243447;
+            background: #f7f9fb;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .measure-tool-button:hover {
+            background: #e9f1f7;
+        }
+
+        .measure-tool-button.active {
+            color: #ffffff;
+            background: #7c3aed;
+            border-color: #6d28d9;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.16);
+        }
+
+        #measure-result {
+            min-height: 54px;
+            margin-top: 9px;
+            padding: 9px 10px;
+            border: 1px solid #d6dde4;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.55;
+        }
+
+        #measure-result strong {
+            color: #5b21b6;
+        }
+
+        .measurement-div-icon {
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+
+        .measurement-map-label {
+            display: inline-block;
+            min-width: 130px;
+            padding: 7px 9px;
+            transform: translate(-50%, -50%);
+            color: #111827;
+            background: rgba(255, 255, 255, 0.96);
+            border: 2px solid #7c3aed;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.45;
+            text-align: center;
+            max-width: min(270px, 72vw);
+            white-space: normal;
+            pointer-events: none;
+        }
+
+        .measurement-start-marker {
+            width: 12px;
+            height: 12px;
+            margin: -6px 0 0 -6px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            background: #7c3aed;
+            box-shadow: 0 0 0 2px #5b21b6;
+        }
+
         .legend-section {
             display: none;
             margin-top: 9px;
@@ -430,6 +517,7 @@
             }
 
             #search-panel,
+            #measure-panel,
             #layer-panel,
             #legend {
                 display: none;
@@ -444,6 +532,7 @@
             }
 
             #search-panel.mobile-open,
+            #measure-panel.mobile-open,
             #layer-panel.mobile-open,
             #legend.mobile-open {
                 display: block;
@@ -451,6 +540,10 @@
 
             #search-panel {
                 max-height: min(52vh, 370px);
+            }
+
+            #measure-panel {
+                max-height: min(52vh, 390px);
             }
 
             #legend {
@@ -526,6 +619,34 @@
 
         <div class="help-text">
             좌표계: WGS84(EPSG:4326) · 위도(Y), 경도(X) 순서
+        </div>
+    </section>
+
+
+    <section id="measure-panel" class="floating-panel">
+        <div class="panel-title">거리·면적 측정</div>
+
+        <div class="measure-tool-grid">
+            <button id="measure-distance-button" class="measure-tool-button" type="button">
+                거리
+            </button>
+            <button id="measure-circle-button" class="measure-tool-button" type="button">
+                원
+            </button>
+            <button id="measure-square-button" class="measure-tool-button" type="button">
+                정사각형
+            </button>
+            <button id="measure-clear-button" class="measure-tool-button" type="button">
+                전체 삭제
+            </button>
+        </div>
+
+        <div id="measure-result">
+            도구를 선택한 뒤 지도에서 시작점과 끝점을 차례로 클릭하세요.
+        </div>
+
+        <div class="help-text">
+            거리: 두 점 사이 길이 · 원: 반지름·둘레·면적 · 정사각형: 변 길이·둘레·면적
         </div>
     </section>
 
@@ -622,6 +743,18 @@
             검색
         </button>
 
+
+        <button
+            id="measure-toggle"
+            class="mobile-panel-toggle"
+            type="button"
+            aria-controls="measure-panel"
+            aria-expanded="false"
+            title="측정 패널 열기"
+        >
+            측정
+        </button>
+
         <button
             id="layer-toggle"
             class="mobile-panel-toggle"
@@ -687,7 +820,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260714-09";
+        const APP_VERSION = "20260716-01";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -744,9 +877,11 @@
             const layerStatus = document.getElementById("layer-status");
             const searchMessage = document.getElementById("search-message");
             const searchPanel = document.getElementById("search-panel");
+            const measurePanel = document.getElementById("measure-panel");
             const layerPanel = document.getElementById("layer-panel");
             const legend = document.getElementById("legend");
             const searchToggle = document.getElementById("search-toggle");
+            const measureToggle = document.getElementById("measure-toggle");
             const layerToggle = document.getElementById("layer-toggle");
             const legendToggle = document.getElementById("legend-toggle");
             const addressInput = document.getElementById("address-input");
@@ -754,6 +889,11 @@
             const longitudeInput = document.getElementById("longitude-input");
             const addressSearchButton = document.getElementById("address-search-button");
             const coordinateSearchButton = document.getElementById("coordinate-search-button");
+            const measureDistanceButton = document.getElementById("measure-distance-button");
+            const measureCircleButton = document.getElementById("measure-circle-button");
+            const measureSquareButton = document.getElementById("measure-square-button");
+            const measureClearButton = document.getElementById("measure-clear-button");
+            const measureResult = document.getElementById("measure-result");
 
             function escapeHtml(value) {
                 return String(value ?? "")
@@ -777,6 +917,14 @@
                     closedLabel: "검색",
                     openTitle: "검색 패널 닫기",
                     closedTitle: "검색 패널 열기"
+                },
+                measure: {
+                    panel: measurePanel,
+                    button: measureToggle,
+                    openLabel: "닫기",
+                    closedLabel: "측정",
+                    openTitle: "측정 패널 닫기",
+                    closedTitle: "측정 패널 열기"
                 },
                 layer: {
                     panel: layerPanel,
@@ -919,7 +1067,8 @@
                 ["sigunguPane", 480, "auto"],
                 ["emdPane", 490, "auto"],
                 ["debrisPane", 540, "auto"],
-                ["humanDamagePane", 560, "auto"]
+                ["humanDamagePane", 560, "auto"],
+                ["measurementPane", 590, "none"]
             ].forEach(([name, zIndex, pointerEvents]) => {
                 if (!map.getPane(name)) {
                     map.createPane(name);
@@ -2055,6 +2204,350 @@
                     console.warn("읍면동 경계 로드 실패", error);
                 });
 
+
+            /*
+             * 거리·원·정사각형 측정 도구
+             * - 별도 플러그인 없이 Leaflet 기본 기능만 사용
+             * - 도구 선택 후 지도에서 시작점과 끝점을 차례로 클릭
+             */
+            const measurementLayerGroup = L.layerGroup().addTo(map);
+            const measureButtons = {
+                distance: measureDistanceButton,
+                circle: measureCircleButton,
+                square: measureSquareButton
+            };
+
+            let activeMeasureMode = null;
+            let measureStartLatLng = null;
+            let measureStartMarker = null;
+            let measurementNumber = 0;
+
+            function formatMeasureLength(meters) {
+                if (!Number.isFinite(meters)) {
+                    return "-";
+                }
+
+                if (meters >= 1000) {
+                    return `${(meters / 1000).toLocaleString("ko-KR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })} km`;
+                }
+
+                return `${meters.toLocaleString("ko-KR", {
+                    minimumFractionDigits: meters < 100 ? 1 : 0,
+                    maximumFractionDigits: 1
+                })} m`;
+            }
+
+            function formatMeasureArea(squareMeters) {
+                if (!Number.isFinite(squareMeters)) {
+                    return "-";
+                }
+
+                const squareMeterText = squareMeters.toLocaleString("ko-KR", {
+                    minimumFractionDigits: squareMeters < 1000 ? 1 : 0,
+                    maximumFractionDigits: 1
+                });
+                const hectareText = (squareMeters / 10000).toLocaleString("ko-KR", {
+                    minimumFractionDigits: 3,
+                    maximumFractionDigits: 3
+                });
+                const squareKilometerText = (squareMeters / 1000000).toLocaleString("ko-KR", {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4
+                });
+
+                return `${squareMeterText} ㎡ · ${hectareText} ha · ${squareKilometerText} ㎢`;
+            }
+
+            function setMeasureResult(html) {
+                measureResult.innerHTML = html;
+            }
+
+            function removeMeasureStartMarker() {
+                if (measureStartMarker) {
+                    measurementLayerGroup.removeLayer(measureStartMarker);
+                    measureStartMarker = null;
+                }
+                measureStartLatLng = null;
+            }
+
+            function updateMeasureButtonState() {
+                Object.entries(measureButtons).forEach(([mode, button]) => {
+                    const isActive = mode === activeMeasureMode;
+                    button.classList.toggle("active", isActive);
+                    button.setAttribute("aria-pressed", String(isActive));
+                });
+
+                map.getContainer().style.cursor = activeMeasureMode
+                    ? "crosshair"
+                    : "";
+            }
+
+            function measurementInstruction(mode) {
+                if (mode === "distance") {
+                    return "<strong>거리 측정</strong><br>지도에서 시작점과 끝점을 차례로 클릭하세요.";
+                }
+                if (mode === "circle") {
+                    return "<strong>원 측정</strong><br>중심점을 클릭한 뒤 원의 가장자리를 클릭하세요.";
+                }
+                if (mode === "square") {
+                    return "<strong>정사각형 측정</strong><br>중심점을 클릭한 뒤 정사각형의 모서리 방향을 클릭하세요.";
+                }
+                return "도구를 선택한 뒤 지도에서 시작점과 끝점을 차례로 클릭하세요.";
+            }
+
+            function activateMeasureMode(mode) {
+                removeMeasureStartMarker();
+
+                activeMeasureMode = activeMeasureMode === mode
+                    ? null
+                    : mode;
+
+                updateMeasureButtonState();
+                setMeasureResult(measurementInstruction(activeMeasureMode));
+            }
+
+            function addMeasurementLabel(latlng, html) {
+                const marker = L.marker(latlng, {
+                    pane: "measurementPane",
+                    interactive: false,
+                    keyboard: false,
+                    icon: L.divIcon({
+                        className: "measurement-div-icon",
+                        html: `<div class="measurement-map-label">${html}</div>`
+                    })
+                });
+
+                measurementLayerGroup.addLayer(marker);
+                return marker;
+            }
+
+            function addStartMarker(latlng) {
+                removeMeasureStartMarker();
+                measureStartLatLng = latlng;
+                measureStartMarker = L.marker(latlng, {
+                    pane: "measurementPane",
+                    interactive: false,
+                    keyboard: false,
+                    icon: L.divIcon({
+                        className: "measurement-div-icon",
+                        html: '<div class="measurement-start-marker"></div>',
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6]
+                    })
+                });
+                measurementLayerGroup.addLayer(measureStartMarker);
+            }
+
+            function squareFromCenterAndPoint(center, point) {
+                const zoom = map.getZoom();
+                const centerPixel = map.project(center, zoom);
+                const pointPixel = map.project(point, zoom);
+                const halfSize = Math.max(
+                    Math.abs(pointPixel.x - centerPixel.x),
+                    Math.abs(pointPixel.y - centerPixel.y)
+                );
+
+                if (halfSize < 2) {
+                    return null;
+                }
+
+                const northWest = map.unproject(
+                    L.point(centerPixel.x - halfSize, centerPixel.y - halfSize),
+                    zoom
+                );
+                const northEast = map.unproject(
+                    L.point(centerPixel.x + halfSize, centerPixel.y - halfSize),
+                    zoom
+                );
+                const southEast = map.unproject(
+                    L.point(centerPixel.x + halfSize, centerPixel.y + halfSize),
+                    zoom
+                );
+                const southWest = map.unproject(
+                    L.point(centerPixel.x - halfSize, centerPixel.y + halfSize),
+                    zoom
+                );
+
+                return [northWest, northEast, southEast, southWest];
+            }
+
+            function finishDistanceMeasurement(start, end) {
+                const distance = map.distance(start, end);
+                if (distance < 0.05) {
+                    setMeasureResult("두 지점을 서로 다르게 선택해 주세요.");
+                    return false;
+                }
+
+                const line = L.polyline([start, end], {
+                    pane: "measurementPane",
+                    color: "#2563eb",
+                    weight: 4,
+                    opacity: 0.92,
+                    dashArray: "9 7",
+                    interactive: false
+                });
+                measurementLayerGroup.addLayer(line);
+
+                const center = L.latLng(
+                    (start.lat + end.lat) / 2,
+                    (start.lng + end.lng) / 2
+                );
+                const label = `거리 ${formatMeasureLength(distance)}`;
+                addMeasurementLabel(center, label);
+                setMeasureResult(`<strong>거리 측정 완료</strong><br>${formatMeasureLength(distance)}`);
+                return true;
+            }
+
+            function finishCircleMeasurement(center, edge) {
+                const radius = map.distance(center, edge);
+                if (radius < 0.05) {
+                    setMeasureResult("중심점과 가장자리 지점을 서로 다르게 선택해 주세요.");
+                    return false;
+                }
+
+                const circumference = 2 * Math.PI * radius;
+                const area = Math.PI * radius * radius;
+
+                const circle = L.circle(center, {
+                    pane: "measurementPane",
+                    radius,
+                    color: "#7c3aed",
+                    weight: 3,
+                    opacity: 0.95,
+                    fillColor: "#a78bfa",
+                    fillOpacity: 0.20,
+                    interactive: false
+                });
+                const radiusLine = L.polyline([center, edge], {
+                    pane: "measurementPane",
+                    color: "#7c3aed",
+                    weight: 2,
+                    opacity: 0.9,
+                    dashArray: "7 6",
+                    interactive: false
+                });
+
+                measurementLayerGroup.addLayer(circle);
+                measurementLayerGroup.addLayer(radiusLine);
+                addMeasurementLabel(
+                    center,
+                    `반지름 ${formatMeasureLength(radius)}<br>` +
+                    `둘레 ${formatMeasureLength(circumference)}<br>` +
+                    `면적 ${formatMeasureArea(area)}`
+                );
+
+                setMeasureResult(
+                    `<strong>원 측정 완료</strong><br>` +
+                    `반지름: ${formatMeasureLength(radius)}<br>` +
+                    `둘레: ${formatMeasureLength(circumference)}<br>` +
+                    `면적: ${formatMeasureArea(area)}`
+                );
+                return true;
+            }
+
+            function finishSquareMeasurement(center, point) {
+                const corners = squareFromCenterAndPoint(center, point);
+                if (!corners) {
+                    setMeasureResult("중심점에서 조금 더 떨어진 지점을 선택해 주세요.");
+                    return false;
+                }
+
+                const [northWest, northEast, southEast, southWest] = corners;
+                const top = map.distance(northWest, northEast);
+                const right = map.distance(northEast, southEast);
+                const bottom = map.distance(southEast, southWest);
+                const left = map.distance(southWest, northWest);
+                const width = (top + bottom) / 2;
+                const height = (left + right) / 2;
+                const side = (width + height) / 2;
+                const perimeter = top + right + bottom + left;
+                const area = width * height;
+
+                const square = L.polygon(corners, {
+                    pane: "measurementPane",
+                    color: "#0f766e",
+                    weight: 3,
+                    opacity: 0.95,
+                    fillColor: "#2dd4bf",
+                    fillOpacity: 0.20,
+                    interactive: false
+                });
+                measurementLayerGroup.addLayer(square);
+                addMeasurementLabel(
+                    center,
+                    `변 길이 ${formatMeasureLength(side)}<br>` +
+                    `둘레 ${formatMeasureLength(perimeter)}<br>` +
+                    `면적 ${formatMeasureArea(area)}`
+                );
+
+                setMeasureResult(
+                    `<strong>정사각형 측정 완료</strong><br>` +
+                    `변 길이: ${formatMeasureLength(side)}<br>` +
+                    `둘레: ${formatMeasureLength(perimeter)}<br>` +
+                    `면적: ${formatMeasureArea(area)}`
+                );
+                return true;
+            }
+
+            function handleMeasurementClick(event) {
+                if (!activeMeasureMode) {
+                    return;
+                }
+
+                if (!measureStartLatLng) {
+                    addStartMarker(event.latlng);
+                    setMeasureResult(
+                        measurementInstruction(activeMeasureMode) +
+                        "<br><strong>첫 번째 지점을 선택했습니다.</strong> 두 번째 지점을 클릭하세요."
+                    );
+                    return;
+                }
+
+                const start = measureStartLatLng;
+                const end = event.latlng;
+                let completed = false;
+
+                measurementNumber += 1;
+
+                if (activeMeasureMode === "distance") {
+                    completed = finishDistanceMeasurement(start, end);
+                } else if (activeMeasureMode === "circle") {
+                    completed = finishCircleMeasurement(start, end);
+                } else if (activeMeasureMode === "square") {
+                    completed = finishSquareMeasurement(start, end);
+                }
+
+                removeMeasureStartMarker();
+
+                if (!completed) {
+                    measurementNumber = Math.max(0, measurementNumber - 1);
+                }
+            }
+
+            measureDistanceButton.addEventListener("click", () => {
+                activateMeasureMode("distance");
+            });
+            measureCircleButton.addEventListener("click", () => {
+                activateMeasureMode("circle");
+            });
+            measureSquareButton.addEventListener("click", () => {
+                activateMeasureMode("square");
+            });
+            measureClearButton.addEventListener("click", () => {
+                measurementLayerGroup.clearLayers();
+                measureStartMarker = null;
+                measureStartLatLng = null;
+                measurementNumber = 0;
+                activeMeasureMode = null;
+                updateMeasureButtonState();
+                setMeasureResult("측정 결과를 모두 삭제했습니다. 도구를 다시 선택해 주세요.");
+            });
+
+            map.on("click", handleMeasurementClick);
+
             let searchMarker = null;
 
             function requestVWorldJsonp(parameters) {
@@ -2233,6 +2726,10 @@
             });
 
             map.on("click", async event => {
+                if (activeMeasureMode) {
+                    return;
+                }
+
                 const latitude = event.latlng.lat;
                 const longitude = event.latlng.lng;
                 latitudeInput.value = latitude.toFixed(7);
