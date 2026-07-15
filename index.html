@@ -591,6 +591,569 @@
                 margin-bottom: 74px !important;
             }
         }
+
+
+        /* ============================================================
+         * 고급 측정·비교·레이어 관리·화면 저장 UI
+         * ============================================================ */
+        #measure-panel {
+            width: 390px;
+            max-height: calc(100vh - 375px);
+            overflow-y: auto;
+        }
+
+        .measure-tool-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .measure-subsection {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dfe5ea;
+        }
+
+        .measure-subtitle {
+            margin-bottom: 7px;
+            color: #17324d;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .measure-field-row {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr) 70px;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .measure-field-row.two-columns {
+            grid-template-columns: 82px minmax(0, 1fr);
+        }
+
+        .measure-field-row label {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .measure-field-row input,
+        .measure-field-row select,
+        #measure-name-input,
+        #layer-search-input,
+        #capture-title-input,
+        #compare-left-select,
+        #compare-right-select {
+            width: 100%;
+            min-width: 0;
+            padding: 7px 8px;
+            border: 1px solid #b8c2cc;
+            border-radius: 5px;
+            background: #ffffff;
+        }
+
+        .preset-button-row,
+        .measure-action-grid,
+        .layer-manager-buttons,
+        .comparison-button-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 5px;
+            margin-top: 7px;
+        }
+
+        .measure-action-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .preset-size-button,
+        .measure-action-button,
+        .layer-manager-button,
+        .comparison-button {
+            min-width: 0;
+            padding: 7px 5px;
+            border: 1px solid #c9d2dc;
+            border-radius: 5px;
+            color: #243447;
+            background: #eef2f6;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .preset-size-button:hover,
+        .measure-action-button:hover,
+        .layer-manager-button:hover,
+        .comparison-button:hover {
+            background: #dfe8f0;
+        }
+
+        .measure-action-button.danger {
+            color: #991b1b;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .measure-action-button.active,
+        .comparison-button.active {
+            color: #ffffff;
+            border-color: #1f5f8b;
+            background: #1f5f8b;
+        }
+
+        #measure-selection-status {
+            margin-bottom: 7px;
+            padding: 7px 8px;
+            border-radius: 5px;
+            color: #475569;
+            background: #f1f5f9;
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        #measure-selection-status.selected {
+            color: #174968;
+            background: #e0f2fe;
+        }
+
+        .measurement-map-label.selected-label {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), 0 2px 8px rgba(0, 0, 0, 0.28);
+        }
+
+        .measurement-handle-marker.rotation-handle {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            background: #2563eb;
+            box-shadow: 0 0 0 2px #1e3a8a, 0 2px 7px rgba(0, 0, 0, 0.35);
+        }
+
+        .measurement-handle-marker.vertex-handle {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 3px solid #ffffff;
+            background: #f97316;
+            box-shadow: 0 0 0 2px #9a3412, 0 2px 7px rgba(0, 0, 0, 0.35);
+        }
+
+        #human-buffer-section {
+            border: 1px solid #fecaca;
+            border-radius: 7px;
+            padding: 10px;
+            background: #fffafa;
+        }
+
+        .buffer-site-card {
+            margin-top: 7px;
+            padding: 8px 9px;
+            border-radius: 6px;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .buffer-site-card.active {
+            color: #7f1d1d;
+            background: #fff1f2;
+            border-color: #fecdd3;
+        }
+
+        .buffer-radius-presets {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .buffer-radius-button {
+            min-width: 0;
+            padding: 7px 4px;
+            border: 1px solid #f3b4b4;
+            border-radius: 5px;
+            color: #7f1d1d;
+            background: #fff7f7;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .buffer-radius-button:hover,
+        .buffer-radius-button.active {
+            color: #ffffff;
+            background: #b42318;
+            border-color: #b42318;
+        }
+
+        .buffer-custom-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 70px auto;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        #buffer-custom-radius-input,
+        #buffer-custom-radius-unit {
+            min-width: 0;
+            width: 100%;
+            padding: 7px 8px;
+            border: 1px solid #b8c2cc;
+            border-radius: 5px;
+            background: #ffffff;
+        }
+
+        .buffer-option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .buffer-action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        #buffer-analysis-results {
+            margin-top: 9px;
+        }
+
+        .buffer-result-summary {
+            margin-bottom: 7px;
+            padding: 8px 9px;
+            border-radius: 6px;
+            color: #334155;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .buffer-result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .buffer-result-card {
+            min-width: 0;
+            padding: 8px;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .buffer-result-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .buffer-result-label {
+            display: block;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .buffer-result-value {
+            display: block;
+            margin-top: 3px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 900;
+            overflow-wrap: anywhere;
+        }
+
+        .buffer-result-note {
+            display: block;
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 9px;
+            line-height: 1.35;
+        }
+
+        .buffer-data-status {
+            margin-top: 8px;
+            padding: 7px 8px;
+            border-radius: 5px;
+            color: #475569;
+            background: #f1f5f9;
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .buffer-data-status.success {
+            color: #166534;
+            background: #f0fdf4;
+        }
+
+        .buffer-data-status.warning {
+            color: #92400e;
+            background: #fffbeb;
+        }
+
+        .human-buffer-label {
+            padding: 5px 8px;
+            border: 1px solid #991b1b;
+            border-radius: 14px;
+            color: #ffffff;
+            background: rgba(153, 27, 27, 0.92);
+            font-size: 11px;
+            font-weight: 900;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        #comparison-section {
+            margin-top: 10px;
+        }
+
+        .comparison-select-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        #compare-position {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        #comparison-divider {
+            display: none;
+            position: absolute;
+            z-index: 1450;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            transform: translateX(-2px);
+            pointer-events: none;
+            background: #ffffff;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), 0 0 8px rgba(0, 0, 0, 0.45);
+        }
+
+        #comparison-divider.active {
+            display: block;
+        }
+
+        .comparison-label {
+            position: absolute;
+            top: 12px;
+            min-width: 120px;
+            padding: 7px 10px;
+            border-radius: 18px;
+            color: #ffffff;
+            background: rgba(23, 50, 77, 0.92);
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #comparison-left-label {
+            right: 13px;
+        }
+
+        #comparison-right-label {
+            left: 13px;
+        }
+
+        .layer-manager {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dfe5ea;
+        }
+
+        .layer-search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .favorite-filter-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .layer-manager-buttons {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        #managed-layer-list {
+            margin-top: 8px;
+            border: 1px solid #dfe5ea;
+            border-radius: 6px;
+            max-height: 190px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .managed-layer-row {
+            display: grid;
+            grid-template-columns: 24px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 8px;
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        .managed-layer-row:last-child {
+            border-bottom: 0;
+        }
+
+        .managed-layer-row.hidden-row {
+            display: none;
+        }
+
+        .managed-layer-name {
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .managed-layer-category {
+            padding: 2px 5px;
+            border-radius: 8px;
+            color: #64748b;
+            background: #f1f5f9;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .favorite-star-button {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border: 0;
+            color: #94a3b8;
+            background: transparent;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .favorite-star-button.favorite {
+            color: #f59e0b;
+        }
+
+        #capture-overlay {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        #capture-overlay.active {
+            display: block;
+        }
+
+        #capture-heading {
+            position: absolute;
+            top: 92px;
+            left: 50%;
+            max-width: 70vw;
+            padding: 8px 18px;
+            transform: translateX(-50%);
+            border-radius: 7px;
+            color: #ffffff;
+            background: rgba(23, 50, 77, 0.94);
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
+            box-shadow: 0 2px 9px rgba(0, 0, 0, 0.35);
+        }
+
+        #capture-north-arrow {
+            position: absolute;
+            top: 95px;
+            right: 360px;
+            width: 52px;
+            padding: 5px;
+            border-radius: 6px;
+            color: #111827;
+            background: rgba(255, 255, 255, 0.94);
+            font-size: 13px;
+            font-weight: 900;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #capture-north-arrow .arrow {
+            display: block;
+            font-size: 30px;
+            line-height: 28px;
+        }
+
+        #capture-footer {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            color: #111827;
+            background: rgba(255, 255, 255, 0.94);
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+        }
+
+        #map-export-button {
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,0.45);
+            border-radius: 6px;
+            color: #ffffff;
+            background: rgba(255,255,255,0.12);
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        #map-export-button:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        @media screen and (max-width: 900px) {
+            #measure-panel {
+                max-height: min(70vh, 610px);
+            }
+
+            .measure-tool-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            #map-export-button {
+                padding: 7px 9px;
+                font-size: 12px;
+            }
+
+            #capture-heading {
+                top: 128px;
+                max-width: calc(100vw - 30px);
+                font-size: 15px;
+            }
+
+            #capture-north-arrow {
+                top: 130px;
+                right: 14px;
+            }
+        }
+
     </style>
 </head>
 
@@ -611,6 +1174,7 @@
                 <option value="60">60시간 / 250 mm</option>
                 <option value="72">72시간 / 300 mm</option>
             </select>
+            <button id="map-export-button" type="button" title="현재 화면을 PNG로 저장">PNG 저장</button>
         </div>
     </header>
 
@@ -618,6 +1182,11 @@
         <div id="map-error">
             <strong>Leaflet 지도를 불러오지 못했습니다.</strong><br>
             인터넷 연결 또는 CDN 접근 상태를 확인한 후 새로고침해 주세요.
+        </div>
+
+        <div id="comparison-divider" aria-hidden="true">
+            <div id="comparison-left-label" class="comparison-label">12시간 / 50 mm</div>
+            <div id="comparison-right-label" class="comparison-label">72시간 / 300 mm</div>
         </div>
     </main>
 
@@ -653,36 +1222,191 @@
         </div>
     </section>
 
-
     <section id="measure-panel" class="floating-panel">
-        <div class="panel-title">거리·면적 측정</div>
+        <div class="panel-title">거리·면적 측정 및 도형 편집</div>
 
         <div class="measure-tool-grid">
-            <button id="measure-distance-button" class="measure-tool-button" type="button">
-                거리
-            </button>
-            <button id="measure-circle-button" class="measure-tool-button" type="button">
-                원
-            </button>
-            <button id="measure-square-button" class="measure-tool-button" type="button">
-                정사각형
-            </button>
-            <button id="measure-clear-button" class="measure-tool-button" type="button">
-                전체 삭제
-            </button>
+            <button id="measure-distance-button" class="measure-tool-button" type="button">직선</button>
+            <button id="measure-path-button" class="measure-tool-button" type="button">선형 경로</button>
+            <button id="measure-circle-button" class="measure-tool-button" type="button">원</button>
+            <button id="measure-square-button" class="measure-tool-button" type="button">정사각형</button>
+            <button id="measure-rectangle-button" class="measure-tool-button" type="button">직사각형</button>
+            <button id="measure-polygon-button" class="measure-tool-button" type="button">자유 다각형</button>
+            <button id="measure-finish-button" class="measure-tool-button" type="button">도형 완료</button>
+            <button id="measure-undo-button" class="measure-tool-button" type="button">실행 취소</button>
+            <button id="measure-clear-button" class="measure-tool-button" type="button">전체 삭제</button>
         </div>
 
         <div id="measure-result">
-            도구를 선택한 뒤 지도에서 시작점과 끝점을 차례로 클릭하세요.
+            도구를 선택한 뒤 지도에서 지점을 선택하세요.
+        </div>
+
+        <div class="measure-subsection">
+            <div class="measure-subtitle">선택 도형 관리</div>
+            <div id="measure-selection-status">지도에서 측정 도형을 클릭하면 선택됩니다.</div>
+
+            <div class="measure-field-row two-columns">
+                <label for="measure-name-input">도형 이름</label>
+                <input id="measure-name-input" type="text" maxlength="80" placeholder="예: 감천면 분석구역" disabled>
+            </div>
+
+            <div id="measure-primary-size-section" hidden>
+                <div class="measure-field-row">
+                    <label id="measure-primary-size-label" for="measure-primary-size-input">크기</label>
+                    <input id="measure-primary-size-input" type="number" min="1" step="1" placeholder="500">
+                    <select id="measure-primary-size-unit">
+                        <option value="m">m</option>
+                        <option value="km">km</option>
+                    </select>
+                </div>
+                <div class="preset-button-row">
+                    <button class="preset-size-button" type="button" data-size-m="100">100 m</button>
+                    <button class="preset-size-button" type="button" data-size-m="250">250 m</button>
+                    <button class="preset-size-button" type="button" data-size-m="500">500 m</button>
+                    <button class="preset-size-button" type="button" data-size-m="1000">1 km</button>
+                </div>
+            </div>
+
+            <div id="measure-rectangle-size-section" hidden>
+                <div class="measure-field-row">
+                    <label for="measure-width-input">가로</label>
+                    <input id="measure-width-input" type="number" min="1" step="1">
+                    <span>m</span>
+                </div>
+                <div class="measure-field-row">
+                    <label for="measure-height-input">세로</label>
+                    <input id="measure-height-input" type="number" min="1" step="1">
+                    <span>m</span>
+                </div>
+            </div>
+
+            <div id="measure-rotation-section" hidden>
+                <div class="measure-field-row">
+                    <label for="measure-rotation-input">회전각</label>
+                    <input id="measure-rotation-input" type="number" min="0" max="359.9" step="0.1">
+                    <span>°</span>
+                </div>
+            </div>
+
+            <div class="measure-action-grid">
+                <button id="measure-duplicate-button" class="measure-action-button" type="button" disabled>복사</button>
+                <button id="measure-lock-button" class="measure-action-button" type="button" disabled>잠금</button>
+                <button id="measure-delete-button" class="measure-action-button danger" type="button" disabled>선택 삭제</button>
+            </div>
         </div>
 
         <div class="help-text">
-            거리: 두 점 사이 길이 · 원·정사각형: 생성 후 중심점과 외곽 조절점을 드래그해 위치·크기 변경
+            원·정사각형은 수치를 직접 입력하거나 100·250·500·1,000m 버튼을 사용할 수 있습니다. 도형 클릭 후 조절점을 드래그하면 이동·크기 변경·회전이 가능합니다.
         </div>
     </section>
 
     <section id="layer-panel" class="floating-panel">
         <div class="panel-title">분석 레이어</div>
+
+        <div class="layer-manager">
+            <div class="measure-subtitle">레이어 검색·즐겨찾기</div>
+            <div class="layer-search-row">
+                <input id="layer-search-input" type="search" placeholder="레이어 이름 검색">
+                <label class="favorite-filter-label">
+                    <input id="layer-favorites-only" type="checkbox">
+                    즐겨찾기만
+                </label>
+            </div>
+            <div class="layer-manager-buttons">
+                <button id="layers-all-off-button" class="layer-manager-button" type="button">전체 끄기</button>
+                <button id="layers-analysis-only-button" class="layer-manager-button" type="button">분석만</button>
+                <button id="layers-admin-only-button" class="layer-manager-button" type="button">행정경계만</button>
+            </div>
+            <div id="managed-layer-list"></div>
+            <div class="help-text">별표를 누르면 즐겨찾기에 저장되며 마지막 레이어·시나리오·투명도 설정이 자동 복원됩니다.</div>
+        </div>
+
+        <div id="human-buffer-section" class="layer-section">
+            <div class="layer-title-row">
+                <div class="measure-subtitle" style="margin:0;">인명피해 우려지역 자동 버퍼 분석</div>
+            </div>
+
+            <div id="buffer-selected-site" class="buffer-site-card">
+                지도에서 ‘경상북도 인명피해 우려지역(415)’ 지점을 클릭하세요. 기본 500m 버퍼가 자동 생성됩니다.
+            </div>
+
+            <button id="buffer-show-points-button" class="primary-button" type="button" style="width:100%;margin-top:7px;">
+                인명피해 우려지역 415개 지점 표시
+            </button>
+
+            <div class="buffer-radius-presets" aria-label="버퍼 반경 선택">
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="100">100m</button>
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="300">300m</button>
+                <button class="buffer-radius-button active" type="button" data-buffer-radius-m="500">500m</button>
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="1000">1km</button>
+            </div>
+
+            <div class="buffer-custom-row">
+                <input id="buffer-custom-radius-input" type="number" min="10" step="10" value="500" aria-label="사용자 버퍼 반경">
+                <select id="buffer-custom-radius-unit" aria-label="버퍼 거리 단위">
+                    <option value="m">m</option>
+                    <option value="km">km</option>
+                </select>
+                <button id="buffer-apply-button" class="primary-button" type="button">적용</button>
+            </div>
+
+            <label class="buffer-option-label">
+                <input id="buffer-auto-load-debris" type="checkbox" checked>
+                <span>선택 지점의 시군구 토석류 자료를 자동으로 불러와 RedZone·YellowZone 길이를 분석</span>
+            </label>
+
+            <div class="buffer-action-row">
+                <button id="buffer-rerun-button" class="secondary-button" type="button" disabled>다시 분석</button>
+                <button id="buffer-clear-button" class="secondary-button" type="button" disabled>버퍼 제거</button>
+            </div>
+
+            <div id="buffer-analysis-results">
+                <div class="buffer-result-summary">분석 지점을 선택하면 버퍼 면적, 인명피해 우려지역, 인구, 건물, 토석류, 소유역 및 TRIGRS 위험면적을 표시합니다.</div>
+            </div>
+
+            <div id="buffer-data-status" class="buffer-data-status">
+                인구·건물·TRIGRS 통계는 <code>data/buffer_analysis</code> 자료가 있을 때 자동 계산됩니다.
+            </div>
+        </div>
+
+        <div id="comparison-section" class="layer-section">
+            <div class="layer-title-row">
+                <label class="layer-check-label">
+                    <input id="comparison-enabled" type="checkbox">
+                    강우 시나리오 좌우 비교
+                </label>
+            </div>
+            <div class="comparison-select-row">
+                <select id="compare-left-select">
+                    <option value="12">왼쪽 12h / 50mm</option>
+                    <option value="24">왼쪽 24h / 100mm</option>
+                    <option value="36">왼쪽 36h / 150mm</option>
+                    <option value="48">왼쪽 48h / 200mm</option>
+                    <option value="60">왼쪽 60h / 250mm</option>
+                    <option value="72">왼쪽 72h / 300mm</option>
+                </select>
+                <select id="compare-right-select">
+                    <option value="12">오른쪽 12h / 50mm</option>
+                    <option value="24">오른쪽 24h / 100mm</option>
+                    <option value="36">오른쪽 36h / 150mm</option>
+                    <option value="48">오른쪽 48h / 200mm</option>
+                    <option value="60">오른쪽 60h / 250mm</option>
+                    <option value="72" selected>오른쪽 72h / 300mm</option>
+                </select>
+            </div>
+            <input id="compare-position" type="range" min="5" max="95" step="1" value="50" aria-label="비교 경계 위치">
+            <div class="comparison-button-row" style="grid-template-columns:1fr 1fr;">
+                <button id="scenario-play-button" class="comparison-button" type="button">시나리오 자동재생</button>
+                <button id="comparison-reset-button" class="comparison-button" type="button">12h ↔ 72h</button>
+            </div>
+        </div>
+
+        <div class="layer-section">
+            <div class="measure-subtitle">지도 화면 저장</div>
+            <input id="capture-title-input" type="text" value="경상북도 산사태 위험 통합 WebGIS" maxlength="100">
+            <button id="capture-panel-button" class="primary-button" type="button" style="width:100%;margin-top:7px;">현재 화면 PNG 저장</button>
+            <div class="help-text">브라우저가 공유 화면을 물으면 ‘현재 탭’을 선택하세요. 지도·범례·측정값·축척·북쪽 화살표·출력 일시가 함께 저장됩니다.</div>
+        </div>
 
         <div class="layer-section">
             <div class="layer-title-row">
@@ -841,6 +1565,14 @@
             </div>
         </div>
 
+        <div id="legend-human-buffer" class="legend-section">
+            <div class="legend-title">인명피해 우려지역 분석 버퍼</div>
+            <div class="legend-row">
+                <span class="legend-color" style="background:rgba(239,68,68,0.16);border:2px solid #b91c1c;border-radius:50%;"></span>
+                <span>선택 지점 중심 자동 분석 반경</span>
+            </div>
+        </div>
+
         <div id="legend-debris" class="legend-section">
             <div class="legend-title">토석류 위험구간</div>
             <div class="legend-row"><span class="line-sample" style="border-top-width:4px;border-top-color:#d7191c"></span><span>RedZone</span></div>
@@ -848,15 +1580,29 @@
         </div>
     </section>
 
+
+    <div id="capture-overlay" aria-hidden="true">
+        <div id="capture-heading">경상북도 산사태 위험 통합 WebGIS</div>
+        <div id="capture-north-arrow"><span class="arrow">↑</span>N</div>
+        <div id="capture-footer"></div>
+    </div>
+
     <script>
         "use strict";
 
-        const APP_VERSION = "20260716-01";
+        const APP_VERSION = "20260716-02";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js",
             "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        ];
+
+
+        const turfSources = [
+            "https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js",
+            "https://unpkg.com/@turf/turf@6.5.0/turf.min.js"
         ];
 
         function loadExternalScript(src) {
@@ -885,6 +1631,27 @@
                 }
             }
             throw new Error("모든 Leaflet CDN 로드에 실패했습니다.");
+        }
+
+
+        async function loadTurf() {
+            if (typeof window.turf !== "undefined") {
+                return true;
+            }
+
+            for (const src of turfSources) {
+                try {
+                    await loadExternalScript(src);
+                    if (typeof window.turf !== "undefined") {
+                        return true;
+                    }
+                } catch (error) {
+                    console.warn(error.message);
+                }
+            }
+
+            console.warn("Turf.js를 불러오지 못해 일부 교차·면적 통계가 제한됩니다.");
+            return false;
         }
 
         function initializeWebGIS() {
@@ -921,10 +1688,61 @@
             const addressSearchButton = document.getElementById("address-search-button");
             const coordinateSearchButton = document.getElementById("coordinate-search-button");
             const measureDistanceButton = document.getElementById("measure-distance-button");
+            const measurePathButton = document.getElementById("measure-path-button");
             const measureCircleButton = document.getElementById("measure-circle-button");
             const measureSquareButton = document.getElementById("measure-square-button");
+            const measureRectangleButton = document.getElementById("measure-rectangle-button");
+            const measurePolygonButton = document.getElementById("measure-polygon-button");
+            const measureFinishButton = document.getElementById("measure-finish-button");
+            const measureUndoButton = document.getElementById("measure-undo-button");
             const measureClearButton = document.getElementById("measure-clear-button");
             const measureResult = document.getElementById("measure-result");
+            const measureSelectionStatus = document.getElementById("measure-selection-status");
+            const measureNameInput = document.getElementById("measure-name-input");
+            const measurePrimarySizeSection = document.getElementById("measure-primary-size-section");
+            const measurePrimarySizeLabel = document.getElementById("measure-primary-size-label");
+            const measurePrimarySizeInput = document.getElementById("measure-primary-size-input");
+            const measurePrimarySizeUnit = document.getElementById("measure-primary-size-unit");
+            const measureRectangleSizeSection = document.getElementById("measure-rectangle-size-section");
+            const measureWidthInput = document.getElementById("measure-width-input");
+            const measureHeightInput = document.getElementById("measure-height-input");
+            const measureRotationSection = document.getElementById("measure-rotation-section");
+            const measureRotationInput = document.getElementById("measure-rotation-input");
+            const measureDuplicateButton = document.getElementById("measure-duplicate-button");
+            const measureLockButton = document.getElementById("measure-lock-button");
+            const measureDeleteButton = document.getElementById("measure-delete-button");
+            const layerSearchInput = document.getElementById("layer-search-input");
+            const layerFavoritesOnly = document.getElementById("layer-favorites-only");
+            const managedLayerList = document.getElementById("managed-layer-list");
+            const layersAllOffButton = document.getElementById("layers-all-off-button");
+            const layersAnalysisOnlyButton = document.getElementById("layers-analysis-only-button");
+            const layersAdminOnlyButton = document.getElementById("layers-admin-only-button");
+            const comparisonEnabled = document.getElementById("comparison-enabled");
+            const compareLeftSelect = document.getElementById("compare-left-select");
+            const compareRightSelect = document.getElementById("compare-right-select");
+            const comparePosition = document.getElementById("compare-position");
+            const comparisonResetButton = document.getElementById("comparison-reset-button");
+            const scenarioPlayButton = document.getElementById("scenario-play-button");
+            const comparisonDivider = document.getElementById("comparison-divider");
+            const comparisonLeftLabel = document.getElementById("comparison-left-label");
+            const comparisonRightLabel = document.getElementById("comparison-right-label");
+            const mapExportButton = document.getElementById("map-export-button");
+            const capturePanelButton = document.getElementById("capture-panel-button");
+            const captureTitleInput = document.getElementById("capture-title-input");
+            const captureOverlay = document.getElementById("capture-overlay");
+            const captureHeading = document.getElementById("capture-heading");
+            const captureFooter = document.getElementById("capture-footer");
+            const bufferSelectedSite = document.getElementById("buffer-selected-site");
+            const bufferShowPointsButton = document.getElementById("buffer-show-points-button");
+            const bufferCustomRadiusInput = document.getElementById("buffer-custom-radius-input");
+            const bufferCustomRadiusUnit = document.getElementById("buffer-custom-radius-unit");
+            const bufferApplyButton = document.getElementById("buffer-apply-button");
+            const bufferRerunButton = document.getElementById("buffer-rerun-button");
+            const bufferClearButton = document.getElementById("buffer-clear-button");
+            const bufferAutoLoadDebris = document.getElementById("buffer-auto-load-debris");
+            const bufferAnalysisResults = document.getElementById("buffer-analysis-results");
+            const bufferDataStatus = document.getElementById("buffer-data-status");
+            const bufferRadiusButtons = [...document.querySelectorAll("[data-buffer-radius-m]")];
 
             function escapeHtml(value) {
                 return String(value ?? "")
@@ -938,6 +1756,72 @@
             function setLayerStatus(message, type = "") {
                 layerStatus.textContent = message;
                 layerStatus.className = type;
+            }
+
+            const INTERFACE_STORAGE_KEY = "gyeongbukWebgisInterfaceV3";
+            const FAVORITES_STORAGE_KEY = "gyeongbukWebgisLayerFavoritesV1";
+            const MANAGED_STATE_STORAGE_KEY = "gyeongbukWebgisManagedLayersV1";
+
+            function readLocalJson(key, fallback) {
+                try {
+                    const value = JSON.parse(localStorage.getItem(key));
+                    return value && typeof value === "object" ? value : fallback;
+                } catch (error) {
+                    return fallback;
+                }
+            }
+
+            const savedInterfaceState = readLocalJson(INTERFACE_STORAGE_KEY, {});
+            const savedLayerFavorites = new Set(readLocalJson(FAVORITES_STORAGE_KEY, []));
+            const savedManagedState = readLocalJson(MANAGED_STATE_STORAGE_KEY, {});
+
+            if (savedInterfaceState.scenario && document.querySelector(`#scenario-select option[value="${savedInterfaceState.scenario}"]`)) {
+                scenarioSelect.value = savedInterfaceState.scenario;
+            }
+            if (Number.isFinite(Number(savedInterfaceState.trigrsOpacity))) {
+                trigrsOpacity.value = String(savedInterfaceState.trigrsOpacity);
+                trigrsOpacityValue.textContent = `${trigrsOpacity.value}%`;
+            }
+            if (Number.isFinite(Number(savedInterfaceState.susceptibilityOpacity))) {
+                susceptibilityOpacity.value = String(savedInterfaceState.susceptibilityOpacity);
+                susceptibilityOpacityValue.textContent = `${susceptibilityOpacity.value}%`;
+            }
+            if (typeof savedInterfaceState.trigrsEnabled === "boolean") {
+                trigrsEnabled.checked = savedInterfaceState.trigrsEnabled;
+            }
+            if (typeof savedInterfaceState.susceptibilityEnabled === "boolean") {
+                susceptibilityEnabled.checked = savedInterfaceState.susceptibilityEnabled;
+            }
+            if (savedInterfaceState.captureTitle) {
+                captureTitleInput.value = savedInterfaceState.captureTitle;
+            }
+
+            function saveInterfaceState() {
+                try {
+                    localStorage.setItem(INTERFACE_STORAGE_KEY, JSON.stringify({
+                        scenario: scenarioSelect.value,
+                        trigrsOpacity: Number(trigrsOpacity.value),
+                        susceptibilityOpacity: Number(susceptibilityOpacity.value),
+                        trigrsEnabled: trigrsEnabled.checked,
+                        susceptibilityEnabled: susceptibilityEnabled.checked,
+                        captureTitle: captureTitleInput.value.trim(),
+                        compareLeft: compareLeftSelect.value,
+                        compareRight: compareRightSelect.value,
+                        comparePosition: Number(comparePosition.value)
+                    }));
+                } catch (error) {
+                    console.warn("설정 저장 실패", error);
+                }
+            }
+
+            if (savedInterfaceState.compareLeft) {
+                compareLeftSelect.value = savedInterfaceState.compareLeft;
+            }
+            if (savedInterfaceState.compareRight) {
+                compareRightSelect.value = savedInterfaceState.compareRight;
+            }
+            if (Number.isFinite(Number(savedInterfaceState.comparePosition))) {
+                comparePosition.value = String(savedInterfaceState.comparePosition);
             }
 
             const mobilePanels = {
@@ -1083,7 +1967,7 @@
             map.on(
                 "click",
                 () => {
-                    if (isMobileMode()) {
+                    if (isMobileMode() && !activeMeasureMode) {
                         setMobilePanelState(null);
                     }
                 }
@@ -1094,11 +1978,14 @@
             [
                 ["susceptibilityPane", 410, "none"],
                 ["trigrsPane", 420, "none"],
+                ["comparisonLeftPane", 423, "none"],
+                ["comparisonRightPane", 424, "none"],
                 ["watershedPane", 455, "auto"],
                 ["sigunguPane", 480, "auto"],
                 ["emdPane", 490, "auto"],
                 ["debrisPane", 540, "auto"],
                 ["humanDamagePane", 560, "auto"],
+                ["bufferAnalysisPane", 575, "auto"],
                 ["measurementPane", 590, "auto"]
             ].forEach(([name, zIndex, pointerEvents]) => {
                 if (!map.getPane(name)) {
@@ -1157,6 +2044,145 @@
                 imperial: false,
                 maxWidth: 220
             }).addTo(map);
+
+
+            /* 사용자 정의 레이어 검색·즐겨찾기·상태 저장 */
+            const managedLayers = new Map();
+
+            function persistManagedLayerState() {
+                const state = {};
+                managedLayers.forEach((entry, id) => {
+                    state[id] = Boolean(entry.getActive());
+                });
+                try {
+                    localStorage.setItem(MANAGED_STATE_STORAGE_KEY, JSON.stringify(state));
+                } catch (error) {
+                    console.warn("레이어 상태 저장 실패", error);
+                }
+            }
+
+            function persistFavorites() {
+                try {
+                    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...savedLayerFavorites]));
+                } catch (error) {
+                    console.warn("즐겨찾기 저장 실패", error);
+                }
+            }
+
+            function renderManagedLayers() {
+                const keyword = layerSearchInput.value.trim().toLowerCase();
+                const favoritesOnly = layerFavoritesOnly.checked;
+                managedLayerList.innerHTML = "";
+
+                [...managedLayers.entries()]
+                    .sort((a, b) => a[1].name.localeCompare(b[1].name, "ko"))
+                    .forEach(([id, entry]) => {
+                        if (keyword && !entry.name.toLowerCase().includes(keyword)) {
+                            return;
+                        }
+                        if (favoritesOnly && !savedLayerFavorites.has(id)) {
+                            return;
+                        }
+
+                        const row = document.createElement("div");
+                        row.className = "managed-layer-row";
+
+                        const activeCheckbox = document.createElement("input");
+                        activeCheckbox.type = "checkbox";
+                        activeCheckbox.checked = Boolean(entry.getActive());
+                        activeCheckbox.title = `${entry.name} 켜기/끄기`;
+                        activeCheckbox.addEventListener("change", () => {
+                            entry.setActive(activeCheckbox.checked);
+                            window.setTimeout(() => {
+                                persistManagedLayerState();
+                                renderManagedLayers();
+                            }, 0);
+                        });
+
+                        const name = document.createElement("div");
+                        name.className = "managed-layer-name";
+                        name.textContent = entry.name;
+                        name.title = entry.name;
+
+                        const right = document.createElement("div");
+                        right.style.display = "flex";
+                        right.style.alignItems = "center";
+                        right.style.gap = "3px";
+
+                        const category = document.createElement("span");
+                        category.className = "managed-layer-category";
+                        category.textContent = entry.category === "admin" ? "행정" : "분석";
+
+                        const star = document.createElement("button");
+                        star.type = "button";
+                        star.className = `favorite-star-button${savedLayerFavorites.has(id) ? " favorite" : ""}`;
+                        star.textContent = savedLayerFavorites.has(id) ? "★" : "☆";
+                        star.title = savedLayerFavorites.has(id) ? "즐겨찾기 해제" : "즐겨찾기 추가";
+                        star.addEventListener("click", () => {
+                            if (savedLayerFavorites.has(id)) {
+                                savedLayerFavorites.delete(id);
+                            } else {
+                                savedLayerFavorites.add(id);
+                            }
+                            persistFavorites();
+                            renderManagedLayers();
+                        });
+
+                        right.append(category, star);
+                        row.append(activeCheckbox, name, right);
+                        managedLayerList.appendChild(row);
+                    });
+
+                if (!managedLayerList.children.length) {
+                    const empty = document.createElement("div");
+                    empty.style.padding = "12px";
+                    empty.style.color = "#64748b";
+                    empty.style.fontSize = "11px";
+                    empty.textContent = "조건에 맞는 레이어가 없습니다.";
+                    managedLayerList.appendChild(empty);
+                }
+            }
+
+            function registerManagedLayer(id, name, category, getActive, setActive) {
+                managedLayers.set(id, { id, name, category, getActive, setActive });
+                renderManagedLayers();
+
+                if (typeof savedManagedState[id] === "boolean") {
+                    window.setTimeout(() => {
+                        setActive(savedManagedState[id]);
+                        renderManagedLayers();
+                    }, 0);
+                }
+            }
+
+            function setManagedCategoryMode(mode) {
+                managedLayers.forEach(entry => {
+                    if (mode === "off") {
+                        entry.setActive(false);
+                    } else if (mode === "analysis") {
+                        entry.setActive(entry.category === "analysis" ? entry.getActive() || entry.id === "trigrs" : false);
+                    } else if (mode === "admin") {
+                        entry.setActive(entry.category === "admin");
+                    }
+                });
+                window.setTimeout(() => {
+                    persistManagedLayerState();
+                    renderManagedLayers();
+                }, 0);
+            }
+
+            layerSearchInput.addEventListener("input", renderManagedLayers);
+            layerFavoritesOnly.addEventListener("change", renderManagedLayers);
+            layersAllOffButton.addEventListener("click", () => setManagedCategoryMode("off"));
+            layersAnalysisOnlyButton.addEventListener("click", () => setManagedCategoryMode("analysis"));
+            layersAdminOnlyButton.addEventListener("click", () => setManagedCategoryMode("admin"));
+
+            map.on("overlayadd overlayremove", () => {
+                window.setTimeout(() => {
+                    persistManagedLayerState();
+                    renderManagedLayers();
+                }, 0);
+            });
 
             /*
              * 경상북도 전체 DEM 기반 소유역 경계
@@ -1294,6 +2320,13 @@
                 watershedLayer,
                 "경상북도 소유역 경계(2,201)"
             );
+            registerManagedLayer(
+                "watershed",
+                "경상북도 소유역 경계(2,201)",
+                "analysis",
+                () => map.hasLayer(watershedLayer),
+                active => active ? map.addLayer(watershedLayer) : map.removeLayer(watershedLayer)
+            );
 
             async function loadWatershedLayer() {
                 if (
@@ -1417,6 +2450,836 @@
             );
 
             /*
+             * 인명피해 우려지역 자동 버퍼 분석
+             * - 지점 클릭 시 기본 500m 버퍼 생성
+             * - 인명피해 지점, 토석류, 소유역은 현재 웹 레이어에서 즉시 분석
+             * - 인구·건물·TRIGRS 통계는 data/buffer_analysis 자료가 있을 때 자동 분석
+             */
+            const humanBufferLayerGroup = L.layerGroup().addTo(map);
+            let selectedHumanDamageFeature = null;
+            let selectedHumanDamageLatLng = null;
+            let selectedHumanDamageMarker = null;
+            let activeHumanBufferRadiusM = 500;
+            let activeHumanBufferFeature = null;
+            let humanBufferAnalysisToken = 0;
+            let bufferDatasetIndexPromise = null;
+            const bufferDatasetCache = new Map();
+
+            layerControl.addOverlay(
+                humanBufferLayerGroup,
+                "인명피해 자동 분석 버퍼"
+            );
+            registerManagedLayer(
+                "humanBuffer",
+                "인명피해 자동 분석 버퍼",
+                "analysis",
+                () => map.hasLayer(humanBufferLayerGroup),
+                active => {
+                    if (active) {
+                        humanBufferLayerGroup.addTo(map);
+                    } else {
+                        map.removeLayer(humanBufferLayerGroup);
+                    }
+                    updateLegendVisibility();
+                }
+            );
+
+            const BUFFER_DATA_INDEX_URL = new URL(
+                "./data/buffer_analysis/index.json",
+                document.baseURI
+            );
+
+            const BUFFER_GLOBAL_CANDIDATES = {
+                combined: [
+                    "./data/buffer_analysis/gyeongbuk_population_building_100m.geojson",
+                    "./data/buffer_analysis/gyeongbuk_census_100m.geojson",
+                    "./data/census/gyeongbuk_population_building_100m.geojson",
+                    "./data/census/gyeongbuk_census_100m.geojson"
+                ],
+                population: [
+                    "./data/buffer_analysis/gyeongbuk_population_100m.geojson",
+                    "./data/census/gyeongbuk_population_100m.geojson"
+                ],
+                building: [
+                    "./data/buffer_analysis/gyeongbuk_buildings.geojson",
+                    "./data/building/gyeongbuk_buildings.geojson",
+                    "./data/building/gyeongbuk_building_points.geojson"
+                ],
+                risk: [
+                    "./data/buffer_analysis/gyeongbuk_trigrs_grid.geojson",
+                    "./data/buffer_analysis/gyeongbuk_risk_grid_100m.geojson",
+                    "./data/risk/gyeongbuk_trigrs_grid.geojson"
+                ]
+            };
+
+            function setBufferDataStatus(message, type = "") {
+                bufferDataStatus.textContent = message;
+                bufferDataStatus.className = `buffer-data-status${type ? ` ${type}` : ""}`;
+            }
+
+            function normalizeFeatureCollection(data) {
+                if (!data) return null;
+                if (data.type === "FeatureCollection" && Array.isArray(data.features)) {
+                    return data;
+                }
+                if (data.type === "Feature") {
+                    return { type: "FeatureCollection", features: [data] };
+                }
+                return null;
+            }
+
+            async function fetchOptionalJson(urlValue) {
+                const url = new URL(urlValue, document.baseURI);
+                url.searchParams.set("v", APP_VERSION);
+                try {
+                    const response = await fetch(url.href, { cache: "force-cache" });
+                    if (!response.ok) return null;
+                    const data = await response.json();
+                    return { data, url: url.href };
+                } catch (error) {
+                    console.warn(`선택 자료 로드 실패: ${url.href}`, error);
+                    return null;
+                }
+            }
+
+            async function loadBufferDatasetIndex() {
+                if (!bufferDatasetIndexPromise) {
+                    bufferDatasetIndexPromise = fetchOptionalJson(BUFFER_DATA_INDEX_URL.href)
+                        .then(result => result?.data || null);
+                }
+                return bufferDatasetIndexPromise;
+            }
+
+            function findBufferIndexRow(indexData, sigunguName) {
+                const rows = indexData?.sigungu
+                    || indexData?.datasets
+                    || indexData?.regions
+                    || [];
+                if (!Array.isArray(rows)) return null;
+                const normalized = String(sigunguName || "").replaceAll(" ", "");
+                return rows.find(row => {
+                    const candidate = row.sigungu_name
+                        || row.sigungu
+                        || row.name
+                        || row.region
+                        || "";
+                    return String(candidate).replaceAll(" ", "") === normalized;
+                }) || null;
+            }
+
+            function resolveIndexDatasetUrl(value) {
+                if (!value) return null;
+                return new URL(value, BUFFER_DATA_INDEX_URL).href;
+            }
+
+            async function fetchFirstDataset(candidates) {
+                for (const candidate of candidates.filter(Boolean)) {
+                    const result = await fetchOptionalJson(candidate);
+                    const featureCollection = normalizeFeatureCollection(result?.data);
+                    if (featureCollection) {
+                        return {
+                            data: featureCollection,
+                            url: result.url,
+                            count: featureCollection.features.length
+                        };
+                    }
+                }
+                return null;
+            }
+
+            async function ensureBufferDatasets(properties = {}) {
+                const sigunguName = properties["시군구명"]
+                    || properties.SIGUNGU
+                    || properties.sigungu
+                    || "경상북도";
+                const cacheKey = String(sigunguName).trim() || "경상북도";
+
+                if (bufferDatasetCache.has(cacheKey)) {
+                    return bufferDatasetCache.get(cacheKey);
+                }
+
+                setBufferDataStatus(`${cacheKey} 인구·건물·TRIGRS 분석자료 연결을 확인하는 중입니다.`);
+                const indexData = await loadBufferDatasetIndex();
+                const row = findBufferIndexRow(indexData, cacheKey);
+
+                const rowCandidates = {
+                    combined: [
+                        resolveIndexDatasetUrl(row?.combined),
+                        resolveIndexDatasetUrl(row?.combined_url),
+                        resolveIndexDatasetUrl(row?.census),
+                        resolveIndexDatasetUrl(row?.census_url),
+                        resolveIndexDatasetUrl(row?.population_building),
+                        resolveIndexDatasetUrl(row?.population_building_url)
+                    ],
+                    population: [
+                        resolveIndexDatasetUrl(row?.population),
+                        resolveIndexDatasetUrl(row?.population_url)
+                    ],
+                    building: [
+                        resolveIndexDatasetUrl(row?.building),
+                        resolveIndexDatasetUrl(row?.building_url),
+                        resolveIndexDatasetUrl(row?.buildings),
+                        resolveIndexDatasetUrl(row?.buildings_url)
+                    ],
+                    risk: [
+                        resolveIndexDatasetUrl(row?.risk),
+                        resolveIndexDatasetUrl(row?.risk_url),
+                        resolveIndexDatasetUrl(row?.trigrs),
+                        resolveIndexDatasetUrl(row?.trigrs_url)
+                    ]
+                };
+
+                const hasRowCandidate = key => rowCandidates[key].some(Boolean);
+                const [combined, population, building, risk] = await Promise.all([
+                    fetchFirstDataset([
+                        ...rowCandidates.combined,
+                        ...(!hasRowCandidate("combined") ? BUFFER_GLOBAL_CANDIDATES.combined : [])
+                    ]),
+                    fetchFirstDataset([
+                        ...rowCandidates.population,
+                        ...(!hasRowCandidate("population") ? BUFFER_GLOBAL_CANDIDATES.population : [])
+                    ]),
+                    fetchFirstDataset([
+                        ...rowCandidates.building,
+                        ...(!hasRowCandidate("building") ? BUFFER_GLOBAL_CANDIDATES.building : [])
+                    ]),
+                    fetchFirstDataset([
+                        ...rowCandidates.risk,
+                        ...(!hasRowCandidate("risk") ? BUFFER_GLOBAL_CANDIDATES.risk : [])
+                    ])
+                ]);
+
+                const result = { cacheKey, combined, population, building, risk };
+                bufferDatasetCache.set(cacheKey, result);
+
+                const loaded = [
+                    combined ? `인구·건물 ${combined.count.toLocaleString()}개` : null,
+                    population ? `인구 ${population.count.toLocaleString()}개` : null,
+                    building ? `건물 ${building.count.toLocaleString()}개` : null,
+                    risk ? `TRIGRS ${risk.count.toLocaleString()}개` : null
+                ].filter(Boolean);
+
+                if (loaded.length) {
+                    setBufferDataStatus(`${cacheKey} 추가 분석자료 연결 완료 · ${loaded.join(" · ")}`, "success");
+                } else {
+                    setBufferDataStatus(
+                        `${cacheKey}의 인구·건물·TRIGRS 벡터 통계자료가 없습니다. 현재 연결된 인명피해·토석류·소유역 자료만 분석합니다.`,
+                        "warning"
+                    );
+                }
+                return result;
+            }
+
+            function destinationCoordinate(center, distanceM, bearingDeg) {
+                const earthRadius = 6371008.8;
+                const angularDistance = distanceM / earthRadius;
+                const bearing = bearingDeg * Math.PI / 180;
+                const lat1 = center.lat * Math.PI / 180;
+                const lon1 = center.lng * Math.PI / 180;
+                const lat2 = Math.asin(
+                    Math.sin(lat1) * Math.cos(angularDistance)
+                    + Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing)
+                );
+                const lon2 = lon1 + Math.atan2(
+                    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+                    Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2)
+                );
+                return [lon2 * 180 / Math.PI, lat2 * 180 / Math.PI];
+            }
+
+            function createBufferFeature(center, radiusM) {
+                if (window.turf) {
+                    return turf.circle(
+                        [center.lng, center.lat],
+                        radiusM / 1000,
+                        { steps: 128, units: "kilometers" }
+                    );
+                }
+
+                const coordinates = [];
+                for (let bearing = 0; bearing <= 360; bearing += 3) {
+                    coordinates.push(destinationCoordinate(center, radiusM, bearing));
+                }
+                return {
+                    type: "Feature",
+                    properties: {},
+                    geometry: { type: "Polygon", coordinates: [coordinates] }
+                };
+            }
+
+            function formatAreaValue(areaM2) {
+                const value = Number(areaM2);
+                if (!Number.isFinite(value)) return "-";
+                if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString("ko-KR", { maximumFractionDigits: 3 })}㎢`;
+                if (value >= 10_000) return `${(value / 10_000).toLocaleString("ko-KR", { maximumFractionDigits: 3 })}ha`;
+                return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}㎡`;
+            }
+
+            function formatDistanceValue(distanceM) {
+                const value = Number(distanceM);
+                if (!Number.isFinite(value)) return "-";
+                if (value >= 1000) return `${(value / 1000).toLocaleString("ko-KR", { maximumFractionDigits: 3 })}km`;
+                return `${value.toLocaleString("ko-KR", { maximumFractionDigits: 1 })}m`;
+            }
+
+            function readNumericProperty(properties, keys) {
+                for (const key of keys) {
+                    const raw = properties?.[key];
+                    if (raw === null || raw === undefined || raw === "") continue;
+                    const value = Number(String(raw).replaceAll(",", ""));
+                    if (Number.isFinite(value)) return value;
+                }
+                return null;
+            }
+
+            function featureOverlap(feature, bufferFeature) {
+                if (!feature?.geometry || !bufferFeature?.geometry) {
+                    return { intersects: false, fraction: 0, areaM2: 0 };
+                }
+                if (!window.turf) {
+                    if (feature.geometry.type === "Point") {
+                        const [lng, lat] = feature.geometry.coordinates;
+                        const center = selectedHumanDamageLatLng;
+                        const inside = center && map.distance(center, L.latLng(lat, lng)) <= activeHumanBufferRadiusM;
+                        return { intersects: inside, fraction: inside ? 1 : 0, areaM2: 0 };
+                    }
+                    return { intersects: false, fraction: 0, areaM2: 0 };
+                }
+
+                try {
+                    const type = feature.geometry.type;
+                    if (type === "Point") {
+                        const inside = turf.booleanPointInPolygon(feature, bufferFeature);
+                        return { intersects: inside, fraction: inside ? 1 : 0, areaM2: 0 };
+                    }
+                    const intersects = turf.booleanIntersects(feature, bufferFeature);
+                    if (!intersects) return { intersects: false, fraction: 0, areaM2: 0 };
+                    if (type === "Polygon" || type === "MultiPolygon") {
+                        const originalArea = turf.area(feature);
+                        const intersection = turf.intersect(feature, bufferFeature);
+                        const areaM2 = intersection ? turf.area(intersection) : 0;
+                        const fraction = originalArea > 0 ? Math.min(1, areaM2 / originalArea) : 1;
+                        return { intersects: true, fraction, areaM2 };
+                    }
+                    return { intersects: true, fraction: 1, areaM2: 0 };
+                } catch (error) {
+                    console.warn("버퍼 교차 계산 오류", error);
+                    return { intersects: false, fraction: 0, areaM2: 0 };
+                }
+            }
+
+            const POPULATION_PROPERTY_KEYS = [
+                "POP", "POPULATION", "population", "TOT_POP", "TOTAL_POP",
+                "인구", "인구수", "총인구", "총인구수", "POP_CNT", "PPLTN"
+            ];
+            const BUILDING_PROPERTY_KEYS = [
+                "BUILDING_COUNT", "BUILDINGS", "BLDG_CNT", "BLD_CNT",
+                "건물", "건물수", "건축물", "건축물수", "BLDG_COUNT"
+            ];
+            const CELL_AREA_PROPERTY_KEYS = [
+                "AREA_M2", "CELL_AREA_M2", "GRID_AREA", "면적", "면적_m2"
+            ];
+
+            function aggregateSocioeconomicData(dataset, bufferFeature, mode) {
+                const result = {
+                    population: 0,
+                    buildings: 0,
+                    buildingFootprintM2: 0,
+                    matchedFeatures: 0,
+                    hasPopulation: false,
+                    hasBuildings: false
+                };
+                const features = dataset?.data?.features || [];
+
+                features.forEach(feature => {
+                    const overlap = featureOverlap(feature, bufferFeature);
+                    if (!overlap.intersects) return;
+                    result.matchedFeatures += 1;
+                    const properties = feature.properties || {};
+                    const population = readNumericProperty(properties, POPULATION_PROPERTY_KEYS);
+                    const buildingCount = readNumericProperty(properties, BUILDING_PROPERTY_KEYS);
+
+                    if (population !== null && mode !== "building") {
+                        result.population += population * overlap.fraction;
+                        result.hasPopulation = true;
+                    }
+
+                    if (buildingCount !== null && mode !== "population") {
+                        result.buildings += buildingCount * overlap.fraction;
+                        result.hasBuildings = true;
+                    } else if (mode === "building") {
+                        result.buildings += 1;
+                        result.hasBuildings = true;
+                    }
+
+                    if (mode === "building" && overlap.areaM2 > 0) {
+                        result.buildingFootprintM2 += overlap.areaM2;
+                    }
+                });
+
+                return result;
+            }
+
+            function mergeSocioeconomicResults(...results) {
+                return results.reduce((acc, item) => {
+                    if (!item) return acc;
+                    acc.population += item.population;
+                    acc.buildings += item.buildings;
+                    acc.buildingFootprintM2 += item.buildingFootprintM2;
+                    acc.matchedFeatures += item.matchedFeatures;
+                    acc.hasPopulation ||= item.hasPopulation;
+                    acc.hasBuildings ||= item.hasBuildings;
+                    return acc;
+                }, {
+                    population: 0,
+                    buildings: 0,
+                    buildingFootprintM2: 0,
+                    matchedFeatures: 0,
+                    hasPopulation: false,
+                    hasBuildings: false
+                });
+            }
+
+            function riskFsValue(feature, scenarioKey) {
+                const p = feature.properties || {};
+                return readNumericProperty(p, [
+                    `FS_${scenarioKey}`, `FS${scenarioKey}`, `fs_${scenarioKey}`, `fs${scenarioKey}`,
+                    `TRIGRS_${scenarioKey}`, `TRIGRS${scenarioKey}`, "FS", "fs", "MIN_FS", "FS_MIN"
+                ]);
+            }
+
+            function aggregateRiskData(dataset, bufferFeature, scenarioKey) {
+                const result = {
+                    available: false,
+                    analyzedAreaM2: 0,
+                    fsBelow10M2: 0,
+                    fsBelow13M2: 0,
+                    fsBelow15M2: 0,
+                    matchedFeatures: 0
+                };
+                const features = dataset?.data?.features || [];
+
+                features.forEach(feature => {
+                    const fs = riskFsValue(feature, scenarioKey);
+                    if (!Number.isFinite(fs)) return;
+                    const overlap = featureOverlap(feature, bufferFeature);
+                    if (!overlap.intersects) return;
+                    let areaM2 = overlap.areaM2;
+                    if (!(areaM2 > 0)) {
+                        const baseArea = readNumericProperty(feature.properties || {}, CELL_AREA_PROPERTY_KEYS) || 10000;
+                        areaM2 = baseArea * overlap.fraction;
+                    }
+                    result.available = true;
+                    result.matchedFeatures += 1;
+                    result.analyzedAreaM2 += areaM2;
+                    if (fs < 1.0) result.fsBelow10M2 += areaM2;
+                    if (fs < 1.3) result.fsBelow13M2 += areaM2;
+                    if (fs < 1.5) result.fsBelow15M2 += areaM2;
+                });
+                return result;
+            }
+
+            function countHumanDamagePointsInBuffer(bufferFeature) {
+                let count = 0;
+                humanDamageLayer.eachLayer(layer => {
+                    const feature = layer.feature;
+                    if (!feature?.geometry) return;
+                    const overlap = featureOverlap(feature, bufferFeature);
+                    if (overlap.intersects) count += 1;
+                });
+                return count;
+            }
+
+            function analyzeWatershedsInBuffer(bufferFeature) {
+                if (!watershedLoaded) {
+                    return { available: false, count: 0, ids: [] };
+                }
+                const ids = [];
+                watershedLayer.eachLayer(layer => {
+                    const feature = layer.feature;
+                    if (!feature?.geometry) return;
+                    if (featureOverlap(feature, bufferFeature).intersects) {
+                        ids.push(feature.properties?.BASIN_ID ?? "-");
+                    }
+                });
+                return { available: true, count: ids.length, ids };
+            }
+
+            function flattenLineFeatures(feature) {
+                if (!window.turf || !feature?.geometry) return [];
+                try {
+                    return turf.flatten(feature).features.filter(item =>
+                        item.geometry?.type === "LineString"
+                    );
+                } catch (error) {
+                    return [];
+                }
+            }
+
+            function lineLengthInsideBuffer(feature, bufferFeature) {
+                if (!window.turf) return 0;
+                let lengthM = 0;
+                flattenLineFeatures(feature).forEach(line => {
+                    try {
+                        if (!turf.booleanIntersects(line, bufferFeature)) return;
+                        const split = turf.lineSplit(line, bufferFeature);
+                        const parts = split.features.length ? split.features : [line];
+                        parts.forEach(part => {
+                            const km = turf.length(part, { units: "kilometers" });
+                            if (!(km > 0)) return;
+                            const midpoint = turf.along(part, km / 2, { units: "kilometers" });
+                            if (turf.booleanPointInPolygon(midpoint, bufferFeature)) {
+                                lengthM += km * 1000;
+                            }
+                        });
+                    } catch (error) {
+                        console.warn("토석류 구간 버퍼 길이 계산 오류", error);
+                    }
+                });
+                return lengthM;
+            }
+
+            function analyzeDebrisLayerInBuffer(layerGroup, bufferFeature) {
+                if (!layerGroup) return { available: false, count: 0, lengthM: 0 };
+                let count = 0;
+                let lengthM = 0;
+                layerGroup.eachLayer(layer => {
+                    const feature = layer.feature || layer.toGeoJSON?.();
+                    if (!feature?.geometry) return;
+                    if (featureOverlap(feature, bufferFeature).intersects) {
+                        count += 1;
+                        lengthM += lineLengthInsideBuffer(feature, bufferFeature);
+                    }
+                });
+                return { available: true, count, lengthM };
+            }
+
+            async function ensureDebrisForHumanSite(properties) {
+                if (!bufferAutoLoadDebris.checked) return false;
+                const sigunguName = properties?.["시군구명"] || properties?.SIGUNGU || "";
+                if (!sigunguName || loadedDebrisName === sigunguName) return Boolean(debrisRedLayer || debrisYellowLayer);
+                const row = debrisIndex.find(item =>
+                    String(item.sigungu_name || "").replaceAll(" ", "")
+                    === String(sigunguName).replaceAll(" ", "")
+                );
+                if (!row) return false;
+                debrisEnabled.checked = true;
+                debrisSelect.value = row.file;
+                await loadSelectedDebris();
+                return loadedDebrisName === sigunguName;
+            }
+
+            function drawHumanBuffer() {
+                if (!selectedHumanDamageLatLng) return;
+                if (!map.hasLayer(humanBufferLayerGroup)) {
+                    humanBufferLayerGroup.addTo(map);
+                }
+                humanBufferLayerGroup.clearLayers();
+                activeHumanBufferFeature = createBufferFeature(
+                    selectedHumanDamageLatLng,
+                    activeHumanBufferRadiusM
+                );
+
+                const circle = L.circle(selectedHumanDamageLatLng, {
+                    pane: "bufferAnalysisPane",
+                    radius: activeHumanBufferRadiusM,
+                    color: "#b91c1c",
+                    weight: 3,
+                    opacity: 0.95,
+                    fillColor: "#ef4444",
+                    fillOpacity: 0.14,
+                    dashArray: "8 5",
+                    interactive: true
+                });
+                circle.bindPopup(
+                    `<strong>인명피해 우려지역 분석 버퍼</strong><br>`
+                    + `반경: ${formatDistanceValue(activeHumanBufferRadiusM)}<br>`
+                    + `면적: ${formatAreaValue(Math.PI * activeHumanBufferRadiusM ** 2)}`
+                );
+                humanBufferLayerGroup.addLayer(circle);
+
+                const labelPosition = L.latLng(
+                    destinationCoordinate(selectedHumanDamageLatLng, activeHumanBufferRadiusM, 45)[1],
+                    destinationCoordinate(selectedHumanDamageLatLng, activeHumanBufferRadiusM, 45)[0]
+                );
+                const label = L.marker(labelPosition, {
+                    pane: "bufferAnalysisPane",
+                    interactive: false,
+                    icon: L.divIcon({
+                        className: "",
+                        html: `<div class="human-buffer-label">반경 ${escapeHtml(formatDistanceValue(activeHumanBufferRadiusM))}</div>`,
+                        iconSize: null,
+                        iconAnchor: [0, 12]
+                    })
+                });
+                humanBufferLayerGroup.addLayer(label);
+                updateLegendVisibility();
+                renderManagedLayers();
+            }
+
+            function bufferResultCard(label, value, note = "", full = false) {
+                return `
+                    <div class="buffer-result-card${full ? " full" : ""}">
+                        <span class="buffer-result-label">${escapeHtml(label)}</span>
+                        <strong class="buffer-result-value">${escapeHtml(value)}</strong>
+                        ${note ? `<span class="buffer-result-note">${escapeHtml(note)}</span>` : ""}
+                    </div>
+                `;
+            }
+
+            function riskPercentage(areaM2, bufferAreaM2) {
+                if (!(bufferAreaM2 > 0)) return "-";
+                return `${(areaM2 / bufferAreaM2 * 100).toLocaleString("ko-KR", { maximumFractionDigits: 2 })}%`;
+            }
+
+            async function runHumanBufferAnalysis({ fitMap = false } = {}) {
+                if (!selectedHumanDamageFeature || !selectedHumanDamageLatLng) {
+                    setBufferDataStatus("먼저 인명피해 우려지역 지점을 클릭해 주세요.", "warning");
+                    return;
+                }
+
+                const token = ++humanBufferAnalysisToken;
+                drawHumanBuffer();
+                bufferRerunButton.disabled = true;
+                bufferApplyButton.disabled = true;
+                bufferAnalysisResults.innerHTML = '<div class="buffer-result-summary">버퍼 내부 공간자료를 분석하는 중입니다.</div>';
+
+                const properties = selectedHumanDamageFeature.properties || {};
+                try {
+                    await ensureDebrisForHumanSite(properties);
+                    const datasets = await ensureBufferDatasets(properties);
+                    if (token !== humanBufferAnalysisToken) return;
+
+                    const bufferFeature = activeHumanBufferFeature;
+                    const bufferAreaM2 = Math.PI * activeHumanBufferRadiusM ** 2;
+                    const humanCount = countHumanDamagePointsInBuffer(bufferFeature);
+                    const watersheds = analyzeWatershedsInBuffer(bufferFeature);
+                    const red = analyzeDebrisLayerInBuffer(debrisRedLayer, bufferFeature);
+                    const yellow = analyzeDebrisLayerInBuffer(debrisYellowLayer, bufferFeature);
+
+                    const combinedStats = datasets.combined
+                        ? aggregateSocioeconomicData(datasets.combined, bufferFeature, "combined")
+                        : null;
+                    const populationStats = datasets.population && !combinedStats?.hasPopulation
+                        ? aggregateSocioeconomicData(datasets.population, bufferFeature, "population")
+                        : null;
+                    const buildingStats = datasets.building && !combinedStats?.hasBuildings
+                        ? aggregateSocioeconomicData(datasets.building, bufferFeature, "building")
+                        : null;
+                    const socioeconomic = mergeSocioeconomicResults(
+                        combinedStats,
+                        populationStats,
+                        buildingStats
+                    );
+                    const risk = datasets.risk
+                        ? aggregateRiskData(datasets.risk, bufferFeature, scenarioSelect.value)
+                        : { available: false };
+
+                    const title = properties["우려지역명"] || "인명피해 우려지역";
+                    const region = [properties["시군구명"], properties["읍면동"]].filter(Boolean).join(" ");
+                    const populationText = socioeconomic.hasPopulation
+                        ? `${Math.round(socioeconomic.population).toLocaleString("ko-KR")}명`
+                        : "자료 미연결";
+                    const buildingText = socioeconomic.hasBuildings
+                        ? `${Math.round(socioeconomic.buildings).toLocaleString("ko-KR")}동`
+                        : "자료 미연결";
+                    const redText = red.available
+                        ? `${red.count.toLocaleString("ko-KR")}개 · ${formatDistanceValue(red.lengthM)}`
+                        : "시군구 자료 미로드";
+                    const yellowText = yellow.available
+                        ? `${yellow.count.toLocaleString("ko-KR")}개 · ${formatDistanceValue(yellow.lengthM)}`
+                        : "시군구 자료 미로드";
+                    const watershedText = watersheds.available
+                        ? `${watersheds.count.toLocaleString("ko-KR")}개`
+                        : "레이어 미로드";
+
+                    let riskHtml = bufferResultCard(
+                        `TRIGRS ${scenarioSelect.value}시간 위험면적`,
+                        risk.available ? `FS<1.3 ${formatAreaValue(risk.fsBelow13M2)}` : "자료 미연결",
+                        risk.available
+                            ? `FS<1.0 ${formatAreaValue(risk.fsBelow10M2)} (${riskPercentage(risk.fsBelow10M2, bufferAreaM2)}) · FS<1.5 ${formatAreaValue(risk.fsBelow15M2)} (${riskPercentage(risk.fsBelow15M2, bufferAreaM2)})`
+                            : "현재 PNG 타일만으로는 면적 집계가 불가능하며 TRIGRS 격자 GeoJSON이 필요합니다.",
+                        true
+                    );
+
+                    bufferAnalysisResults.innerHTML = `
+                        <div class="buffer-result-summary">
+                            <strong>${escapeHtml(title)}</strong>${region ? ` · ${escapeHtml(region)}` : ""}<br>
+                            중심 ${selectedHumanDamageLatLng.lat.toFixed(7)}, ${selectedHumanDamageLatLng.lng.toFixed(7)} · 반경 ${escapeHtml(formatDistanceValue(activeHumanBufferRadiusM))}
+                        </div>
+                        <div class="buffer-result-grid">
+                            ${bufferResultCard("버퍼 면적", formatAreaValue(bufferAreaM2), `둘레 ${formatDistanceValue(2 * Math.PI * activeHumanBufferRadiusM)}`)}
+                            ${bufferResultCard("우려지역 지점", `${humanCount.toLocaleString("ko-KR")}개`, "선택 지점을 포함한 415개 지점 기준")}
+                            ${bufferResultCard("인구", populationText, socioeconomic.hasPopulation ? `교차 자료 ${socioeconomic.matchedFeatures.toLocaleString("ko-KR")}개` : "센서스 인구 속성 필요")}
+                            ${bufferResultCard("건물", buildingText, socioeconomic.buildingFootprintM2 > 0 ? `교차 건축면적 ${formatAreaValue(socioeconomic.buildingFootprintM2)}` : "건물 수 또는 건축물 GeoJSON 필요")}
+                            ${bufferResultCard("토석류 RedZone", redText, red.available ? "버퍼 내부 교차 구간 수·길이" : "토석류 자동 로드 여부 확인")}
+                            ${bufferResultCard("토석류 YellowZone", yellowText, yellow.available ? "버퍼 내부 교차 구간 수·길이" : "토석류 자동 로드 여부 확인")}
+                            ${bufferResultCard("교차 소유역", watershedText, watersheds.available && watersheds.ids.length ? `BASIN_ID ${watersheds.ids.slice(0, 5).join(", ")}${watersheds.ids.length > 5 ? " 외" : ""}` : "소유역 레이어를 켜면 계산")}
+                            ${bufferResultCard("분석 시나리오", `${scenarios[scenarioSelect.value]?.duration || scenarioSelect.value}시간 / ${scenarios[scenarioSelect.value]?.rainfall || "-"}mm`, "TRIGRS 벡터 자료가 연결된 경우 위험면적 계산")}
+                            ${riskHtml}
+                        </div>
+                    `;
+
+                    if (fitMap) {
+                        const bounds = L.latLngBounds(
+                            destinationCoordinate(selectedHumanDamageLatLng, activeHumanBufferRadiusM * 1.15, 225).reverse(),
+                            destinationCoordinate(selectedHumanDamageLatLng, activeHumanBufferRadiusM * 1.15, 45).reverse()
+                        );
+                        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 16 });
+                    }
+                    setLayerStatus(`${title} 반경 ${formatDistanceValue(activeHumanBufferRadiusM)} 자동 버퍼 분석을 완료했습니다.`, "success");
+                } catch (error) {
+                    console.error("인명피해 자동 버퍼 분석 실패", error);
+                    bufferAnalysisResults.innerHTML = `<div class="buffer-result-summary">분석 실패: ${escapeHtml(error.message)}</div>`;
+                    setBufferDataStatus(`버퍼 분석 실패: ${error.message}`, "warning");
+                } finally {
+                    if (token === humanBufferAnalysisToken) {
+                        bufferRerunButton.disabled = false;
+                        bufferApplyButton.disabled = false;
+                        bufferClearButton.disabled = false;
+                    }
+                }
+            }
+
+            function setActiveBufferRadius(radiusM, runAnalysis = true) {
+                const value = Number(radiusM);
+                if (!Number.isFinite(value) || value < 10 || value > 50000) {
+                    setBufferDataStatus("버퍼 반경은 10m 이상 50km 이하로 입력해 주세요.", "warning");
+                    return;
+                }
+                activeHumanBufferRadiusM = value;
+                bufferCustomRadiusInput.value = value >= 1000 && bufferCustomRadiusUnit.value === "km"
+                    ? String(value / 1000)
+                    : String(Math.round(value * 100) / 100);
+                if (bufferCustomRadiusUnit.value === "m") {
+                    bufferCustomRadiusInput.value = String(Math.round(value * 100) / 100);
+                }
+                function updateBufferShowPointsButton() {
+                const active = typeof humanDamageLayer !== "undefined" && map.hasLayer(humanDamageLayer);
+                bufferShowPointsButton.textContent = active
+                    ? "인명피해 우려지역 지점 숨기기"
+                    : "인명피해 우려지역 415개 지점 표시";
+            }
+
+            bufferShowPointsButton.addEventListener("click", () => {
+                if (map.hasLayer(humanDamageLayer)) {
+                    map.removeLayer(humanDamageLayer);
+                } else {
+                    humanDamageLayer.addTo(map);
+                    if (humanDamageLayer.getBounds().isValid()) {
+                        map.fitBounds(humanDamageLayer.getBounds(), { padding: [24, 24], maxZoom: 10 });
+                    }
+                }
+                updateBufferShowPointsButton();
+                renderManagedLayers();
+            });
+
+            bufferRadiusButtons.forEach(button => {
+                    button.classList.toggle(
+                        "active",
+                        Number(button.dataset.bufferRadiusM) === Math.round(value)
+                    );
+                });
+                if (selectedHumanDamageLatLng) {
+                    drawHumanBuffer();
+                    if (runAnalysis) runHumanBufferAnalysis({ fitMap: false });
+                }
+            }
+
+            function selectHumanDamageSite(feature, latlng, markerLayer) {
+                if (selectedHumanDamageMarker && selectedHumanDamageMarker !== markerLayer) {
+                    selectedHumanDamageMarker.setStyle?.({
+                        radius: 6,
+                        color: "#7f1d1d",
+                        weight: 1.5,
+                        fillColor: "#dc2626",
+                        fillOpacity: 0.88
+                    });
+                    selectedHumanDamageMarker.setRadius?.(6);
+                }
+
+                selectedHumanDamageFeature = feature;
+                selectedHumanDamageLatLng = L.latLng(latlng.lat, latlng.lng);
+                selectedHumanDamageMarker = markerLayer;
+                markerLayer.setStyle?.({
+                    color: "#ffffff",
+                    weight: 3,
+                    fillColor: "#b91c1c",
+                    fillOpacity: 1
+                });
+                markerLayer.setRadius?.(9);
+
+                const p = feature.properties || {};
+                const title = p["우려지역명"] || "인명피해 우려지역";
+                const region = [p["시군구명"], p["읍면동"]].filter(Boolean).join(" ");
+                bufferSelectedSite.classList.add("active");
+                bufferSelectedSite.innerHTML = `
+                    <strong>${escapeHtml(title)}</strong><br>
+                    ${escapeHtml(region || "지역정보 없음")} · 코드 ${escapeHtml(p["재해우려지역코드"] || "-")}
+                `;
+                bufferRerunButton.disabled = false;
+                bufferClearButton.disabled = false;
+                setActiveBufferRadius(activeHumanBufferRadiusM, false);
+                runHumanBufferAnalysis({ fitMap: true });
+
+                if (isMobileMode()) {
+                    setMobilePanelState("layer");
+                }
+            }
+
+            function clearHumanBufferAnalysis() {
+                humanBufferAnalysisToken += 1;
+                humanBufferLayerGroup.clearLayers();
+                activeHumanBufferFeature = null;
+                selectedHumanDamageFeature = null;
+                selectedHumanDamageLatLng = null;
+                if (selectedHumanDamageMarker) {
+                    selectedHumanDamageMarker.setStyle?.({
+                        radius: 6,
+                        color: "#7f1d1d",
+                        weight: 1.5,
+                        fillColor: "#dc2626",
+                        fillOpacity: 0.88
+                    });
+                    selectedHumanDamageMarker.setRadius?.(6);
+                }
+                selectedHumanDamageMarker = null;
+                bufferSelectedSite.classList.remove("active");
+                bufferSelectedSite.textContent = "지도에서 ‘경상북도 인명피해 우려지역(415)’ 지점을 클릭하세요. 기본 500m 버퍼가 자동 생성됩니다.";
+                bufferAnalysisResults.innerHTML = '<div class="buffer-result-summary">분석 지점을 선택하면 버퍼 통계가 표시됩니다.</div>';
+                bufferRerunButton.disabled = true;
+                bufferClearButton.disabled = true;
+                setBufferDataStatus("인구·건물·TRIGRS 통계는 data/buffer_analysis 자료가 있을 때 자동 계산됩니다.");
+                updateLegendVisibility();
+                renderManagedLayers();
+            }
+
+            bufferRadiusButtons.forEach(button => {
+                button.addEventListener("click", () => {
+                    bufferCustomRadiusUnit.value = "m";
+                    setActiveBufferRadius(Number(button.dataset.bufferRadiusM), true);
+                });
+            });
+
+            bufferApplyButton.addEventListener("click", () => {
+                const scale = bufferCustomRadiusUnit.value === "km" ? 1000 : 1;
+                setActiveBufferRadius(Number(bufferCustomRadiusInput.value) * scale, true);
+            });
+            bufferCustomRadiusInput.addEventListener("keydown", event => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    bufferApplyButton.click();
+                }
+            });
+            bufferRerunButton.addEventListener("click", () => runHumanBufferAnalysis({ fitMap: false }));
+            bufferClearButton.addEventListener("click", clearHumanBufferAnalysis);
+            scenarioSelect.addEventListener("change", () => {
+                if (selectedHumanDamageFeature) {
+                    runHumanBufferAnalysis({ fitMap: false });
+                }
+            });
+
+            /*
              * 경상북도 인명피해 우려지역 415개 지점
              * 기본값은 OFF이며 레이어 버튼에서 켜고 끌 수 있습니다.
              */
@@ -1528,6 +3391,14 @@
                             `, {
                                 maxWidth: 380
                             });
+
+                            layer.on("click", event => {
+                                selectHumanDamageSite(
+                                    feature,
+                                    event.latlng || layer.getLatLng(),
+                                    layer
+                                );
+                            });
                         }
                 }
             );
@@ -1538,6 +3409,13 @@
             layerControl.addOverlay(
                 humanDamageLayer,
                 "경상북도 인명피해(415)"
+            );
+            registerManagedLayer(
+                "humanDamage",
+                "경상북도 인명피해 우려지역(415)",
+                "analysis",
+                () => map.hasLayer(humanDamageLayer),
+                active => active ? map.addLayer(humanDamageLayer) : map.removeLayer(humanDamageLayer)
             );
 
             fetch(
@@ -1632,6 +3510,7 @@
                         "경상북도 인명피해:",
                         `${humanDamageCount}개 지점`
                     );
+                    updateBufferShowPointsButton();
                 })
                 .catch(error => {
                     console.error(
@@ -1653,6 +3532,7 @@
                         event.layer
                         === humanDamageLayer
                     ) {
+                        updateBufferShowPointsButton();
                         setLayerStatus(
                             `경상북도 인명피해 ` +
                             `${humanDamageCount.toLocaleString()}` +
@@ -1670,6 +3550,7 @@
                         event.layer
                         === humanDamageLayer
                     ) {
+                        updateBufferShowPointsButton();
                         setLayerStatus(
                             "경상북도 인명피해 레이어를 숨겼습니다."
                         );
@@ -1752,6 +3633,11 @@
 
                 activeTrigrsLayer = trigrsLayers[key] || null;
 
+                if (comparisonEnabled.checked) {
+                    updateLegendVisibility();
+                    return;
+                }
+
                 if (!trigrsEnabled.checked || !activeTrigrsLayer) {
                     updateLegendVisibility();
                     return;
@@ -1772,6 +3658,160 @@
 
                 updateLegendVisibility();
             }
+
+
+            /* 강우 시나리오 좌우 비교 및 자동재생 */
+            let comparisonLeftLayer = null;
+            let comparisonRightLayer = null;
+            let scenarioPlayTimer = null;
+
+            function scenarioText(key) {
+                const scenario = scenarios[key];
+                return scenario ? `${scenario.duration}시간 / ${scenario.rainfall} mm` : key;
+            }
+
+            function createComparisonTileLayer(key, pane) {
+                const scenario = scenarios[key];
+                return L.tileLayer(
+                    `${trigrsRoot}${scenario.folder}/{z}/{x}/{y}.png?v=${APP_VERSION}`,
+                    {
+                        minZoom: 7,
+                        minNativeZoom: 7,
+                        maxNativeZoom: 12,
+                        maxZoom: 19,
+                        noWrap: true,
+                        opacity: Number(trigrsOpacity.value) / 100,
+                        pane,
+                        keepBuffer: 3,
+                        updateWhenIdle: false,
+                        attribution: "TRIGRS 시나리오 비교"
+                    }
+                );
+            }
+
+            function removeComparisonLayers() {
+                [comparisonLeftLayer, comparisonRightLayer].forEach(layer => {
+                    if (layer && map.hasLayer(layer)) {
+                        map.removeLayer(layer);
+                    }
+                });
+                comparisonLeftLayer = null;
+                comparisonRightLayer = null;
+                comparisonDivider.classList.remove("active");
+            }
+
+            function updateComparisonClip() {
+                if (!comparisonEnabled.checked || !comparisonLeftLayer || !comparisonRightLayer) {
+                    return;
+                }
+
+                const percentage = Number(comparePosition.value) / 100;
+                const northWest = map.containerPointToLayerPoint([0, 0]);
+                const southEast = map.containerPointToLayerPoint(map.getSize());
+                const splitX = northWest.x + map.getSize().x * percentage;
+
+                const leftContainer = comparisonLeftLayer.getContainer();
+                const rightContainer = comparisonRightLayer.getContainer();
+
+                if (leftContainer) {
+                    leftContainer.style.clip = `rect(${northWest.y}px, ${splitX}px, ${southEast.y}px, ${northWest.x}px)`;
+                }
+                if (rightContainer) {
+                    rightContainer.style.clip = `rect(${northWest.y}px, ${southEast.x}px, ${southEast.y}px, ${splitX}px)`;
+                }
+
+                comparisonDivider.style.left = `${percentage * 100}%`;
+                comparisonLeftLabel.textContent = scenarioText(compareLeftSelect.value);
+                comparisonRightLabel.textContent = scenarioText(compareRightSelect.value);
+            }
+
+            function enableComparison() {
+                if (!trigrsEnabled.checked) {
+                    trigrsEnabled.checked = true;
+                }
+                if (activeTrigrsLayer && map.hasLayer(activeTrigrsLayer)) {
+                    map.removeLayer(activeTrigrsLayer);
+                }
+                removeComparisonLayers();
+                comparisonEnabled.checked = true;
+                comparisonLeftLayer = createComparisonTileLayer(compareLeftSelect.value, "comparisonLeftPane").addTo(map);
+                comparisonRightLayer = createComparisonTileLayer(compareRightSelect.value, "comparisonRightPane").addTo(map);
+                comparisonDivider.classList.add("active");
+                scenarioSelect.disabled = true;
+                window.requestAnimationFrame(updateComparisonClip);
+                setLayerStatus(`시나리오 비교: ${scenarioText(compareLeftSelect.value)} ↔ ${scenarioText(compareRightSelect.value)}`, "success");
+                saveInterfaceState();
+                renderManagedLayers();
+            }
+
+            function disableComparison() {
+                comparisonEnabled.checked = false;
+                removeComparisonLayers();
+                scenarioSelect.disabled = false;
+                showTrigrsScenario(scenarioSelect.value, false);
+                saveInterfaceState();
+            }
+
+            function stopScenarioPlayback() {
+                if (scenarioPlayTimer) {
+                    window.clearInterval(scenarioPlayTimer);
+                    scenarioPlayTimer = null;
+                }
+                scenarioPlayButton.textContent = "시나리오 자동재생";
+                scenarioPlayButton.classList.remove("active");
+            }
+
+            function toggleScenarioPlayback() {
+                if (scenarioPlayTimer) {
+                    stopScenarioPlayback();
+                    return;
+                }
+                if (comparisonEnabled.checked) {
+                    disableComparison();
+                }
+                const keys = Object.keys(scenarios);
+                let index = Math.max(0, keys.indexOf(scenarioSelect.value));
+                scenarioPlayButton.textContent = "자동재생 정지";
+                scenarioPlayButton.classList.add("active");
+                scenarioPlayTimer = window.setInterval(() => {
+                    index = (index + 1) % keys.length;
+                    scenarioSelect.value = keys[index];
+                    showTrigrsScenario(keys[index], false);
+                    saveInterfaceState();
+                }, 1500);
+            }
+
+            comparisonEnabled.addEventListener("change", () => {
+                if (comparisonEnabled.checked) {
+                    stopScenarioPlayback();
+                    enableComparison();
+                } else {
+                    disableComparison();
+                }
+            });
+            compareLeftSelect.addEventListener("change", () => {
+                if (comparisonEnabled.checked) enableComparison();
+                saveInterfaceState();
+            });
+            compareRightSelect.addEventListener("change", () => {
+                if (comparisonEnabled.checked) enableComparison();
+                saveInterfaceState();
+            });
+            comparePosition.addEventListener("input", () => {
+                updateComparisonClip();
+                saveInterfaceState();
+            });
+            comparisonResetButton.addEventListener("click", () => {
+                compareLeftSelect.value = "12";
+                compareRightSelect.value = "72";
+                comparePosition.value = "50";
+                if (comparisonEnabled.checked) {
+                    enableComparison();
+                }
+                saveInterfaceState();
+            });
+            scenarioPlayButton.addEventListener("click", toggleScenarioPlayback);
+            map.on("move zoom resize", updateComparisonClip);
 
             const susceptibilityRoot = new URL(
                 "./data/landslide_susceptibility/",
@@ -1833,17 +3873,28 @@
                     "active",
                     debrisEnabled.checked && (debrisRedEnabled.checked || debrisYellowEnabled.checked)
                 );
+                document.getElementById("legend-human-buffer").classList.toggle(
+                    "active",
+                    map.hasLayer(humanBufferLayerGroup) && humanBufferLayerGroup.getLayers().length > 0
+                );
             }
 
             scenarioSelect.addEventListener("change", () => {
+                stopScenarioPlayback();
                 showTrigrsScenario(scenarioSelect.value, true);
+                saveInterfaceState();
             });
 
             trigrsEnabled.addEventListener("change", () => {
+                if (!trigrsEnabled.checked && comparisonEnabled.checked) {
+                    disableComparison();
+                }
                 showTrigrsScenario(scenarioSelect.value, false);
                 if (!trigrsEnabled.checked) {
                     setLayerStatus("TRIGRS 레이어를 숨겼습니다.");
                 }
+                saveInterfaceState();
+                renderManagedLayers();
             });
 
             trigrsOpacity.addEventListener("input", () => {
@@ -1852,6 +3903,9 @@
                 if (activeTrigrsLayer) {
                     activeTrigrsLayer.setOpacity(value / 100);
                 }
+                if (comparisonLeftLayer) comparisonLeftLayer.setOpacity(value / 100);
+                if (comparisonRightLayer) comparisonRightLayer.setOpacity(value / 100);
+                saveInterfaceState();
             });
 
             susceptibilityEnabled.addEventListener("change", () => {
@@ -1863,6 +3917,38 @@
                 susceptibilityOpacityValue.textContent = `${value}%`;
                 susceptibilityLayer.setOpacity(value / 100);
             });
+
+            registerManagedLayer(
+                "trigrs",
+                "TRIGRS 사면안전율",
+                "analysis",
+                () => trigrsEnabled.checked,
+                active => {
+                    trigrsEnabled.checked = active;
+                    if (!active && comparisonEnabled.checked) {
+                        disableComparison();
+                    }
+                    showTrigrsScenario(scenarioSelect.value, false);
+                }
+            );
+            registerManagedLayer(
+                "susceptibility",
+                "산사태 취약성 지도",
+                "analysis",
+                () => susceptibilityEnabled.checked,
+                active => {
+                    susceptibilityEnabled.checked = active;
+                    updateSusceptibilityLayer(false);
+                }
+            );
+
+            [scenarioSelect, trigrsEnabled, trigrsOpacity, susceptibilityEnabled, susceptibilityOpacity, captureTitleInput]
+                .forEach(element => element.addEventListener("change", () => {
+                    saveInterfaceState();
+                    persistManagedLayerState();
+                    renderManagedLayers();
+                }));
+
 
             const debrisRenderer = L.canvas({
                 padding: 0.5,
@@ -2110,6 +4196,8 @@
                     updateDebrisVisibility();
                     setLayerStatus("토석류 레이어를 숨겼습니다.");
                 }
+                persistManagedLayerState();
+                renderManagedLayers();
             });
 
             debrisLoadButton.addEventListener("click", loadSelectedDebris);
@@ -2129,7 +4217,19 @@
                 }
             });
 
+            registerManagedLayer(
+                "debris",
+                "토석류 위험구간",
+                "analysis",
+                () => debrisEnabled.checked,
+                active => {
+                    debrisEnabled.checked = active;
+                    updateDebrisVisibility();
+                }
+            );
+
             let sigunguLayer = null;
+            let emdLayer = null;
 
             fetch(`./data/boundary/gyeongbuk_sigungu.geojson?v=${APP_VERSION}`)
                 .then(response => {
@@ -2174,6 +4274,13 @@
                     }).addTo(map);
 
                     layerControl.addOverlay(sigunguLayer, "경상북도 시군구 경계");
+                    registerManagedLayer(
+                        "sigungu",
+                        "경상북도 시군구 경계",
+                        "admin",
+                        () => map.hasLayer(sigunguLayer),
+                        active => active ? map.addLayer(sigunguLayer) : map.removeLayer(sigunguLayer)
+                    );
                     if (sigunguLayer.getBounds().isValid()) {
                         map.fitBounds(sigunguLayer.getBounds(), { padding: [18, 18], maxZoom: 9 });
                     }
@@ -2207,7 +4314,7 @@
                         };
                     }
 
-                    const emdLayer = L.geoJSON(data, {
+                    emdLayer = L.geoJSON(data, {
                         pane: "emdPane",
                         style: emdStyle,
                         onEachFeature: (feature, layer) => {
@@ -2225,6 +4332,13 @@
                     });
 
                     layerControl.addOverlay(emdLayer, "경상북도 읍면동 경계");
+                    registerManagedLayer(
+                        "emd",
+                        "경상북도 읍면동 경계",
+                        "admin",
+                        () => map.hasLayer(emdLayer),
+                        active => active ? map.addLayer(emdLayer) : map.removeLayer(emdLayer)
+                    );
                     map.on("zoomend", () => {
                         if (map.hasLayer(emdLayer)) {
                             emdLayer.setStyle(emdStyle());
@@ -2237,34 +4351,41 @@
 
 
             /*
-             * 거리·원·정사각형 측정 도구
-             * - 별도 플러그인 없이 Leaflet 기본 기능만 사용
-             * - 원과 정사각형은 생성 후 조절점을 드래그하여 이동·크기 변경
+             * 고급 거리·경로·원·정사각형·직사각형·자유 다각형 측정 도구
+             * - 정확한 수치 입력, 프리셋, 선택, 이름, 복사, 잠금, 개별 삭제, 실행 취소
+             * - 중심 이동, 크기 조절, 정사각형·직사각형 회전
              */
             const measurementLayerGroup = L.layerGroup().addTo(map);
             const measureButtons = {
                 distance: measureDistanceButton,
+                path: measurePathButton,
                 circle: measureCircleButton,
-                square: measureSquareButton
+                square: measureSquareButton,
+                rectangle: measureRectangleButton,
+                polygon: measurePolygonButton
             };
 
+            const measurements = new Map();
+            const undoStack = [];
             let activeMeasureMode = null;
-            let measureStartLatLng = null;
-            let measureStartMarker = null;
-            let measurementNumber = 0;
+            let draftPoints = [];
+            let draftLayer = null;
+            let draftMarkers = [];
+            let selectedMeasurementId = null;
+            let nextMeasurementId = 1;
+            let restoringMeasurements = false;
+            let inputUpdateTimer = null;
 
             function formatMeasureLength(meters) {
                 if (!Number.isFinite(meters)) {
                     return "-";
                 }
-
                 if (meters >= 1000) {
                     return `${(meters / 1000).toLocaleString("ko-KR", {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
+                        maximumFractionDigits: 3
                     })} km`;
                 }
-
                 return `${meters.toLocaleString("ko-KR", {
                     minimumFractionDigits: meters < 100 ? 1 : 0,
                     maximumFractionDigits: 1
@@ -2275,197 +4396,28 @@
                 if (!Number.isFinite(squareMeters)) {
                     return "-";
                 }
-
-                const squareMeterText = squareMeters.toLocaleString("ko-KR", {
+                return `${squareMeters.toLocaleString("ko-KR", {
                     minimumFractionDigits: squareMeters < 1000 ? 1 : 0,
                     maximumFractionDigits: 1
-                });
-                const hectareText = (squareMeters / 10000).toLocaleString("ko-KR", {
+                })} ㎡ · ${(squareMeters / 10000).toLocaleString("ko-KR", {
                     minimumFractionDigits: 3,
                     maximumFractionDigits: 3
-                });
-                const squareKilometerText = (squareMeters / 1000000).toLocaleString("ko-KR", {
+                })} ha · ${(squareMeters / 1000000).toLocaleString("ko-KR", {
                     minimumFractionDigits: 4,
                     maximumFractionDigits: 4
-                });
-
-                return `${squareMeterText} ㎡ · ${hectareText} ha · ${squareKilometerText} ㎢`;
+                })} ㎢`;
             }
 
             function setMeasureResult(html) {
                 measureResult.innerHTML = html;
             }
 
-            function removeMeasureStartMarker() {
-                if (measureStartMarker) {
-                    measurementLayerGroup.removeLayer(measureStartMarker);
-                    measureStartMarker = null;
-                }
-                measureStartLatLng = null;
+            function latLngArray(latlng) {
+                return [Number(latlng.lat), Number(latlng.lng)];
             }
 
-            function updateMeasureButtonState() {
-                Object.entries(measureButtons).forEach(([mode, button]) => {
-                    const isActive = mode === activeMeasureMode;
-                    button.classList.toggle("active", isActive);
-                    button.setAttribute("aria-pressed", String(isActive));
-                });
-
-                map.getContainer().style.cursor = activeMeasureMode
-                    ? "crosshair"
-                    : "";
-            }
-
-            function measurementInstruction(mode) {
-                if (mode === "distance") {
-                    return "<strong>거리 측정</strong><br>지도에서 시작점과 끝점을 차례로 클릭하세요.";
-                }
-                if (mode === "circle") {
-                    return "<strong>원 측정</strong><br>중심점을 클릭한 뒤 원의 가장자리를 클릭하세요.";
-                }
-                if (mode === "square") {
-                    return "<strong>정사각형 측정</strong><br>중심점을 클릭한 뒤 정사각형의 모서리 방향을 클릭하세요.";
-                }
-                return "도구를 선택한 뒤 지도에서 시작점과 끝점을 차례로 클릭하세요.";
-            }
-
-            function activateMeasureMode(mode) {
-                removeMeasureStartMarker();
-
-                activeMeasureMode = activeMeasureMode === mode
-                    ? null
-                    : mode;
-
-                updateMeasureButtonState();
-                setMeasureResult(measurementInstruction(activeMeasureMode));
-            }
-
-            function createMeasurementDivIcon(html, iconSize = [18, 18], iconAnchor = [9, 9]) {
-                return L.divIcon({
-                    className: "measurement-div-icon",
-                    html,
-                    iconSize,
-                    iconAnchor
-                });
-            }
-
-            function createDragHandle(latlng, markerClass, tooltipText) {
-                const marker = L.marker(latlng, {
-                    pane: "measurementPane",
-                    draggable: true,
-                    interactive: true,
-                    keyboard: false,
-                    bubblingMouseEvents: false,
-                    autoPan: true,
-                    autoPanPadding: [40, 40],
-                    icon: createMeasurementDivIcon(
-                        `<div class="measurement-handle-marker ${markerClass}"></div>`
-                    )
-                });
-
-                marker.bindTooltip(tooltipText, {
-                    direction: "top",
-                    offset: [0, -10],
-                    opacity: 0.95
-                });
-
-                marker.on("mousedown touchstart click", event => {
-                    if (event.originalEvent) {
-                        L.DomEvent.stopPropagation(event.originalEvent);
-                    }
-                });
-
-                measurementLayerGroup.addLayer(marker);
-                return marker;
-            }
-
-            function addMeasurementLabel(latlng, html) {
-                const marker = L.marker(latlng, {
-                    pane: "measurementPane",
-                    interactive: false,
-                    keyboard: false,
-                    icon: createMeasurementDivIcon(
-                        `<div class="measurement-map-label">${html}</div>`,
-                        [1, 1],
-                        [0, 0]
-                    )
-                });
-
-                measurementLayerGroup.addLayer(marker);
-                return marker;
-            }
-
-            function updateMeasurementLabel(marker, latlng, html) {
-                marker.setLatLng(latlng);
-                marker.setIcon(createMeasurementDivIcon(
-                    `<div class="measurement-map-label">${html}</div>`,
-                    [1, 1],
-                    [0, 0]
-                ));
-            }
-
-            function addStartMarker(latlng) {
-                removeMeasureStartMarker();
-                measureStartLatLng = latlng;
-                measureStartMarker = L.marker(latlng, {
-                    pane: "measurementPane",
-                    interactive: false,
-                    keyboard: false,
-                    icon: createMeasurementDivIcon(
-                        '<div class="measurement-start-marker"></div>',
-                        [12, 12],
-                        [6, 6]
-                    )
-                });
-                measurementLayerGroup.addLayer(measureStartMarker);
-            }
-
-            function squareGeometry(center, point) {
-                const zoom = map.getZoom();
-                const centerPixel = map.project(center, zoom);
-                const pointPixel = map.project(point, zoom);
-                const dx = pointPixel.x - centerPixel.x;
-                const dy = pointPixel.y - centerPixel.y;
-                const halfSize = Math.max(Math.abs(dx), Math.abs(dy));
-
-                if (halfSize < 2) {
-                    return null;
-                }
-
-                const signX = dx >= 0 ? 1 : -1;
-                const signY = dy >= 0 ? 1 : -1;
-
-                const northWest = map.unproject(
-                    L.point(centerPixel.x - halfSize, centerPixel.y - halfSize),
-                    zoom
-                );
-                const northEast = map.unproject(
-                    L.point(centerPixel.x + halfSize, centerPixel.y - halfSize),
-                    zoom
-                );
-                const southEast = map.unproject(
-                    L.point(centerPixel.x + halfSize, centerPixel.y + halfSize),
-                    zoom
-                );
-                const southWest = map.unproject(
-                    L.point(centerPixel.x - halfSize, centerPixel.y + halfSize),
-                    zoom
-                );
-                const snappedHandle = map.unproject(
-                    L.point(
-                        centerPixel.x + signX * halfSize,
-                        centerPixel.y + signY * halfSize
-                    ),
-                    zoom
-                );
-
-                return {
-                    corners: [northWest, northEast, southEast, southWest],
-                    snappedHandle,
-                    halfSize,
-                    signX,
-                    signY
-                };
+            function arrayLatLng(value) {
+                return L.latLng(Number(value[0]), Number(value[1]));
             }
 
             function destinationPoint(start, distanceMeters, bearingDegrees) {
@@ -2474,7 +4426,6 @@
                 const bearing = bearingDegrees * Math.PI / 180;
                 const latitude1 = start.lat * Math.PI / 180;
                 const longitude1 = start.lng * Math.PI / 180;
-
                 const latitude2 = Math.asin(
                     Math.sin(latitude1) * Math.cos(angularDistance)
                     + Math.cos(latitude1) * Math.sin(angularDistance) * Math.cos(bearing)
@@ -2483,7 +4434,6 @@
                     Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(latitude1),
                     Math.cos(angularDistance) - Math.sin(latitude1) * Math.sin(latitude2)
                 );
-
                 return L.latLng(
                     latitude2 * 180 / Math.PI,
                     ((longitude2 * 180 / Math.PI + 540) % 360) - 180
@@ -2497,333 +4447,921 @@
                 const y = Math.sin(deltaLongitude) * Math.cos(latitude2);
                 const x = Math.cos(latitude1) * Math.sin(latitude2)
                     - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(deltaLongitude);
-
                 return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
             }
 
-            function finishDistanceMeasurement(start, end) {
-                const distance = map.distance(start, end);
-                if (distance < 0.05) {
-                    setMeasureResult("두 지점을 서로 다르게 선택해 주세요.");
-                    return false;
+            function offsetLatLng(center, eastMeters, northMeters) {
+                const distance = Math.hypot(eastMeters, northMeters);
+                if (distance < 0.001) {
+                    return L.latLng(center.lat, center.lng);
                 }
-
-                const line = L.polyline([start, end], {
-                    pane: "measurementPane",
-                    color: "#2563eb",
-                    weight: 4,
-                    opacity: 0.92,
-                    dashArray: "9 7",
-                    interactive: false
-                });
-                measurementLayerGroup.addLayer(line);
-
-                const center = L.latLng(
-                    (start.lat + end.lat) / 2,
-                    (start.lng + end.lng) / 2
-                );
-                const label = `거리 ${formatMeasureLength(distance)}`;
-                addMeasurementLabel(center, label);
-                setMeasureResult(`<strong>거리 측정 완료</strong><br>${formatMeasureLength(distance)}`);
-                return true;
+                const bearing = (Math.atan2(eastMeters, northMeters) * 180 / Math.PI + 360) % 360;
+                return destinationPoint(center, distance, bearing);
             }
 
-            function finishCircleMeasurement(center, edge) {
-                const initialRadius = map.distance(center, edge);
-                if (initialRadius < 0.05) {
-                    setMeasureResult("중심점과 가장자리 지점을 서로 다르게 선택해 주세요.");
-                    return false;
-                }
-
-                const circle = L.circle(center, {
-                    pane: "measurementPane",
-                    radius: initialRadius,
-                    color: "#7c3aed",
-                    weight: 3,
-                    opacity: 0.95,
-                    fillColor: "#a78bfa",
-                    fillOpacity: 0.20,
-                    interactive: false
-                });
-                const radiusLine = L.polyline([center, edge], {
-                    pane: "measurementPane",
-                    color: "#7c3aed",
-                    weight: 2,
-                    opacity: 0.9,
-                    dashArray: "7 6",
-                    interactive: false
-                });
-                const centerHandle = createDragHandle(
-                    center,
-                    "center-handle",
-                    "드래그: 원 위치 이동"
-                );
-                const radiusHandle = createDragHandle(
-                    edge,
-                    "resize-handle",
-                    "드래그: 반지름 변경"
-                );
-                const labelMarker = addMeasurementLabel(center, "");
-
-                measurementLayerGroup.addLayer(circle);
-                measurementLayerGroup.addLayer(radiusLine);
-
-                function updateCircleResult(showPanel = true) {
-                    const currentCenter = centerHandle.getLatLng();
-                    const currentEdge = radiusHandle.getLatLng();
-                    const radius = map.distance(currentCenter, currentEdge);
-                    const circumference = 2 * Math.PI * radius;
-                    const area = Math.PI * radius * radius;
-                    const labelHtml =
-                        `반지름 ${formatMeasureLength(radius)}<br>` +
-                        `둘레 ${formatMeasureLength(circumference)}<br>` +
-                        `면적 ${formatMeasureArea(area)}`;
-
-                    circle.setLatLng(currentCenter);
-                    circle.setRadius(radius);
-                    radiusLine.setLatLngs([currentCenter, currentEdge]);
-                    updateMeasurementLabel(labelMarker, currentCenter, labelHtml);
-
-                    if (showPanel) {
-                        setMeasureResult(
-                            `<strong>원 크기 조절</strong><br>` +
-                            `반지름: ${formatMeasureLength(radius)}<br>` +
-                            `둘레: ${formatMeasureLength(circumference)}<br>` +
-                            `면적: ${formatMeasureArea(area)}<br>` +
-                            `<span style="color:#64748b">주황색 점: 위치 이동 · 보라색 점: 크기 조절</span>`
-                        );
-                    }
-                }
-
-                let centerDragState = null;
-                centerHandle.on("dragstart", () => {
-                    const oldCenter = centerHandle.getLatLng();
-                    const oldEdge = radiusHandle.getLatLng();
-                    centerDragState = {
-                        radius: map.distance(oldCenter, oldEdge),
-                        bearing: bearingBetween(oldCenter, oldEdge)
-                    };
-                    map.dragging.disable();
-                });
-                centerHandle.on("drag", () => {
-                    const currentCenter = centerHandle.getLatLng();
-                    if (centerDragState) {
-                        radiusHandle.setLatLng(destinationPoint(
-                            currentCenter,
-                            centerDragState.radius,
-                            centerDragState.bearing
-                        ));
-                    }
-                    updateCircleResult(true);
-                });
-                centerHandle.on("dragend", () => {
-                    centerDragState = null;
-                    map.dragging.enable();
-                    updateCircleResult(true);
-                });
-
-                radiusHandle.on("dragstart", () => map.dragging.disable());
-                radiusHandle.on("drag", () => updateCircleResult(true));
-                radiusHandle.on("dragend", () => {
-                    map.dragging.enable();
-                    updateCircleResult(true);
-                });
-
-                updateCircleResult(false);
-                setMeasureResult(
-                    `<strong>원 측정 완료</strong><br>` +
-                    `반지름: ${formatMeasureLength(initialRadius)}<br>` +
-                    `둘레: ${formatMeasureLength(2 * Math.PI * initialRadius)}<br>` +
-                    `면적: ${formatMeasureArea(Math.PI * initialRadius * initialRadius)}<br>` +
-                    `<span style="color:#64748b">주황색 점: 위치 이동 · 보라색 점: 크기 조절</span>`
-                );
-                return true;
+            function localMeters(center, point) {
+                const north = map.distance(center, L.latLng(point.lat, center.lng)) * (point.lat >= center.lat ? 1 : -1);
+                const east = map.distance(center, L.latLng(center.lat, point.lng)) * (point.lng >= center.lng ? 1 : -1);
+                return { east, north };
             }
 
-            function finishSquareMeasurement(center, point) {
-                const initialGeometry = squareGeometry(center, point);
-                if (!initialGeometry) {
-                    setMeasureResult("중심점에서 조금 더 떨어진 지점을 선택해 주세요.");
-                    return false;
-                }
-
-                const square = L.polygon(initialGeometry.corners, {
-                    pane: "measurementPane",
-                    color: "#0f766e",
-                    weight: 3,
-                    opacity: 0.95,
-                    fillColor: "#2dd4bf",
-                    fillOpacity: 0.20,
-                    interactive: false
+            function rectangleCorners(center, width, height, rotation) {
+                const angle = rotation * Math.PI / 180;
+                const anglePerpendicular = (rotation + 90) * Math.PI / 180;
+                const corners = [];
+                [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([widthSign, heightSign]) => {
+                    const east = widthSign * width / 2 * Math.sin(angle)
+                        + heightSign * height / 2 * Math.sin(anglePerpendicular);
+                    const north = widthSign * width / 2 * Math.cos(angle)
+                        + heightSign * height / 2 * Math.cos(anglePerpendicular);
+                    corners.push(offsetLatLng(center, east, north));
                 });
-                const centerHandle = createDragHandle(
-                    center,
-                    "center-handle",
-                    "드래그: 정사각형 위치 이동"
-                );
-                const resizeHandle = createDragHandle(
-                    initialGeometry.snappedHandle,
-                    "square-resize-handle",
-                    "드래그: 정사각형 크기 변경"
-                );
-                const labelMarker = addMeasurementLabel(center, "");
+                return corners;
+            }
 
-                measurementLayerGroup.addLayer(square);
+            function rectangleResizeHandle(center, width, height, rotation) {
+                return rectangleCorners(center, width, height, rotation)[2];
+            }
 
-                function calculateSquareStats(corners) {
-                    const [northWest, northEast, southEast, southWest] = corners;
-                    const top = map.distance(northWest, northEast);
-                    const right = map.distance(northEast, southEast);
-                    const bottom = map.distance(southEast, southWest);
-                    const left = map.distance(southWest, northWest);
-                    const width = (top + bottom) / 2;
-                    const height = (left + right) / 2;
-                    const side = (width + height) / 2;
-                    return {
-                        side,
-                        perimeter: top + right + bottom + left,
-                        area: width * height
-                    };
+            function rotationHandlePoint(center, width, height, rotation) {
+                return destinationPoint(center, Math.max(width, height) / 2 + Math.max(35, Math.min(120, Math.max(width, height) * 0.18)), rotation);
+            }
+
+            function lineLength(points, close = false) {
+                let length = 0;
+                for (let index = 1; index < points.length; index += 1) {
+                    length += map.distance(points[index - 1], points[index]);
                 }
+                if (close && points.length > 2) {
+                    length += map.distance(points[points.length - 1], points[0]);
+                }
+                return length;
+            }
 
-                function updateSquareResult(showPanel = true, snapHandle = true) {
-                    const currentCenter = centerHandle.getLatLng();
-                    const geometry = squareGeometry(currentCenter, resizeHandle.getLatLng());
-                    if (!geometry) {
+            function geodesicArea(points) {
+                if (points.length < 3) {
+                    return 0;
+                }
+                const earthRadius = 6378137;
+                const radians = Math.PI / 180;
+                let area = 0;
+                for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+                    const p1 = points[j];
+                    const p2 = points[i];
+                    area += ((p2.lng - p1.lng) * radians)
+                        * (2 + Math.sin(p1.lat * radians) + Math.sin(p2.lat * radians));
+                }
+                return Math.abs(area * earthRadius * earthRadius / 2);
+            }
+
+            function averagePoint(points) {
+                if (!points.length) {
+                    return map.getCenter();
+                }
+                const sum = points.reduce((result, point) => ({
+                    lat: result.lat + point.lat,
+                    lng: result.lng + point.lng
+                }), { lat: 0, lng: 0 });
+                return L.latLng(sum.lat / points.length, sum.lng / points.length);
+            }
+
+            function createMeasurementDivIcon(html, iconSize = [18, 18], iconAnchor = [9, 9]) {
+                return L.divIcon({
+                    className: "measurement-div-icon",
+                    html,
+                    iconSize,
+                    iconAnchor
+                });
+            }
+
+            function createHandle(latlng, markerClass, tooltipText) {
+                const marker = L.marker(latlng, {
+                    pane: "measurementPane",
+                    draggable: true,
+                    interactive: true,
+                    keyboard: false,
+                    bubblingMouseEvents: false,
+                    autoPan: true,
+                    autoPanPadding: [40, 40],
+                    icon: createMeasurementDivIcon(`<div class="measurement-handle-marker ${markerClass}"></div>`)
+                });
+                marker.bindTooltip(tooltipText, { direction: "top", offset: [0, -10], opacity: 0.95 });
+                marker.on("mousedown touchstart click", event => {
+                    if (event.originalEvent) {
+                        L.DomEvent.stopPropagation(event.originalEvent);
+                    }
+                });
+                return marker;
+            }
+
+            function createLabel(latlng, html, selected = false) {
+                return L.marker(latlng, {
+                    pane: "measurementPane",
+                    interactive: false,
+                    keyboard: false,
+                    icon: createMeasurementDivIcon(
+                        `<div class="measurement-map-label${selected ? " selected-label" : ""}">${html}</div>`,
+                        [1, 1],
+                        [0, 0]
+                    )
+                });
+            }
+
+            function updateLabel(marker, latlng, html, selected = false) {
+                marker.setLatLng(latlng);
+                marker.setIcon(createMeasurementDivIcon(
+                    `<div class="measurement-map-label${selected ? " selected-label" : ""}">${html}</div>`,
+                    [1, 1],
+                    [0, 0]
+                ));
+            }
+
+            function defaultMeasurementName(type, id) {
+                const names = {
+                    distance: "직선 거리",
+                    path: "선형 경로",
+                    circle: "원형 분석구역",
+                    square: "정사각형 분석구역",
+                    rectangle: "직사각형 분석구역",
+                    polygon: "자유 다각형 분석구역"
+                };
+                return `${names[type] || "측정 도형"} ${id}`;
+            }
+
+            function serializeMeasurements() {
+                return {
+                    selectedId: selectedMeasurementId,
+                    nextId: nextMeasurementId,
+                    items: [...measurements.values()].map(object => ({
+                        id: object.id,
+                        type: object.type,
+                        name: object.name,
+                        locked: object.locked,
+                        params: JSON.parse(JSON.stringify(object.params))
+                    }))
+                };
+            }
+
+            function pushUndoState() {
+                if (restoringMeasurements) {
+                    return;
+                }
+                const snapshot = JSON.stringify(serializeMeasurements());
+                if (undoStack[undoStack.length - 1] !== snapshot) {
+                    undoStack.push(snapshot);
+                    if (undoStack.length > 30) {
+                        undoStack.shift();
+                    }
+                }
+                measureUndoButton.disabled = undoStack.length === 0;
+            }
+
+            function removeObjectLayers(object) {
+                [...object.layers, ...object.handles].forEach(layer => {
+                    if (measurementLayerGroup.hasLayer(layer)) {
+                        measurementLayerGroup.removeLayer(layer);
+                    }
+                });
+            }
+
+            function clearMeasurementObjects() {
+                measurements.forEach(removeObjectLayers);
+                measurements.clear();
+                selectedMeasurementId = null;
+            }
+
+            function restoreMeasurements(snapshotText) {
+                restoringMeasurements = true;
+                try {
+                    const snapshot = JSON.parse(snapshotText);
+                    clearMeasurementObjects();
+                    nextMeasurementId = Number(snapshot.nextId) || 1;
+                    snapshot.items.forEach(state => createMeasurementObject(state, false));
+                    selectMeasurement(snapshot.selectedId && measurements.has(snapshot.selectedId) ? snapshot.selectedId : null);
+                } finally {
+                    restoringMeasurements = false;
+                }
+            }
+
+            function undoMeasurementAction() {
+                if (!undoStack.length) {
+                    return;
+                }
+                const snapshot = undoStack.pop();
+                restoreMeasurements(snapshot);
+                measureUndoButton.disabled = undoStack.length === 0;
+                setMeasureResult("최근 도형 작업을 실행 취소했습니다.");
+            }
+
+            function objectIsSelected(object) {
+                return object && object.id === selectedMeasurementId;
+            }
+
+            function addObjectLayer(object, layer, selectable = true) {
+                object.layers.push(layer);
+                measurementLayerGroup.addLayer(layer);
+                if (selectable) {
+                    layer.on("click", event => {
+                        if (event.originalEvent) {
+                            L.DomEvent.stopPropagation(event.originalEvent);
+                        }
+                        selectMeasurement(object.id);
+                    });
+                }
+                return layer;
+            }
+
+            function addObjectHandle(object, marker) {
+                object.handles.push(marker);
+                return marker;
+            }
+
+            function setHandlesVisible(object, visible) {
+                object.handles.forEach(handle => {
+                    if (visible && !measurementLayerGroup.hasLayer(handle)) {
+                        measurementLayerGroup.addLayer(handle);
+                    } else if (!visible && measurementLayerGroup.hasLayer(handle)) {
+                        measurementLayerGroup.removeLayer(handle);
+                    }
+                    if (handle.dragging) {
+                        if (visible && !object.locked) {
+                            handle.dragging.enable();
+                        } else {
+                            handle.dragging.disable();
+                        }
+                    }
+                });
+            }
+
+            function bindHandleDrag(marker, object, onDrag, onStart = null, onEnd = null) {
+                marker.on("dragstart", () => {
+                    if (object.locked) {
+                        marker.dragging.disable();
                         return;
                     }
-
-                    if (snapHandle) {
-                        resizeHandle.setLatLng(geometry.snappedHandle);
+                    pushUndoState();
+                    map.dragging.disable();
+                    if (onStart) {
+                        onStart(marker.getLatLng());
                     }
-
-                    const stats = calculateSquareStats(geometry.corners);
-                    const labelHtml =
-                        `변 길이 ${formatMeasureLength(stats.side)}<br>` +
-                        `둘레 ${formatMeasureLength(stats.perimeter)}<br>` +
-                        `면적 ${formatMeasureArea(stats.area)}`;
-
-                    square.setLatLngs(geometry.corners);
-                    updateMeasurementLabel(labelMarker, currentCenter, labelHtml);
-
-                    if (showPanel) {
-                        setMeasureResult(
-                            `<strong>정사각형 크기 조절</strong><br>` +
-                            `변 길이: ${formatMeasureLength(stats.side)}<br>` +
-                            `둘레: ${formatMeasureLength(stats.perimeter)}<br>` +
-                            `면적: ${formatMeasureArea(stats.area)}<br>` +
-                            `<span style="color:#64748b">주황색 점: 위치 이동 · 청록색 사각점: 크기 조절</span>`
-                        );
+                });
+                marker.on("drag", () => {
+                    if (!object.locked) {
+                        onDrag(marker.getLatLng());
                     }
+                });
+                marker.on("dragend", () => {
+                    map.dragging.enable();
+                    if (onEnd) {
+                        onEnd(marker.getLatLng());
+                    }
+                    object.update();
+                    updateSelectionPanel();
+                });
+            }
+
+            function bindShapeStyle(object, shape, baseStyle) {
+                object.shape = shape;
+                object.baseStyle = baseStyle;
+                object.updateStyle = () => {
+                    const selected = objectIsSelected(object);
+                    const style = {
+                        ...baseStyle,
+                        weight: selected ? (baseStyle.weight || 3) + 2 : baseStyle.weight,
+                        opacity: object.locked ? 0.72 : (baseStyle.opacity ?? 0.95),
+                        dashArray: object.locked ? "8 6" : baseStyle.dashArray || null
+                    };
+                    shape.setStyle(style);
+                };
+                addObjectLayer(object, shape, true);
+            }
+
+            function objectDetailsHtml(object) {
+                const name = `<strong>${escapeHtml(object.name)}</strong>${object.locked ? " 🔒" : ""}<br>`;
+                if (object.type === "distance") {
+                    const points = object.params.points.map(arrayLatLng);
+                    const distance = map.distance(points[0], points[1]);
+                    const bearing = bearingBetween(points[0], points[1]);
+                    return name
+                        + `거리: ${formatMeasureLength(distance)}<br>`
+                        + `방위각: ${bearing.toFixed(1)}°<br>`
+                        + `시작점: ${points[0].lat.toFixed(6)}, ${points[0].lng.toFixed(6)}<br>`
+                        + `종료점: ${points[1].lat.toFixed(6)}, ${points[1].lng.toFixed(6)}`;
+                }
+                if (object.type === "path") {
+                    const points = object.params.points.map(arrayLatLng);
+                    return name + `총 길이: ${formatMeasureLength(lineLength(points))}<br>꼭짓점: ${points.length}개`;
+                }
+                if (object.type === "circle") {
+                    const radius = Number(object.params.radius);
+                    return name
+                        + `반지름: ${formatMeasureLength(radius)}<br>`
+                        + `둘레: ${formatMeasureLength(2 * Math.PI * radius)}<br>`
+                        + `면적: ${formatMeasureArea(Math.PI * radius * radius)}`;
+                }
+                if (object.type === "square") {
+                    const side = Number(object.params.side);
+                    return name
+                        + `변 길이: ${formatMeasureLength(side)}<br>`
+                        + `둘레: ${formatMeasureLength(side * 4)}<br>`
+                        + `면적: ${formatMeasureArea(side * side)}<br>`
+                        + `회전각: ${Number(object.params.rotation).toFixed(1)}°`;
+                }
+                if (object.type === "rectangle") {
+                    const width = Number(object.params.width);
+                    const height = Number(object.params.height);
+                    return name
+                        + `가로 × 세로: ${formatMeasureLength(width)} × ${formatMeasureLength(height)}<br>`
+                        + `둘레: ${formatMeasureLength(2 * (width + height))}<br>`
+                        + `면적: ${formatMeasureArea(width * height)}<br>`
+                        + `회전각: ${Number(object.params.rotation).toFixed(1)}°`;
+                }
+                if (object.type === "polygon") {
+                    const points = object.params.points.map(arrayLatLng);
+                    return name
+                        + `둘레: ${formatMeasureLength(lineLength(points, true))}<br>`
+                        + `면적: ${formatMeasureArea(geodesicArea(points))}<br>`
+                        + `꼭짓점: ${points.length}개`;
+                }
+                return name;
+            }
+
+            function updateObjectLabel(object, position) {
+                const selected = objectIsSelected(object);
+                const html = objectDetailsHtml(object);
+                updateLabel(object.label, position, html, selected);
+            }
+
+            function createMeasurementObject(state, selectAfter = true) {
+                const object = {
+                    id: Number(state.id) || nextMeasurementId++,
+                    type: state.type,
+                    name: state.name || defaultMeasurementName(state.type, state.id || nextMeasurementId),
+                    locked: Boolean(state.locked),
+                    params: JSON.parse(JSON.stringify(state.params)),
+                    layers: [],
+                    handles: [],
+                    shape: null,
+                    label: null,
+                    update: () => {},
+                    updateStyle: () => {}
+                };
+                nextMeasurementId = Math.max(nextMeasurementId, object.id + 1);
+
+                if (object.type === "distance") {
+                    const points = object.params.points.map(arrayLatLng);
+                    const shape = L.polyline(points, {
+                        pane: "measurementPane", color: "#7c3aed", weight: 4, opacity: 0.95, interactive: true
+                    });
+                    bindShapeStyle(object, shape, { color: "#7c3aed", weight: 4, opacity: 0.95 });
+                    object.label = addObjectLayer(object, createLabel(averagePoint(points), ""), false);
+                    const handles = points.map((point, index) => {
+                        const handle = addObjectHandle(object, createHandle(point, "vertex-handle", index === 0 ? "시작점 이동" : "종료점 이동"));
+                        bindHandleDrag(handle, object, latlng => {
+                            object.params.points[index] = latLngArray(latlng);
+                            object.update();
+                        });
+                        return handle;
+                    });
+                    object.update = () => {
+                        const current = object.params.points.map(arrayLatLng);
+                        shape.setLatLngs(current);
+                        handles.forEach((handle, index) => handle.setLatLng(current[index]));
+                        updateObjectLabel(object, averagePoint(current));
+                        object.updateStyle();
+                    };
+                } else if (object.type === "path" || object.type === "polygon") {
+                    const isPolygon = object.type === "polygon";
+                    const points = object.params.points.map(arrayLatLng);
+                    const shape = isPolygon
+                        ? L.polygon(points, {
+                            pane: "measurementPane", color: "#be123c", weight: 3, opacity: 0.95,
+                            fillColor: "#fb7185", fillOpacity: 0.18, interactive: true
+                        })
+                        : L.polyline(points, {
+                            pane: "measurementPane", color: "#c2410c", weight: 4, opacity: 0.95, interactive: true
+                        });
+                    bindShapeStyle(object, shape, isPolygon
+                        ? { color: "#be123c", weight: 3, opacity: 0.95, fillColor: "#fb7185", fillOpacity: 0.18 }
+                        : { color: "#c2410c", weight: 4, opacity: 0.95 });
+                    object.label = addObjectLayer(object, createLabel(averagePoint(points), ""), false);
+                    const handles = points.map((point, index) => {
+                        const handle = addObjectHandle(object, createHandle(point, "vertex-handle", `꼭짓점 ${index + 1} 이동`));
+                        bindHandleDrag(handle, object, latlng => {
+                            object.params.points[index] = latLngArray(latlng);
+                            object.update();
+                        });
+                        return handle;
+                    });
+                    object.update = () => {
+                        const current = object.params.points.map(arrayLatLng);
+                        shape.setLatLngs(current);
+                        handles.forEach((handle, index) => handle.setLatLng(current[index]));
+                        updateObjectLabel(object, averagePoint(current));
+                        object.updateStyle();
+                    };
+                } else if (object.type === "circle") {
+                    const center = arrayLatLng(object.params.center);
+                    const shape = L.circle(center, {
+                        pane: "measurementPane", radius: Number(object.params.radius), color: "#2563eb", weight: 3,
+                        opacity: 0.95, fillColor: "#60a5fa", fillOpacity: 0.20, interactive: true
+                    });
+                    bindShapeStyle(object, shape, { color: "#2563eb", weight: 3, opacity: 0.95, fillColor: "#60a5fa", fillOpacity: 0.20 });
+                    object.label = addObjectLayer(object, createLabel(center, ""), false);
+                    const centerHandle = addObjectHandle(object, createHandle(center, "center-handle", "원 위치 이동"));
+                    const radiusHandle = addObjectHandle(object, createHandle(
+                        destinationPoint(center, Number(object.params.radius), Number(object.params.bearing) || 90),
+                        "resize-handle", "원 반지름 변경"
+                    ));
+                    let centerDragState = null;
+                    bindHandleDrag(centerHandle, object, latlng => {
+                        object.params.center = latLngArray(latlng);
+                        object.update();
+                    }, () => {
+                        centerDragState = {
+                            radius: Number(object.params.radius),
+                            bearing: Number(object.params.bearing) || 90
+                        };
+                    }, () => { centerDragState = null; });
+                    centerHandle.on("drag", () => {
+                        if (centerDragState) {
+                            radiusHandle.setLatLng(destinationPoint(centerHandle.getLatLng(), centerDragState.radius, centerDragState.bearing));
+                        }
+                    });
+                    bindHandleDrag(radiusHandle, object, latlng => {
+                        const currentCenter = arrayLatLng(object.params.center);
+                        object.params.radius = Math.max(1, map.distance(currentCenter, latlng));
+                        object.params.bearing = bearingBetween(currentCenter, latlng);
+                        object.update();
+                    });
+                    object.update = () => {
+                        const currentCenter = arrayLatLng(object.params.center);
+                        const radius = Math.max(1, Number(object.params.radius));
+                        shape.setLatLng(currentCenter).setRadius(radius);
+                        centerHandle.setLatLng(currentCenter);
+                        radiusHandle.setLatLng(destinationPoint(currentCenter, radius, Number(object.params.bearing) || 90));
+                        updateObjectLabel(object, currentCenter);
+                        object.updateStyle();
+                    };
+                } else if (object.type === "square" || object.type === "rectangle") {
+                    const isSquare = object.type === "square";
+                    const center = arrayLatLng(object.params.center);
+                    const width = isSquare ? Number(object.params.side) : Number(object.params.width);
+                    const height = isSquare ? Number(object.params.side) : Number(object.params.height);
+                    const shape = L.polygon(rectangleCorners(center, width, height, Number(object.params.rotation) || 0), {
+                        pane: "measurementPane", color: isSquare ? "#0f766e" : "#9333ea", weight: 3,
+                        opacity: 0.95, fillColor: isSquare ? "#2dd4bf" : "#c084fc", fillOpacity: 0.20, interactive: true
+                    });
+                    bindShapeStyle(object, shape, {
+                        color: isSquare ? "#0f766e" : "#9333ea", weight: 3, opacity: 0.95,
+                        fillColor: isSquare ? "#2dd4bf" : "#c084fc", fillOpacity: 0.20
+                    });
+                    object.label = addObjectLayer(object, createLabel(center, ""), false);
+                    const centerHandle = addObjectHandle(object, createHandle(center, "center-handle", "도형 위치 이동"));
+                    const sizeHandle = addObjectHandle(object, createHandle(
+                        rectangleResizeHandle(center, width, height, Number(object.params.rotation) || 0),
+                        "square-resize-handle", "도형 크기 변경"
+                    ));
+                    const rotationHandle = addObjectHandle(object, createHandle(
+                        rotationHandlePoint(center, width, height, Number(object.params.rotation) || 0),
+                        "rotation-handle", "도형 회전"
+                    ));
+                    bindHandleDrag(centerHandle, object, latlng => {
+                        object.params.center = latLngArray(latlng);
+                        object.update();
+                    });
+                    bindHandleDrag(sizeHandle, object, latlng => {
+                        const currentCenter = arrayLatLng(object.params.center);
+                        if (isSquare) {
+                            object.params.side = Math.max(2, map.distance(currentCenter, latlng) * Math.sqrt(2));
+                        } else {
+                            const local = localMeters(currentCenter, latlng);
+                            const angle = Number(object.params.rotation) * Math.PI / 180;
+                            const perpendicular = (Number(object.params.rotation) + 90) * Math.PI / 180;
+                            const alongWidth = local.east * Math.sin(angle) + local.north * Math.cos(angle);
+                            const alongHeight = local.east * Math.sin(perpendicular) + local.north * Math.cos(perpendicular);
+                            object.params.width = Math.max(2, Math.abs(alongWidth) * 2);
+                            object.params.height = Math.max(2, Math.abs(alongHeight) * 2);
+                        }
+                        object.update();
+                    });
+                    bindHandleDrag(rotationHandle, object, latlng => {
+                        object.params.rotation = bearingBetween(arrayLatLng(object.params.center), latlng);
+                        object.update();
+                    });
+                    object.update = () => {
+                        const currentCenter = arrayLatLng(object.params.center);
+                        const currentWidth = isSquare ? Number(object.params.side) : Number(object.params.width);
+                        const currentHeight = isSquare ? Number(object.params.side) : Number(object.params.height);
+                        const rotation = (Number(object.params.rotation) + 360) % 360;
+                        object.params.rotation = rotation;
+                        shape.setLatLngs(rectangleCorners(currentCenter, currentWidth, currentHeight, rotation));
+                        centerHandle.setLatLng(currentCenter);
+                        sizeHandle.setLatLng(rectangleResizeHandle(currentCenter, currentWidth, currentHeight, rotation));
+                        rotationHandle.setLatLng(rotationHandlePoint(currentCenter, currentWidth, currentHeight, rotation));
+                        updateObjectLabel(object, currentCenter);
+                        object.updateStyle();
+                    };
+                } else {
+                    return null;
                 }
 
-                let squareCenterDragState = null;
-                centerHandle.on("dragstart", () => {
-                    const zoom = map.getZoom();
-                    const oldCenterPixel = map.project(centerHandle.getLatLng(), zoom);
-                    const oldHandlePixel = map.project(resizeHandle.getLatLng(), zoom);
-                    squareCenterDragState = {
-                        zoom,
-                        offset: oldHandlePixel.subtract(oldCenterPixel)
-                    };
-                    map.dragging.disable();
+                measurements.set(object.id, object);
+                object.update();
+                setHandlesVisible(object, false);
+                if (selectAfter) {
+                    selectMeasurement(object.id);
+                }
+                return object;
+            }
+
+            function updateSelectionPanel() {
+                const object = measurements.get(selectedMeasurementId) || null;
+                const hasObject = Boolean(object);
+                measureNameInput.disabled = !hasObject;
+                measureDuplicateButton.disabled = !hasObject;
+                measureLockButton.disabled = !hasObject;
+                measureDeleteButton.disabled = !hasObject;
+                measurePrimarySizeSection.hidden = true;
+                measureRectangleSizeSection.hidden = true;
+                measureRotationSection.hidden = true;
+
+                if (!object) {
+                    measureSelectionStatus.textContent = "지도에서 측정 도형을 클릭하면 선택됩니다.";
+                    measureSelectionStatus.classList.remove("selected");
+                    measureNameInput.value = "";
+                    measureLockButton.textContent = "잠금";
+                    return;
+                }
+
+                measureSelectionStatus.textContent = `${object.name} · ${object.type}${object.locked ? " · 잠김" : " · 편집 가능"}`;
+                measureSelectionStatus.classList.add("selected");
+                measureNameInput.value = object.name;
+                measureLockButton.textContent = object.locked ? "잠금 해제" : "잠금";
+                measureLockButton.classList.toggle("active", object.locked);
+
+                if (object.type === "circle" || object.type === "square") {
+                    measurePrimarySizeSection.hidden = false;
+                    measurePrimarySizeLabel.textContent = object.type === "circle" ? "반지름" : "한 변";
+                    const meters = object.type === "circle" ? Number(object.params.radius) : Number(object.params.side);
+                    const useKilometers = meters >= 1000 && Math.abs(meters % 1000) < 0.01;
+                    measurePrimarySizeUnit.value = useKilometers ? "km" : "m";
+                    previousPrimaryUnit = measurePrimarySizeUnit.value;
+                    measurePrimarySizeInput.value = useKilometers ? (meters / 1000).toFixed(3).replace(/\.000$/, "") : meters.toFixed(1).replace(/\.0$/, "");
+                }
+                if (object.type === "rectangle") {
+                    measureRectangleSizeSection.hidden = false;
+                    measureWidthInput.value = Number(object.params.width).toFixed(1);
+                    measureHeightInput.value = Number(object.params.height).toFixed(1);
+                }
+                if (object.type === "square" || object.type === "rectangle") {
+                    measureRotationSection.hidden = false;
+                    measureRotationInput.value = Number(object.params.rotation).toFixed(1);
+                }
+                setMeasureResult(objectDetailsHtml(object));
+            }
+
+            function selectMeasurement(id) {
+                selectedMeasurementId = id && measurements.has(id) ? id : null;
+                measurements.forEach(object => {
+                    const selected = objectIsSelected(object);
+                    setHandlesVisible(object, selected && !object.locked);
+                    object.updateStyle();
+                    object.update();
                 });
-                centerHandle.on("drag", () => {
-                    if (squareCenterDragState) {
-                        const newCenterPixel = map.project(
-                            centerHandle.getLatLng(),
-                            squareCenterDragState.zoom
-                        );
-                        resizeHandle.setLatLng(map.unproject(
-                            newCenterPixel.add(squareCenterDragState.offset),
-                            squareCenterDragState.zoom
-                        ));
+                updateSelectionPanel();
+            }
+
+            function deleteSelectedMeasurement(pushUndo = true) {
+                const object = measurements.get(selectedMeasurementId);
+                if (!object) {
+                    return;
+                }
+                if (pushUndo) {
+                    pushUndoState();
+                }
+                removeObjectLayers(object);
+                measurements.delete(object.id);
+                selectMeasurement(null);
+                setMeasureResult(`${escapeHtml(object.name)}을(를) 삭제했습니다.`);
+            }
+
+            function duplicateSelectedMeasurement() {
+                const object = measurements.get(selectedMeasurementId);
+                if (!object) {
+                    return;
+                }
+                pushUndoState();
+                const state = {
+                    id: nextMeasurementId++,
+                    type: object.type,
+                    name: `${object.name} 복사본`,
+                    locked: false,
+                    params: JSON.parse(JSON.stringify(object.params))
+                };
+                const shiftPoint = point => latLngArray(destinationPoint(arrayLatLng(point), 45, 135));
+                if (state.params.center) {
+                    state.params.center = shiftPoint(state.params.center);
+                }
+                if (state.params.points) {
+                    state.params.points = state.params.points.map(shiftPoint);
+                }
+                createMeasurementObject(state, true);
+                setMeasureResult(`${escapeHtml(state.name)}을(를) 생성했습니다.`);
+            }
+
+            function applyPrimarySizeMeters(meters, pushUndo = true) {
+                const object = measurements.get(selectedMeasurementId);
+                if (!object || !Number.isFinite(meters) || meters <= 0 || !["circle", "square"].includes(object.type)) {
+                    return;
+                }
+                if (pushUndo) {
+                    pushUndoState();
+                }
+                if (object.type === "circle") {
+                    object.params.radius = meters;
+                } else {
+                    object.params.side = meters;
+                }
+                object.update();
+                updateSelectionPanel();
+            }
+
+            function scheduleSelectedInputUpdate(callback) {
+                window.clearTimeout(inputUpdateTimer);
+                inputUpdateTimer = window.setTimeout(callback, 250);
+            }
+
+            function updateMeasureButtonState() {
+                Object.entries(measureButtons).forEach(([mode, button]) => {
+                    const active = mode === activeMeasureMode;
+                    button.classList.toggle("active", active);
+                    button.setAttribute("aria-pressed", String(active));
+                });
+                measureFinishButton.disabled = !["path", "polygon"].includes(activeMeasureMode) || draftPoints.length < (activeMeasureMode === "polygon" ? 3 : 2);
+                map.getContainer().style.cursor = activeMeasureMode ? "crosshair" : "";
+            }
+
+            function measurementInstruction(mode) {
+                const instructions = {
+                    distance: "<strong>직선 거리</strong><br>시작점과 종료점을 클릭하세요.",
+                    path: "<strong>선형 경로</strong><br>경로 꼭짓점을 연속으로 클릭하고 ‘도형 완료’를 누르세요.",
+                    circle: "<strong>원</strong><br>중심점과 반지름 지점을 클릭하세요.",
+                    square: "<strong>정사각형</strong><br>중심점과 모서리 방향 지점을 클릭하세요.",
+                    rectangle: "<strong>직사각형</strong><br>중심점과 모서리 지점을 클릭하세요.",
+                    polygon: "<strong>자유 다각형</strong><br>꼭짓점을 3개 이상 클릭하고 ‘도형 완료’를 누르세요."
+                };
+                return instructions[mode] || "도구를 선택한 뒤 지도에서 지점을 선택하세요.";
+            }
+
+            function clearDraft() {
+                if (draftLayer && measurementLayerGroup.hasLayer(draftLayer)) {
+                    measurementLayerGroup.removeLayer(draftLayer);
+                }
+                draftMarkers.forEach(marker => {
+                    if (measurementLayerGroup.hasLayer(marker)) {
+                        measurementLayerGroup.removeLayer(marker);
                     }
-                    updateSquareResult(true, true);
                 });
-                centerHandle.on("dragend", () => {
-                    squareCenterDragState = null;
-                    map.dragging.enable();
-                    updateSquareResult(true, true);
-                });
+                draftLayer = null;
+                draftMarkers = [];
+                draftPoints = [];
+                updateMeasureButtonState();
+            }
 
-                resizeHandle.on("dragstart", () => map.dragging.disable());
-                resizeHandle.on("drag", () => updateSquareResult(true, false));
-                resizeHandle.on("dragend", () => {
-                    map.dragging.enable();
-                    updateSquareResult(true, true);
+            function renderDraft() {
+                if (draftLayer && measurementLayerGroup.hasLayer(draftLayer)) {
+                    measurementLayerGroup.removeLayer(draftLayer);
+                }
+                draftMarkers.forEach(marker => measurementLayerGroup.removeLayer(marker));
+                draftMarkers = draftPoints.map(point => {
+                    const marker = L.circleMarker(point, {
+                        pane: "measurementPane", radius: 5, color: "#ffffff", weight: 2,
+                        fillColor: "#f97316", fillOpacity: 1, interactive: false
+                    });
+                    measurementLayerGroup.addLayer(marker);
+                    return marker;
                 });
+                if (draftPoints.length >= 2) {
+                    draftLayer = activeMeasureMode === "polygon"
+                        ? L.polygon(draftPoints, {
+                            pane: "measurementPane", color: "#f97316", weight: 2, dashArray: "6 5",
+                            fillColor: "#fdba74", fillOpacity: 0.12, interactive: false
+                        })
+                        : L.polyline(draftPoints, {
+                            pane: "measurementPane", color: "#f97316", weight: 3, dashArray: "6 5", interactive: false
+                        });
+                    measurementLayerGroup.addLayer(draftLayer);
+                }
+                updateMeasureButtonState();
+            }
 
-                updateSquareResult(false, true);
-                const initialStats = calculateSquareStats(initialGeometry.corners);
-                setMeasureResult(
-                    `<strong>정사각형 측정 완료</strong><br>` +
-                    `변 길이: ${formatMeasureLength(initialStats.side)}<br>` +
-                    `둘레: ${formatMeasureLength(initialStats.perimeter)}<br>` +
-                    `면적: ${formatMeasureArea(initialStats.area)}<br>` +
-                    `<span style="color:#64748b">주황색 점: 위치 이동 · 청록색 사각점: 크기 조절</span>`
-                );
-                return true;
+            function activateMeasureMode(mode) {
+                clearDraft();
+                activeMeasureMode = activeMeasureMode === mode ? null : mode;
+                selectMeasurement(null);
+                updateMeasureButtonState();
+                setMeasureResult(measurementInstruction(activeMeasureMode));
+            }
+
+            function createTwoPointMeasurement(mode, start, end) {
+                const distance = map.distance(start, end);
+                if (distance < 2) {
+                    setMeasureResult("두 지점을 조금 더 떨어뜨려 선택해 주세요.");
+                    return;
+                }
+                pushUndoState();
+                const id = nextMeasurementId++;
+                let params;
+                if (mode === "distance") {
+                    params = { points: [latLngArray(start), latLngArray(end)] };
+                } else if (mode === "circle") {
+                    params = { center: latLngArray(start), radius: distance, bearing: bearingBetween(start, end) };
+                } else {
+                    const local = localMeters(start, end);
+                    const width = Math.max(10, Math.abs(local.east) * 2);
+                    const height = Math.max(10, Math.abs(local.north) * 2);
+                    if (mode === "square") {
+                        params = {
+                            center: latLngArray(start),
+                            side: Math.max(10, Math.max(width, height)),
+                            rotation: 0
+                        };
+                    } else {
+                        params = {
+                            center: latLngArray(start),
+                            width,
+                            height,
+                            rotation: 0
+                        };
+                    }
+                }
+                createMeasurementObject({ id, type: mode, name: defaultMeasurementName(mode, id), locked: false, params }, true);
+                clearDraft();
+            }
+
+            function finishMultiPointMeasurement() {
+                const minimum = activeMeasureMode === "polygon" ? 3 : 2;
+                if (!["path", "polygon"].includes(activeMeasureMode) || draftPoints.length < minimum) {
+                    setMeasureResult(`도형 완료를 위해 지점을 ${minimum}개 이상 선택해 주세요.`);
+                    return;
+                }
+                pushUndoState();
+                const id = nextMeasurementId++;
+                createMeasurementObject({
+                    id,
+                    type: activeMeasureMode,
+                    name: defaultMeasurementName(activeMeasureMode, id),
+                    locked: false,
+                    params: { points: draftPoints.map(latLngArray) }
+                }, true);
+                clearDraft();
             }
 
             function handleMeasurementClick(event) {
                 if (!activeMeasureMode) {
                     return;
                 }
-
-                if (!measureStartLatLng) {
-                    addStartMarker(event.latlng);
+                if (["path", "polygon"].includes(activeMeasureMode)) {
+                    draftPoints.push(event.latlng);
+                    renderDraft();
                     setMeasureResult(
-                        measurementInstruction(activeMeasureMode) +
-                        "<br><strong>첫 번째 지점을 선택했습니다.</strong> 두 번째 지점을 클릭하세요."
+                        measurementInstruction(activeMeasureMode)
+                        + `<br><strong>${draftPoints.length}개 지점 선택</strong>`
                     );
                     return;
                 }
-
-                const start = measureStartLatLng;
-                const end = event.latlng;
-                let completed = false;
-
-                measurementNumber += 1;
-
-                if (activeMeasureMode === "distance") {
-                    completed = finishDistanceMeasurement(start, end);
-                } else if (activeMeasureMode === "circle") {
-                    completed = finishCircleMeasurement(start, end);
-                } else if (activeMeasureMode === "square") {
-                    completed = finishSquareMeasurement(start, end);
-                }
-
-                removeMeasureStartMarker();
-
-                if (!completed) {
-                    measurementNumber = Math.max(0, measurementNumber - 1);
+                draftPoints.push(event.latlng);
+                renderDraft();
+                if (draftPoints.length === 1) {
+                    setMeasureResult(measurementInstruction(activeMeasureMode) + "<br><strong>첫 번째 지점을 선택했습니다.</strong>");
+                } else {
+                    createTwoPointMeasurement(activeMeasureMode, draftPoints[0], draftPoints[1]);
                 }
             }
 
-            measureDistanceButton.addEventListener("click", () => {
-                activateMeasureMode("distance");
+            Object.entries(measureButtons).forEach(([mode, button]) => {
+                button.addEventListener("click", () => activateMeasureMode(mode));
             });
-            measureCircleButton.addEventListener("click", () => {
-                activateMeasureMode("circle");
-            });
-            measureSquareButton.addEventListener("click", () => {
-                activateMeasureMode("square");
+            measureFinishButton.addEventListener("click", finishMultiPointMeasurement);
+            measureUndoButton.addEventListener("click", undoMeasurementAction);
+            measureDeleteButton.addEventListener("click", () => deleteSelectedMeasurement(true));
+            measureDuplicateButton.addEventListener("click", duplicateSelectedMeasurement);
+            measureLockButton.addEventListener("click", () => {
+                const object = measurements.get(selectedMeasurementId);
+                if (!object) {
+                    return;
+                }
+                pushUndoState();
+                object.locked = !object.locked;
+                setHandlesVisible(object, !object.locked);
+                object.update();
+                updateSelectionPanel();
             });
             measureClearButton.addEventListener("click", () => {
-                measurementLayerGroup.clearLayers();
-                measureStartMarker = null;
-                measureStartLatLng = null;
-                measurementNumber = 0;
-                activeMeasureMode = null;
-                if (map.dragging && !map.dragging.enabled()) {
-                    map.dragging.enable();
+                if (!measurements.size && !draftPoints.length) {
+                    return;
                 }
+                pushUndoState();
+                clearDraft();
+                clearMeasurementObjects();
+                activeMeasureMode = null;
                 updateMeasureButtonState();
-                setMeasureResult("측정 결과를 모두 삭제했습니다. 도구를 다시 선택해 주세요.");
+                updateSelectionPanel();
+                setMeasureResult("측정 결과를 모두 삭제했습니다.");
+            });
+
+            measureNameInput.addEventListener("change", () => {
+                const object = measurements.get(selectedMeasurementId);
+                const name = measureNameInput.value.trim();
+                if (!object || !name || name === object.name) {
+                    updateSelectionPanel();
+                    return;
+                }
+                pushUndoState();
+                object.name = name;
+                object.update();
+                updateSelectionPanel();
+            });
+
+            function applyPrimaryInput() {
+                const value = Number(measurePrimarySizeInput.value);
+                const multiplier = measurePrimarySizeUnit.value === "km" ? 1000 : 1;
+                applyPrimarySizeMeters(value * multiplier, false);
+            }
+            let previousPrimaryUnit = measurePrimarySizeUnit.value;
+            measurePrimarySizeInput.addEventListener("focus", pushUndoState);
+            measurePrimarySizeInput.addEventListener("input", () => scheduleSelectedInputUpdate(applyPrimaryInput));
+            measurePrimarySizeUnit.addEventListener("change", () => {
+                const numericValue = Number(measurePrimarySizeInput.value);
+                if (Number.isFinite(numericValue)) {
+                    if (previousPrimaryUnit === "m" && measurePrimarySizeUnit.value === "km") {
+                        measurePrimarySizeInput.value = String(numericValue / 1000);
+                    } else if (previousPrimaryUnit === "km" && measurePrimarySizeUnit.value === "m") {
+                        measurePrimarySizeInput.value = String(numericValue * 1000);
+                    }
+                }
+                previousPrimaryUnit = measurePrimarySizeUnit.value;
+            });
+            document.querySelectorAll(".preset-size-button").forEach(button => {
+                button.addEventListener("click", () => applyPrimarySizeMeters(Number(button.dataset.sizeM), true));
+            });
+
+            function applyRectangleInputs(push = false) {
+                const object = measurements.get(selectedMeasurementId);
+                if (!object || object.type !== "rectangle") {
+                    return;
+                }
+                const width = Number(measureWidthInput.value);
+                const height = Number(measureHeightInput.value);
+                if (!(width > 0 && height > 0)) {
+                    return;
+                }
+                if (push) {
+                    pushUndoState();
+                }
+                object.params.width = width;
+                object.params.height = height;
+                object.update();
+                updateSelectionPanel();
+            }
+            measureWidthInput.addEventListener("focus", pushUndoState);
+            measureHeightInput.addEventListener("focus", pushUndoState);
+            measureWidthInput.addEventListener("input", () => scheduleSelectedInputUpdate(() => applyRectangleInputs(false)));
+            measureHeightInput.addEventListener("input", () => scheduleSelectedInputUpdate(() => applyRectangleInputs(false)));
+
+            measureRotationInput.addEventListener("focus", pushUndoState);
+            measureRotationInput.addEventListener("input", () => scheduleSelectedInputUpdate(() => {
+                const object = measurements.get(selectedMeasurementId);
+                const rotation = Number(measureRotationInput.value);
+                if (!object || !["square", "rectangle"].includes(object.type) || !Number.isFinite(rotation)) {
+                    return;
+                }
+                object.params.rotation = (rotation + 360) % 360;
+                object.update();
+                updateSelectionPanel();
+            }));
+
+            document.addEventListener("keydown", event => {
+                const activeTag = document.activeElement?.tagName;
+                const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(activeTag);
+                if (event.key === "Escape") {
+                    clearDraft();
+                    activeMeasureMode = null;
+                    updateMeasureButtonState();
+                    setMeasureResult("측정 작업을 취소했습니다.");
+                } else if (!typing && event.key === "Delete" && selectedMeasurementId) {
+                    deleteSelectedMeasurement(true);
+                } else if (!typing && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+                    event.preventDefault();
+                    undoMeasurementAction();
+                }
             });
 
             map.on("click", handleMeasurementClick);
+            measureUndoButton.disabled = true;
+            measureFinishButton.disabled = true;
+            updateSelectionPanel();
 
             let searchMarker = null;
 
@@ -3023,7 +5561,136 @@
                 }
             });
 
-            showTrigrsScenario("12", false);
+
+            /* 현재 웹 화면 PNG 저장: 현재 탭 화면 공유를 이용하여 외부 타일도 그대로 캡처 */
+            function downloadCanvas(canvas, filename) {
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        setLayerStatus("PNG 파일 생성에 실패했습니다.", "error");
+                        return;
+                    }
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+                }, "image/png");
+            }
+
+            async function loadHtml2CanvasFallback() {
+                if (window.html2canvas) {
+                    return window.html2canvas;
+                }
+                const sources = [
+                    "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+                    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+                ];
+                for (const src of sources) {
+                    try {
+                        await loadExternalScript(src);
+                        if (window.html2canvas) {
+                            return window.html2canvas;
+                        }
+                    } catch (error) {
+                        console.warn(error);
+                    }
+                }
+                throw new Error("화면 저장 라이브러리를 불러오지 못했습니다.");
+            }
+
+            async function captureWithHtml2Canvas() {
+                const html2canvas = await loadHtml2CanvasFallback();
+                return html2canvas(document.body, {
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: "#ffffff",
+                    scale: Math.min(2, window.devicePixelRatio || 1),
+                    logging: false
+                });
+            }
+
+            async function captureWithScreenApi() {
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { displaySurface: "browser", frameRate: 1 },
+                    audio: false,
+                    preferCurrentTab: true,
+                    selfBrowserSurface: "include",
+                    surfaceSwitching: "exclude"
+                });
+                try {
+                    const video = document.createElement("video");
+                    video.srcObject = stream;
+                    video.muted = true;
+                    await new Promise((resolve, reject) => {
+                        video.onloadedmetadata = resolve;
+                        video.onerror = reject;
+                    });
+                    await video.play();
+                    await new Promise(resolve => window.setTimeout(resolve, 450));
+                    const canvas = document.createElement("canvas");
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext("2d");
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    return canvas;
+                } finally {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            }
+
+            async function exportCurrentMapView() {
+                stopScenarioPlayback();
+                setMobilePanelState(null);
+                captureHeading.textContent = captureTitleInput.value.trim() || "경상북도 산사태 위험 통합 WebGIS";
+                const scenario = comparisonEnabled.checked
+                    ? `${scenarioText(compareLeftSelect.value)} ↔ ${scenarioText(compareRightSelect.value)}`
+                    : scenarioText(scenarioSelect.value);
+                const now = new Date();
+                captureFooter.textContent = `강우 시나리오: ${scenario} · 출력 일시: ${now.toLocaleString("ko-KR")}`;
+                captureOverlay.classList.add("active");
+                captureOverlay.setAttribute("aria-hidden", "false");
+                mapExportButton.disabled = true;
+                capturePanelButton.disabled = true;
+                setLayerStatus("PNG 저장 창에서 ‘현재 탭’을 선택해 주세요.");
+                await new Promise(resolve => window.setTimeout(resolve, 250));
+
+                try {
+                    let canvas;
+                    if (navigator.mediaDevices?.getDisplayMedia && window.isSecureContext) {
+                        canvas = await captureWithScreenApi();
+                    } else {
+                        canvas = await captureWithHtml2Canvas();
+                    }
+                    const stamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+                    downloadCanvas(canvas, `Gyeongbuk_WebGIS_${scenarioSelect.value}h_${stamp}.png`);
+                    setLayerStatus("현재 화면을 PNG로 저장했습니다.", "success");
+                } catch (error) {
+                    if (error.name === "NotAllowedError") {
+                        setLayerStatus("화면 공유가 취소되어 PNG를 저장하지 않았습니다.", "error");
+                    } else {
+                        console.error(error);
+                        try {
+                            const canvas = await captureWithHtml2Canvas();
+                            downloadCanvas(canvas, `Gyeongbuk_WebGIS_${Date.now()}.png`);
+                            setLayerStatus("대체 방식으로 PNG를 저장했습니다. 일부 외부 배경지도는 브라우저 보안 정책에 따라 제외될 수 있습니다.", "success");
+                        } catch (fallbackError) {
+                            setLayerStatus(`PNG 저장 실패: ${fallbackError.message}`, "error");
+                        }
+                    }
+                } finally {
+                    captureOverlay.classList.remove("active");
+                    captureOverlay.setAttribute("aria-hidden", "true");
+                    mapExportButton.disabled = false;
+                    capturePanelButton.disabled = false;
+                }
+            }
+
+            mapExportButton.addEventListener("click", exportCurrentMapView);
+            capturePanelButton.addEventListener("click", exportCurrentMapView);
+
+            showTrigrsScenario(scenarioSelect.value, false);
             updateLegendVisibility();
 
             /*
@@ -3041,6 +5708,7 @@
         }
 
         loadLeaflet()
+            .then(loadTurf)
             .then(initializeWebGIS)
             .catch(error => {
                 console.error(error);
