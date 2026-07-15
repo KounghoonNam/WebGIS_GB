@@ -412,6 +412,37 @@
             box-shadow: 0 0 0 2px #5b21b6;
         }
 
+        .measurement-handle-marker {
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 1px 7px rgba(0, 0, 0, 0.45);
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .measurement-handle-marker:active {
+            cursor: grabbing;
+        }
+
+        .measurement-handle-marker.center-handle {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #b45309, 0 2px 8px rgba(0, 0, 0, 0.40);
+        }
+
+        .measurement-handle-marker.resize-handle {
+            background: #7c3aed;
+            box-shadow: 0 0 0 2px #5b21b6, 0 2px 8px rgba(0, 0, 0, 0.40);
+        }
+
+        .measurement-handle-marker.square-resize-handle {
+            border-radius: 3px;
+            background: #0f766e;
+            box-shadow: 0 0 0 2px #115e59, 0 2px 8px rgba(0, 0, 0, 0.40);
+        }
+
         .legend-section {
             display: none;
             margin-top: 9px;
@@ -646,7 +677,7 @@
         </div>
 
         <div class="help-text">
-            거리: 두 점 사이 길이 · 원: 반지름·둘레·면적 · 정사각형: 변 길이·둘레·면적
+            거리: 두 점 사이 길이 · 원·정사각형: 생성 후 중심점과 외곽 조절점을 드래그해 위치·크기 변경
         </div>
     </section>
 
@@ -1068,7 +1099,7 @@
                 ["emdPane", 490, "auto"],
                 ["debrisPane", 540, "auto"],
                 ["humanDamagePane", 560, "auto"],
-                ["measurementPane", 590, "none"]
+                ["measurementPane", 590, "auto"]
             ].forEach(([name, zIndex, pointerEvents]) => {
                 if (!map.getPane(name)) {
                     map.createPane(name);
@@ -2208,7 +2239,7 @@
             /*
              * 거리·원·정사각형 측정 도구
              * - 별도 플러그인 없이 Leaflet 기본 기능만 사용
-             * - 도구 선택 후 지도에서 시작점과 끝점을 차례로 클릭
+             * - 원과 정사각형은 생성 후 조절점을 드래그하여 이동·크기 변경
              */
             const measurementLayerGroup = L.layerGroup().addTo(map);
             const measureButtons = {
@@ -2309,19 +2340,68 @@
                 setMeasureResult(measurementInstruction(activeMeasureMode));
             }
 
+            function createMeasurementDivIcon(html, iconSize = [18, 18], iconAnchor = [9, 9]) {
+                return L.divIcon({
+                    className: "measurement-div-icon",
+                    html,
+                    iconSize,
+                    iconAnchor
+                });
+            }
+
+            function createDragHandle(latlng, markerClass, tooltipText) {
+                const marker = L.marker(latlng, {
+                    pane: "measurementPane",
+                    draggable: true,
+                    interactive: true,
+                    keyboard: false,
+                    bubblingMouseEvents: false,
+                    autoPan: true,
+                    autoPanPadding: [40, 40],
+                    icon: createMeasurementDivIcon(
+                        `<div class="measurement-handle-marker ${markerClass}"></div>`
+                    )
+                });
+
+                marker.bindTooltip(tooltipText, {
+                    direction: "top",
+                    offset: [0, -10],
+                    opacity: 0.95
+                });
+
+                marker.on("mousedown touchstart click", event => {
+                    if (event.originalEvent) {
+                        L.DomEvent.stopPropagation(event.originalEvent);
+                    }
+                });
+
+                measurementLayerGroup.addLayer(marker);
+                return marker;
+            }
+
             function addMeasurementLabel(latlng, html) {
                 const marker = L.marker(latlng, {
                     pane: "measurementPane",
                     interactive: false,
                     keyboard: false,
-                    icon: L.divIcon({
-                        className: "measurement-div-icon",
-                        html: `<div class="measurement-map-label">${html}</div>`
-                    })
+                    icon: createMeasurementDivIcon(
+                        `<div class="measurement-map-label">${html}</div>`,
+                        [1, 1],
+                        [0, 0]
+                    )
                 });
 
                 measurementLayerGroup.addLayer(marker);
                 return marker;
+            }
+
+            function updateMeasurementLabel(marker, latlng, html) {
+                marker.setLatLng(latlng);
+                marker.setIcon(createMeasurementDivIcon(
+                    `<div class="measurement-map-label">${html}</div>`,
+                    [1, 1],
+                    [0, 0]
+                ));
             }
 
             function addStartMarker(latlng) {
@@ -2331,28 +2411,29 @@
                     pane: "measurementPane",
                     interactive: false,
                     keyboard: false,
-                    icon: L.divIcon({
-                        className: "measurement-div-icon",
-                        html: '<div class="measurement-start-marker"></div>',
-                        iconSize: [12, 12],
-                        iconAnchor: [6, 6]
-                    })
+                    icon: createMeasurementDivIcon(
+                        '<div class="measurement-start-marker"></div>',
+                        [12, 12],
+                        [6, 6]
+                    )
                 });
                 measurementLayerGroup.addLayer(measureStartMarker);
             }
 
-            function squareFromCenterAndPoint(center, point) {
+            function squareGeometry(center, point) {
                 const zoom = map.getZoom();
                 const centerPixel = map.project(center, zoom);
                 const pointPixel = map.project(point, zoom);
-                const halfSize = Math.max(
-                    Math.abs(pointPixel.x - centerPixel.x),
-                    Math.abs(pointPixel.y - centerPixel.y)
-                );
+                const dx = pointPixel.x - centerPixel.x;
+                const dy = pointPixel.y - centerPixel.y;
+                const halfSize = Math.max(Math.abs(dx), Math.abs(dy));
 
                 if (halfSize < 2) {
                     return null;
                 }
+
+                const signX = dx >= 0 ? 1 : -1;
+                const signY = dy >= 0 ? 1 : -1;
 
                 const northWest = map.unproject(
                     L.point(centerPixel.x - halfSize, centerPixel.y - halfSize),
@@ -2370,8 +2451,54 @@
                     L.point(centerPixel.x - halfSize, centerPixel.y + halfSize),
                     zoom
                 );
+                const snappedHandle = map.unproject(
+                    L.point(
+                        centerPixel.x + signX * halfSize,
+                        centerPixel.y + signY * halfSize
+                    ),
+                    zoom
+                );
 
-                return [northWest, northEast, southEast, southWest];
+                return {
+                    corners: [northWest, northEast, southEast, southWest],
+                    snappedHandle,
+                    halfSize,
+                    signX,
+                    signY
+                };
+            }
+
+            function destinationPoint(start, distanceMeters, bearingDegrees) {
+                const earthRadius = 6371008.8;
+                const angularDistance = distanceMeters / earthRadius;
+                const bearing = bearingDegrees * Math.PI / 180;
+                const latitude1 = start.lat * Math.PI / 180;
+                const longitude1 = start.lng * Math.PI / 180;
+
+                const latitude2 = Math.asin(
+                    Math.sin(latitude1) * Math.cos(angularDistance)
+                    + Math.cos(latitude1) * Math.sin(angularDistance) * Math.cos(bearing)
+                );
+                const longitude2 = longitude1 + Math.atan2(
+                    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(latitude1),
+                    Math.cos(angularDistance) - Math.sin(latitude1) * Math.sin(latitude2)
+                );
+
+                return L.latLng(
+                    latitude2 * 180 / Math.PI,
+                    ((longitude2 * 180 / Math.PI + 540) % 360) - 180
+                );
+            }
+
+            function bearingBetween(start, end) {
+                const latitude1 = start.lat * Math.PI / 180;
+                const latitude2 = end.lat * Math.PI / 180;
+                const deltaLongitude = (end.lng - start.lng) * Math.PI / 180;
+                const y = Math.sin(deltaLongitude) * Math.cos(latitude2);
+                const x = Math.cos(latitude1) * Math.sin(latitude2)
+                    - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(deltaLongitude);
+
+                return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
             }
 
             function finishDistanceMeasurement(start, end) {
@@ -2402,18 +2529,15 @@
             }
 
             function finishCircleMeasurement(center, edge) {
-                const radius = map.distance(center, edge);
-                if (radius < 0.05) {
+                const initialRadius = map.distance(center, edge);
+                if (initialRadius < 0.05) {
                     setMeasureResult("중심점과 가장자리 지점을 서로 다르게 선택해 주세요.");
                     return false;
                 }
 
-                const circumference = 2 * Math.PI * radius;
-                const area = Math.PI * radius * radius;
-
                 const circle = L.circle(center, {
                     pane: "measurementPane",
-                    radius,
+                    radius: initialRadius,
                     color: "#7c3aed",
                     weight: 3,
                     opacity: 0.95,
@@ -2429,44 +2553,101 @@
                     dashArray: "7 6",
                     interactive: false
                 });
+                const centerHandle = createDragHandle(
+                    center,
+                    "center-handle",
+                    "드래그: 원 위치 이동"
+                );
+                const radiusHandle = createDragHandle(
+                    edge,
+                    "resize-handle",
+                    "드래그: 반지름 변경"
+                );
+                const labelMarker = addMeasurementLabel(center, "");
 
                 measurementLayerGroup.addLayer(circle);
                 measurementLayerGroup.addLayer(radiusLine);
-                addMeasurementLabel(
-                    center,
-                    `반지름 ${formatMeasureLength(radius)}<br>` +
-                    `둘레 ${formatMeasureLength(circumference)}<br>` +
-                    `면적 ${formatMeasureArea(area)}`
-                );
 
+                function updateCircleResult(showPanel = true) {
+                    const currentCenter = centerHandle.getLatLng();
+                    const currentEdge = radiusHandle.getLatLng();
+                    const radius = map.distance(currentCenter, currentEdge);
+                    const circumference = 2 * Math.PI * radius;
+                    const area = Math.PI * radius * radius;
+                    const labelHtml =
+                        `반지름 ${formatMeasureLength(radius)}<br>` +
+                        `둘레 ${formatMeasureLength(circumference)}<br>` +
+                        `면적 ${formatMeasureArea(area)}`;
+
+                    circle.setLatLng(currentCenter);
+                    circle.setRadius(radius);
+                    radiusLine.setLatLngs([currentCenter, currentEdge]);
+                    updateMeasurementLabel(labelMarker, currentCenter, labelHtml);
+
+                    if (showPanel) {
+                        setMeasureResult(
+                            `<strong>원 크기 조절</strong><br>` +
+                            `반지름: ${formatMeasureLength(radius)}<br>` +
+                            `둘레: ${formatMeasureLength(circumference)}<br>` +
+                            `면적: ${formatMeasureArea(area)}<br>` +
+                            `<span style="color:#64748b">주황색 점: 위치 이동 · 보라색 점: 크기 조절</span>`
+                        );
+                    }
+                }
+
+                let centerDragState = null;
+                centerHandle.on("dragstart", () => {
+                    const oldCenter = centerHandle.getLatLng();
+                    const oldEdge = radiusHandle.getLatLng();
+                    centerDragState = {
+                        radius: map.distance(oldCenter, oldEdge),
+                        bearing: bearingBetween(oldCenter, oldEdge)
+                    };
+                    map.dragging.disable();
+                });
+                centerHandle.on("drag", () => {
+                    const currentCenter = centerHandle.getLatLng();
+                    if (centerDragState) {
+                        radiusHandle.setLatLng(destinationPoint(
+                            currentCenter,
+                            centerDragState.radius,
+                            centerDragState.bearing
+                        ));
+                    }
+                    updateCircleResult(true);
+                });
+                centerHandle.on("dragend", () => {
+                    centerDragState = null;
+                    map.dragging.enable();
+                    updateCircleResult(true);
+                });
+
+                radiusHandle.on("dragstart", () => map.dragging.disable());
+                radiusHandle.on("drag", () => updateCircleResult(true));
+                radiusHandle.on("dragend", () => {
+                    map.dragging.enable();
+                    updateCircleResult(true);
+                });
+
+                updateCircleResult(false);
                 setMeasureResult(
                     `<strong>원 측정 완료</strong><br>` +
-                    `반지름: ${formatMeasureLength(radius)}<br>` +
-                    `둘레: ${formatMeasureLength(circumference)}<br>` +
-                    `면적: ${formatMeasureArea(area)}`
+                    `반지름: ${formatMeasureLength(initialRadius)}<br>` +
+                    `둘레: ${formatMeasureLength(2 * Math.PI * initialRadius)}<br>` +
+                    `면적: ${formatMeasureArea(Math.PI * initialRadius * initialRadius)}<br>` +
+                    `<span style="color:#64748b">주황색 점: 위치 이동 · 보라색 점: 크기 조절</span>`
                 );
                 return true;
             }
 
             function finishSquareMeasurement(center, point) {
-                const corners = squareFromCenterAndPoint(center, point);
-                if (!corners) {
+                const initialGeometry = squareGeometry(center, point);
+                if (!initialGeometry) {
                     setMeasureResult("중심점에서 조금 더 떨어진 지점을 선택해 주세요.");
                     return false;
                 }
 
-                const [northWest, northEast, southEast, southWest] = corners;
-                const top = map.distance(northWest, northEast);
-                const right = map.distance(northEast, southEast);
-                const bottom = map.distance(southEast, southWest);
-                const left = map.distance(southWest, northWest);
-                const width = (top + bottom) / 2;
-                const height = (left + right) / 2;
-                const side = (width + height) / 2;
-                const perimeter = top + right + bottom + left;
-                const area = width * height;
-
-                const square = L.polygon(corners, {
+                const square = L.polygon(initialGeometry.corners, {
                     pane: "measurementPane",
                     color: "#0f766e",
                     weight: 3,
@@ -2475,19 +2656,112 @@
                     fillOpacity: 0.20,
                     interactive: false
                 });
-                measurementLayerGroup.addLayer(square);
-                addMeasurementLabel(
+                const centerHandle = createDragHandle(
                     center,
-                    `변 길이 ${formatMeasureLength(side)}<br>` +
-                    `둘레 ${formatMeasureLength(perimeter)}<br>` +
-                    `면적 ${formatMeasureArea(area)}`
+                    "center-handle",
+                    "드래그: 정사각형 위치 이동"
                 );
+                const resizeHandle = createDragHandle(
+                    initialGeometry.snappedHandle,
+                    "square-resize-handle",
+                    "드래그: 정사각형 크기 변경"
+                );
+                const labelMarker = addMeasurementLabel(center, "");
 
+                measurementLayerGroup.addLayer(square);
+
+                function calculateSquareStats(corners) {
+                    const [northWest, northEast, southEast, southWest] = corners;
+                    const top = map.distance(northWest, northEast);
+                    const right = map.distance(northEast, southEast);
+                    const bottom = map.distance(southEast, southWest);
+                    const left = map.distance(southWest, northWest);
+                    const width = (top + bottom) / 2;
+                    const height = (left + right) / 2;
+                    const side = (width + height) / 2;
+                    return {
+                        side,
+                        perimeter: top + right + bottom + left,
+                        area: width * height
+                    };
+                }
+
+                function updateSquareResult(showPanel = true, snapHandle = true) {
+                    const currentCenter = centerHandle.getLatLng();
+                    const geometry = squareGeometry(currentCenter, resizeHandle.getLatLng());
+                    if (!geometry) {
+                        return;
+                    }
+
+                    if (snapHandle) {
+                        resizeHandle.setLatLng(geometry.snappedHandle);
+                    }
+
+                    const stats = calculateSquareStats(geometry.corners);
+                    const labelHtml =
+                        `변 길이 ${formatMeasureLength(stats.side)}<br>` +
+                        `둘레 ${formatMeasureLength(stats.perimeter)}<br>` +
+                        `면적 ${formatMeasureArea(stats.area)}`;
+
+                    square.setLatLngs(geometry.corners);
+                    updateMeasurementLabel(labelMarker, currentCenter, labelHtml);
+
+                    if (showPanel) {
+                        setMeasureResult(
+                            `<strong>정사각형 크기 조절</strong><br>` +
+                            `변 길이: ${formatMeasureLength(stats.side)}<br>` +
+                            `둘레: ${formatMeasureLength(stats.perimeter)}<br>` +
+                            `면적: ${formatMeasureArea(stats.area)}<br>` +
+                            `<span style="color:#64748b">주황색 점: 위치 이동 · 청록색 사각점: 크기 조절</span>`
+                        );
+                    }
+                }
+
+                let squareCenterDragState = null;
+                centerHandle.on("dragstart", () => {
+                    const zoom = map.getZoom();
+                    const oldCenterPixel = map.project(centerHandle.getLatLng(), zoom);
+                    const oldHandlePixel = map.project(resizeHandle.getLatLng(), zoom);
+                    squareCenterDragState = {
+                        zoom,
+                        offset: oldHandlePixel.subtract(oldCenterPixel)
+                    };
+                    map.dragging.disable();
+                });
+                centerHandle.on("drag", () => {
+                    if (squareCenterDragState) {
+                        const newCenterPixel = map.project(
+                            centerHandle.getLatLng(),
+                            squareCenterDragState.zoom
+                        );
+                        resizeHandle.setLatLng(map.unproject(
+                            newCenterPixel.add(squareCenterDragState.offset),
+                            squareCenterDragState.zoom
+                        ));
+                    }
+                    updateSquareResult(true, true);
+                });
+                centerHandle.on("dragend", () => {
+                    squareCenterDragState = null;
+                    map.dragging.enable();
+                    updateSquareResult(true, true);
+                });
+
+                resizeHandle.on("dragstart", () => map.dragging.disable());
+                resizeHandle.on("drag", () => updateSquareResult(true, false));
+                resizeHandle.on("dragend", () => {
+                    map.dragging.enable();
+                    updateSquareResult(true, true);
+                });
+
+                updateSquareResult(false, true);
+                const initialStats = calculateSquareStats(initialGeometry.corners);
                 setMeasureResult(
                     `<strong>정사각형 측정 완료</strong><br>` +
-                    `변 길이: ${formatMeasureLength(side)}<br>` +
-                    `둘레: ${formatMeasureLength(perimeter)}<br>` +
-                    `면적: ${formatMeasureArea(area)}`
+                    `변 길이: ${formatMeasureLength(initialStats.side)}<br>` +
+                    `둘레: ${formatMeasureLength(initialStats.perimeter)}<br>` +
+                    `면적: ${formatMeasureArea(initialStats.area)}<br>` +
+                    `<span style="color:#64748b">주황색 점: 위치 이동 · 청록색 사각점: 크기 조절</span>`
                 );
                 return true;
             }
@@ -2542,6 +2816,9 @@
                 measureStartLatLng = null;
                 measurementNumber = 0;
                 activeMeasureMode = null;
+                if (map.dragging && !map.dragging.enabled()) {
+                    map.dragging.enable();
+                }
                 updateMeasureButtonState();
                 setMeasureResult("측정 결과를 모두 삭제했습니다. 도구를 다시 선택해 주세요.");
             });
