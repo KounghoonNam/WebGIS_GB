@@ -1385,54 +1385,6 @@
             <div class="help-text">별표를 누르면 즐겨찾기에 저장되며 마지막 레이어·시나리오·투명도 설정이 자동 복원됩니다.</div>
         </div>
 
-        <div id="human-buffer-section" class="layer-section">
-            <div class="layer-title-row">
-                <div class="measure-subtitle" style="margin:0;">인명피해 우려지역 자동 버퍼 분석</div>
-            </div>
-
-            <div id="buffer-selected-site" class="buffer-site-card">
-                지도에서 ‘경상북도 인명피해 우려지역(415)’ 지점을 클릭하세요. 기본 500m 버퍼가 자동 생성됩니다.
-            </div>
-
-            <button id="buffer-show-points-button" class="primary-button" type="button" style="width:100%;margin-top:7px;">
-                인명피해 우려지역 415개 지점 표시
-            </button>
-
-            <div class="buffer-radius-presets" aria-label="버퍼 반경 선택">
-                <button class="buffer-radius-button" type="button" data-buffer-radius-m="100">100m</button>
-                <button class="buffer-radius-button" type="button" data-buffer-radius-m="300">300m</button>
-                <button class="buffer-radius-button active" type="button" data-buffer-radius-m="500">500m</button>
-                <button class="buffer-radius-button" type="button" data-buffer-radius-m="1000">1km</button>
-            </div>
-
-            <div class="buffer-custom-row">
-                <input id="buffer-custom-radius-input" type="number" min="10" step="10" value="500" aria-label="사용자 버퍼 반경">
-                <select id="buffer-custom-radius-unit" aria-label="버퍼 거리 단위">
-                    <option value="m">m</option>
-                    <option value="km">km</option>
-                </select>
-                <button id="buffer-apply-button" class="primary-button" type="button">적용</button>
-            </div>
-
-            <label class="buffer-option-label">
-                <input id="buffer-auto-load-debris" type="checkbox" checked>
-                <span>선택 지점의 시군구 토석류 자료를 자동으로 불러와 RedZone·YellowZone 길이를 분석</span>
-            </label>
-
-            <div class="buffer-action-row">
-                <button id="buffer-rerun-button" class="secondary-button" type="button" disabled>다시 분석</button>
-                <button id="buffer-clear-button" class="secondary-button" type="button" disabled>버퍼 제거</button>
-            </div>
-
-            <div id="buffer-analysis-results">
-                <div class="buffer-result-summary">분석 지점을 선택하면 버퍼 면적, 인명피해 우려지역, 인구, 건물, 토석류, 소유역 및 TRIGRS 위험면적을 표시합니다.</div>
-            </div>
-
-            <div id="buffer-data-status" class="buffer-data-status">
-                인구·건물·TRIGRS 통계는 <code>data/buffer_analysis</code> 자료가 있을 때 자동 계산됩니다.
-            </div>
-        </div>
-
         <div id="comparison-section" class="layer-section">
             <div class="layer-title-row">
                 <label class="layer-check-label">
@@ -1548,6 +1500,54 @@
         <div id="layer-status">
             분석 레이어를 준비하는 중입니다.
         </div>
+
+        <div id="human-buffer-section" class="layer-section">
+            <div class="layer-title-row">
+                <div class="measure-subtitle" style="margin:0;">인명피해 우려지역 자동 버퍼 분석</div>
+            </div>
+
+            <div id="buffer-selected-site" class="buffer-site-card">
+                지도에서 ‘경상북도 인명피해 우려지역(415)’ 지점을 클릭하세요. 기본 500m 버퍼가 자동 생성됩니다.
+            </div>
+
+            <button id="buffer-show-points-button" class="primary-button" type="button" style="width:100%;margin-top:7px;">
+                인명피해 우려지역 415개 지점 표시
+            </button>
+
+            <div class="buffer-radius-presets" aria-label="버퍼 반경 선택">
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="100">100m</button>
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="300">300m</button>
+                <button class="buffer-radius-button active" type="button" data-buffer-radius-m="500">500m</button>
+                <button class="buffer-radius-button" type="button" data-buffer-radius-m="1000">1km</button>
+            </div>
+
+            <div class="buffer-custom-row">
+                <input id="buffer-custom-radius-input" type="number" min="10" step="10" value="500" aria-label="사용자 버퍼 반경">
+                <select id="buffer-custom-radius-unit" aria-label="버퍼 거리 단위">
+                    <option value="m">m</option>
+                    <option value="km">km</option>
+                </select>
+                <button id="buffer-apply-button" class="primary-button" type="button">적용</button>
+            </div>
+
+            <label class="buffer-option-label">
+                <input id="buffer-auto-load-debris" type="checkbox" checked>
+                <span>선택 지점의 시군구 토석류 자료를 자동으로 불러와 RedZone·YellowZone 길이를 분석</span>
+            </label>
+
+            <div class="buffer-action-row">
+                <button id="buffer-rerun-button" class="secondary-button" type="button" disabled>다시 분석</button>
+                <button id="buffer-clear-button" class="secondary-button" type="button" disabled>버퍼 제거</button>
+            </div>
+
+            <div id="buffer-analysis-results">
+                <div class="buffer-result-summary">분석 지점을 선택하면 버퍼 면적, 인명피해 우려지역, 인구, 건물, 토석류, 소유역 및 TRIGRS 위험면적을 표시합니다.</div>
+            </div>
+
+            <div id="buffer-data-status" class="buffer-data-status">
+                인구·건물·TRIGRS 통계는 <code>data/buffer_analysis</code> 자료가 있을 때 자동 계산됩니다.
+            </div>
+        </div>
     </section>
 
     <div id="mobile-panel-buttons" aria-label="모바일 도구">
@@ -1654,7 +1654,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260716-03";
+        const APP_VERSION = "20260716-04";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -2146,8 +2146,34 @@
                 const favoritesOnly = layerFavoritesOnly.checked;
                 managedLayerList.innerHTML = "";
 
+                const managedLayerOrder = [
+                    "sigungu",
+                    "emd",
+                    "watershed",
+                    "humanDamage",
+                    "trigrs",
+                    "susceptibility",
+                    "debris",
+                    "humanBuffer"
+                ];
+                const managedLayerOrderIndex = new Map(
+                    managedLayerOrder.map((id, index) => [id, index])
+                );
+
                 [...managedLayers.entries()]
-                    .sort((a, b) => a[1].name.localeCompare(b[1].name, "ko"))
+                    .sort((a, b) => {
+                        const aOrder = managedLayerOrderIndex.has(a[0])
+                            ? managedLayerOrderIndex.get(a[0])
+                            : Number.MAX_SAFE_INTEGER;
+                        const bOrder = managedLayerOrderIndex.has(b[0])
+                            ? managedLayerOrderIndex.get(b[0])
+                            : Number.MAX_SAFE_INTEGER;
+
+                        if (aOrder !== bOrder) {
+                            return aOrder - bOrder;
+                        }
+                        return a[1].name.localeCompare(b[1].name, "ko");
+                    })
                     .forEach(([id, entry]) => {
                         if (keyword && !entry.name.toLowerCase().includes(keyword)) {
                             return;
