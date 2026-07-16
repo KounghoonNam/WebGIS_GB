@@ -1668,7 +1668,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260716-05";
+        const APP_VERSION = "20260716-22";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -2138,10 +2138,18 @@
                 { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
             );
 
+            /*
+             * 배경지도 없이 분석 레이어만 표시하는 빈 베이스 레이어입니다.
+             * 선택하면 VWorld·OpenStreetMap 타일만 제거되고,
+             * 행정경계·TRIGRS·토석류·측정 도형은 그대로 유지됩니다.
+             */
+            const noBaseLayer = L.layerGroup();
+
             vworldBaseLayer.addTo(map);
 
             const layerControl = L.control.layers(
                 {
+                    "배경지도 없음": noBaseLayer,
                     "VWorld 일반지도": vworldBaseLayer,
                     "VWorld 영상지도": vworldSatelliteLayer,
                     "VWorld 영상 + 지명": vworldHybridLayer,
@@ -2150,6 +2158,14 @@
                 {},
                 { position: "topleft", collapsed: true }
             ).addTo(map);
+
+            map.on("baselayerchange", event => {
+                const isNoBase = event.layer === noBaseLayer;
+                map.getContainer().classList.toggle("no-basemap-active", isNoBase);
+                map.getContainer().style.backgroundColor = isNoBase
+                    ? "#ffffff"
+                    : "#e8eef3";
+            });
 
             /*
              * Leaflet 기본 레이어 선택창의 오버레이 표시 순서
