@@ -1654,7 +1654,7 @@
     <script>
         "use strict";
 
-        const APP_VERSION = "20260716-04";
+        const APP_VERSION = "20260716-05";
 
         const leafletSources = [
             "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
@@ -2036,6 +2036,33 @@
                 preferCanvas: true
             });
 
+            /*
+             * 초기 화면 잠금
+             * 경계·소유역 등 비동기 GeoJSON이 늦게 로드되면서 자체 전체 범위로
+             * fitBounds()를 실행해 울릉도까지 보이는 현상을 방지합니다.
+             * 사용자가 지도를 직접 조작하면 즉시 잠금을 해제합니다.
+             */
+            let initialMainlandViewLocked = true;
+            const initialMainlandViewTimers = [];
+
+            function releaseInitialMainlandViewLock() {
+                if (!initialMainlandViewLocked) {
+                    return;
+                }
+                initialMainlandViewLocked = false;
+                while (initialMainlandViewTimers.length) {
+                    window.clearTimeout(initialMainlandViewTimers.pop());
+                }
+            }
+
+            ["pointerdown", "touchstart", "wheel"].forEach(eventName => {
+                map.getContainer().addEventListener(
+                    eventName,
+                    releaseInitialMainlandViewLock,
+                    { passive: true, once: true }
+                );
+            });
+
             map.on(
                 "click",
                 () => {
@@ -2109,6 +2136,60 @@
                 {},
                 { position: "topleft", collapsed: true }
             ).addTo(map);
+
+            /*
+             * Leaflet 기본 레이어 선택창의 오버레이 표시 순서
+             * 비동기로 GeoJSON이 로드되는 순서와 관계없이 아래 순서를 유지합니다.
+             */
+            const LEAFLET_OVERLAY_DISPLAY_ORDER = [
+                "경상북도 시군구 경계",
+                "경상북도 읍면동 경계",
+                "경상북도 소유역 경계(2,201)",
+                "경상북도 인명피해 우려지역(415)",
+                "인명피해 자동 분석 버퍼"
+            ];
+
+            function reorderLeafletOverlayControl() {
+                window.requestAnimationFrame(() => {
+                    const controlContainer = layerControl.getContainer();
+                    const overlayContainer = controlContainer?.querySelector(
+                        ".leaflet-control-layers-overlays"
+                    );
+
+                    if (!overlayContainer) {
+                        return;
+                    }
+
+                    const labels = Array.from(overlayContainer.children);
+                    const orderMap = new Map(
+                        LEAFLET_OVERLAY_DISPLAY_ORDER.map((name, index) => [name, index])
+                    );
+
+                    labels
+                        .map((label, originalIndex) => {
+                            const labelText = String(label.textContent || "")
+                                .replace(/\s+/g, " ")
+                                .trim();
+
+                            return {
+                                label,
+                                originalIndex,
+                                rank: orderMap.has(labelText)
+                                    ? orderMap.get(labelText)
+                                    : LEAFLET_OVERLAY_DISPLAY_ORDER.length + originalIndex
+                            };
+                        })
+                        .sort((a, b) => a.rank - b.rank || a.originalIndex - b.originalIndex)
+                        .forEach(item => overlayContainer.appendChild(item.label));
+                });
+            }
+
+            const originalLayerControlAddOverlay = layerControl.addOverlay;
+            layerControl.addOverlay = function addOrderedOverlay(layer, name) {
+                originalLayerControlAddOverlay.call(this, layer, name);
+                reorderLeafletOverlayControl();
+                return this;
+            };
 
             L.control.scale({
                 position: "bottomleft",
@@ -2483,14 +2564,18 @@
                             .getBounds()
                             .isValid()
                     ) {
-                        map.fitBounds(
-                            watershedLayer
-                                .getBounds(),
-                            {
-                                padding: [18, 18],
-                                maxZoom: 9
-                            }
-                        );
+                        if (initialMainlandViewLocked) {
+                            enforceInitialMainlandView();
+                        } else {
+                            map.fitBounds(
+                                watershedLayer
+                                    .getBounds(),
+                                {
+                                    padding: [18, 18],
+                                    maxZoom: 9
+                                }
+                            );
+                        }
                     }
                 } catch (error) {
                     console.error(
@@ -3508,7 +3593,7 @@
              */
             layerControl.addOverlay(
                 humanDamageLayer,
-                "경상북도 인명피해(415)"
+                "경상북도 인명피해 우려지역(415)"
             );
             registerManagedLayer(
                 "humanDamage",
@@ -3668,25 +3753,38 @@
                 [37.18, 129.67]
             );
 
-            function fitGyeongbukMainland() {
+            function fitGyeongbukMainland(options = {}) {
                 const mobileMode = window.matchMedia(
                     "(max-width: 900px)"
                 ).matches;
 
+                const fitOptions = mobileMode
+                    ? {
+                        paddingTopLeft: [18, 18],
+                        paddingBottomRight: [18, 82],
+                        maxZoom: 9
+                    }
+                    : {
+                        paddingTopLeft: [470, 55],
+                        paddingBottomRight: [350, 45],
+                        maxZoom: 9
+                    };
+
                 map.fitBounds(
                     GYEONGBUK_MAINLAND_BOUNDS,
-                    mobileMode
-                        ? {
-                            paddingTopLeft: [18, 18],
-                            paddingBottomRight: [18, 82],
-                            maxZoom: 9
-                        }
-                        : {
-                            paddingTopLeft: [470, 55],
-                            paddingBottomRight: [350, 45],
-                            maxZoom: 9
-                        }
+                    {
+                        ...fitOptions,
+                        animate: options.animate ?? false
+                    }
                 );
+            }
+
+            function enforceInitialMainlandView() {
+                if (!initialMainlandViewLocked) {
+                    return;
+                }
+                map.invalidateSize(false);
+                fitGyeongbukMainland({ animate: false });
             }
 
             const scenarios = {
@@ -4381,8 +4479,13 @@
                         () => map.hasLayer(sigunguLayer),
                         active => active ? map.addLayer(sigunguLayer) : map.removeLayer(sigunguLayer)
                     );
-                    if (sigunguLayer.getBounds().isValid()) {
-                        map.fitBounds(sigunguLayer.getBounds(), { padding: [18, 18], maxZoom: 9 });
+                    /*
+                     * 시군구 자료에는 울릉도가 포함되어 있으므로 로드 완료 시
+                     * 전체 시군구 범위로 자동 확대하지 않습니다.
+                     * 초기 화면은 경북 본토 고정 범위를 계속 유지합니다.
+                     */
+                    if (initialMainlandViewLocked) {
+                        enforceInitialMainlandView();
                     }
 
                     map.on("zoomend", () => {
@@ -5805,14 +5908,25 @@
             updateLegendVisibility();
 
             /*
-             * 첫 접속 화면은 울릉도를 제외한 경북 본토에 맞춥니다.
+             * 첫 접속 화면을 울릉도를 제외한 경북 본토에 강제로 고정합니다.
+             * 비동기 레이어가 순차적으로 로드되더라도 약 3초 동안 본토 범위를
+             * 재적용합니다. 사용자가 지도를 직접 조작하면 즉시 중단됩니다.
              */
-            window.requestAnimationFrame(
-                () => {
-                    map.invalidateSize(false);
-                    fitGyeongbukMainland();
-                }
-            );
+            window.requestAnimationFrame(enforceInitialMainlandView);
+
+            [250, 700, 1400, 2400, 3200].forEach(delay => {
+                const timerId = window.setTimeout(() => {
+                    if (initialMainlandViewLocked) {
+                        enforceInitialMainlandView();
+                    }
+                }, delay);
+                initialMainlandViewTimers.push(timerId);
+            });
+
+            const unlockTimerId = window.setTimeout(() => {
+                releaseInitialMainlandViewLock();
+            }, 3600);
+            initialMainlandViewTimers.push(unlockTimerId);
 
             window.addEventListener("resize", () => map.invalidateSize());
             setTimeout(() => map.invalidateSize(), 300);
